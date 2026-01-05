@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RecordServiceForm() {
    const [form, setForm] = useState({
@@ -33,7 +34,7 @@ export default function RecordServiceForm() {
       { value: 'fl', label: 'Front Left (FL)' },
       { value: 'rr', label: 'Rear Right (RR)' },
       { value: 'rl', label: 'Rear Left (RL)' },
-      
+      { value: 'N/A', label: 'N/A' },
    ];
 
    function handleChange(e) {
@@ -45,6 +46,9 @@ export default function RecordServiceForm() {
       console.log('Submitting service record:', form);
       // TODO: send to API route
    }
+
+   // for cancel button
+   const router = useRouter();
 
    return (
       <form
@@ -88,46 +92,67 @@ export default function RecordServiceForm() {
                ))}
             </select>
          </div>
-  {/* Location */}
-<div>
-  <label className="block font-medium mb-2">Location</label>
 
-  <div className="grid grid-cols-2 gap-3">
-    {locations.map((loc) => (
-      <label key={loc.value} className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          value={loc.value}
-          checked={form.location.includes(loc.value)}
-          onChange={(e) => {
-            const value = e.target.value;
-            let updated;
+         {/* Location */}
+         <div>
+            <label className="block font-medium mb-2">Location</label>
 
-            if (form.location.includes(value)) {
-              updated = form.location.filter((l) => l !== value);
-            } else {
-              updated = [...form.location, value];
-            }
+            <div className="grid grid-cols-2 gap-3">
+               {locations.map((loc) => {
+                  return (
+                     <label
+                        key={loc.value}
+                        className="flex items-center gap-2 cursor-pointer"
+                     >
+                        <input
+                           type="checkbox"
+                           value={loc.value}
+                           checked={form.location.includes(loc.value)}
+                           onChange={(e) => {
+                              const value = e.target.value;
+                              let updated = [...form.location];
 
-            // If anything other than N/A is selected, remove N/A
-            if (updated.length > 1 && updated.includes("na")) {
-              updated = updated.filter((l) => l !== "na");
-            }
+                              // Toggle selection
+                              if (updated.includes(value)) {
+                                 updated = updated.filter((l) => l !== value);
+                              } else {
+                                 updated.push(value);
+                              }
 
-            // If nothing selected, default back to N/A
-            if (updated.length === 0) {
-              updated = ["na"];
-            }
+                              // If selecting anything other than N/A → remove N/A
+                              if (updated.length > 1 && updated.includes('N/A')) {
+                                 updated = updated.filter((l) => l !== 'N/A');
+                              }
 
-            setForm({ ...form, location: updated });
-          }}
-          className="h-4 w-4"
-        />
-        {loc.label}
-      </label>
-    ))}
-  </div>
-</div>
+                              // If nothing selected → default back to N/A
+                              if (updated.length === 0) {
+                                 updated = ['N/A'];
+                              }
+
+                              //   // Group logic:
+                              //   // Selecting "front" auto-selects FL + FR
+                              //   if (value === "front" && !form.location.includes("front")) {
+                              //     updated = updated.filter((l) => !["fl", "fr"].includes(l));
+                              //     updated.push("fl", "fr");
+                              //   }
+
+                              //   // Selecting "rear" auto-selects RL + RR
+                              //   if (value === "rear" && !form.location.includes("rear")) {
+                              //     updated = updated.filter((l) => !["rl", "rr"].includes(l));
+                              //     updated.push("rl", "rr");
+                              //   }
+
+                              setForm({ ...form, location: updated });
+                           }}
+                           className="h-4 w-4"
+                        />
+
+                        <span>{loc.label}</span>
+                     </label>
+                  );
+               })}
+            </div>
+         </div>
 
          {/* Date */}
          <div>
@@ -170,12 +195,22 @@ export default function RecordServiceForm() {
          </div>
 
          {/* Submit */}
-         <button
-            type="submit"
-            className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-         >
-            Save Service Record
-         </button>
+         <div className="flex justify-between items-center mt-6 px-3">
+            <button
+               type="submit"
+               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+               Save Service
+            </button>
+
+            <button
+               type="button"
+               onClick={() => router.back()}
+               className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
+            >
+               Cancel
+            </button>
+         </div>
       </form>
    );
 }
