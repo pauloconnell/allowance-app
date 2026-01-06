@@ -27,7 +27,7 @@ export default async function VehiclePage({ params }: Props) {
                Back to Dashboard
             </Link>
             <Link
-               href={`/vehicles/${id}/edit`}
+               href={`/protectedPages/vehicles/${id}/edit`}
                className="bg-yellow-600 text-white px-4 py-2 rounded-lg"
             >
                Edit Vehicle

@@ -22,7 +22,7 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
          {vehicles.map((v) => (
             <Link
                key={v._id}
-               href={`/vehicles/${v._id}`}
+               href={`/protectedPages/vehicles/${v._id}`}
                className="p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition"
             >
                <div className="font-medium">
