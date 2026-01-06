@@ -2,6 +2,7 @@ import { getSession } from "@auth0/nextjs-auth0";
 
 const session = await getSession(); 
 const href = session ? "/protectedPages/dashboard" : "/api/auth/login?screen_hint=signup";
+const isLoggedIn = !!session;
 
 export default function Home() {
   return (
@@ -25,7 +26,7 @@ export default function Home() {
               href={href}
               className="inline-block px-8 pt-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg shadow-lg transition"
            >
-              Get Started
+              {isLoggedIn ? "Dashboard" : "Get Started"}
            </a>
         </section>
 
@@ -87,7 +88,7 @@ export default function Home() {
               href={href}
               className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg shadow-lg transition"
            >
-              Create Your Account
+               {isLoggedIn ? "Dashboard" : "Create Your Account"}
            </a>
         </section>
      </div>
