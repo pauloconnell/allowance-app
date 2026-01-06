@@ -7,7 +7,7 @@ export default function RecordServiceForm({ prefill, vehicles }) {
    const isWorkOrder = prefill.serviceType?.trim().toLowerCase() === 'work order';
 
    const [form, setForm] = useState({
-      vehicleId: prefill.id,
+      vehicleId: prefill.vehicleId,
       serviceType: prefill.serviceType,
       // Only one of these matters depending on mode
       date: isWorkOrder ? '' : new Date().toISOString().split('T')[0],

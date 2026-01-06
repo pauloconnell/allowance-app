@@ -13,7 +13,7 @@ export default async function VehiclePage({ params }: Props) {
 
    // Fetch vehicle + service history from MongoDB
    const vehicle = await getVehicleById(vehicleId);
-   console.log({ vehicle });
+   console.log('vehicle page:',{vehicleId}, { vehicle });
    const history = await getServiceHistory(vehicleId);
 
    return (
@@ -39,7 +39,7 @@ export default async function VehiclePage({ params }: Props) {
             {vehicle?.year} {vehicle?.make} {vehicle?.model} Name: {vehicle?.name}
          </h1>
          <h2>
-            KM:{vehicle.mileage}
+            KM:{vehicle?.mileage}
          </h2>
 
          {/* Action Buttons */}
@@ -48,7 +48,7 @@ export default async function VehiclePage({ params }: Props) {
                href={{
                   pathname: '/protectedPages/record-service',
                   query: {
-                     id,
+                     vehicleId,
                      serviceType: 'Work Order',
                      location: 'na',
                      mileage: vehicle?.mileage
@@ -63,7 +63,7 @@ export default async function VehiclePage({ params }: Props) {
                href={{
                   pathname: '/protectedPages/record-service',
                   query: {
-                     id,
+                     vehicleId,
                      serviceType: 'Inspection',
                      name: vehicle?.name,
                      location: 'na',
@@ -78,7 +78,7 @@ export default async function VehiclePage({ params }: Props) {
                href={{
                   pathname: '/protectedPages/record-service',
                   query: {
-                     id,
+                     vehicleId,
                      name: vehicle?.name,
                   },
                }}

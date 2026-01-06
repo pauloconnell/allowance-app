@@ -13,7 +13,7 @@ export async function PUT(req: Request, { params }) {
       body.mileage = Number(body.mileage.toString().replace(/,/g, ""));
     }
 
-    const updated = await Vehicle.findByIdAndUpdate(params.id, body, {
+    const updated = await Vehicle.findByIdAndUpdate(params.vehicleId, body, {
       new: true,
     });
 
