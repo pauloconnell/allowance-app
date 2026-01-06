@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export default async function DashboardPage() {
     const vehicles = await getAllVehicles();
+    
   return (
     <div className="min-h-screen bg-gray-50"> 
       {/* Same background as homepage */}

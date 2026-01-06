@@ -9,7 +9,7 @@ export async function getVehicleById(id: string) {
 
 export async function getAllVehicles() {
    await connectDB();
-   const vehicles = await await Vehicle.find();
+   const vehicles = await Vehicle.find().lean();
    return vehicles.map((v) => ({ 
     ...v, 
     _id: v._id.toString(),
