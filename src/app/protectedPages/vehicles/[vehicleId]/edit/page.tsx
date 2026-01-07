@@ -19,7 +19,7 @@ export default async function EditVehiclePage({ params }) {
       {/* Back Button */}
       <div className="flex justify-between items-center mb-6 mt-3 mx-6">
         <Link
-          href={`/vehicles/${id}`}
+          href={`/protectedPages/vehicles/${id}`}
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
         >
           Back to Vehicle

@@ -63,7 +63,7 @@ export default function RecordServiceForm({ prefill, vehicles }) {
       });
 
       if (res.ok) {
-         router.push(`/vehicles/${form.vehicleId}`);
+         router.push(`/protectedPages/vehicles/${form.vehicleId}`);
       } else {
          alert('Failed to save record');
       }

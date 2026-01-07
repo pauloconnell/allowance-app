@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getVehicleById, getServiceHistory } from '@/lib/vehicles';
+import ServiceDue from "@/components/RecordService/ServiceDue";
 //import { requireAuth } from '@/lib/requireAuth';
 
 interface Props {
@@ -83,6 +84,12 @@ export default async function VehiclePage({ params }: Props) {
                Record Service
             </Link>
          </div>
+
+            {/* Service Due */}
+                 <section className="flex flex-col gap-6">
+                   <h2 className="text-2xl font-semibold">Service Due</h2>
+                   <ServiceDue />
+                 </section>
 
          {/* Service History */}
          <div>

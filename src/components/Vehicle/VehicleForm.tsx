@@ -47,7 +47,7 @@ export default function VehicleForm({ vehicle }: VehicleFormProps) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
          });
-         router.push(`/vehicles/${vehicle._id}`);
+         router.push(`/protectedPages/vehicles/${vehicle._id}`);
          router.refresh();
       } else {
          // CREATE new vehicle
