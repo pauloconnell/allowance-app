@@ -13,7 +13,7 @@ export default async function NewWorkOrderPage({ params, searchParams }) {
    // Pre-fill the form with the vehicleId and default Work Order values
    const prefill = {
       vehicleId,
-      serviceType: 'Work Order',
+      status: 'open',
       mileage: vehicle?.mileage ?? '',
       name: vehicle?.name ?? '',
       type: vehicle?.type ?? '',

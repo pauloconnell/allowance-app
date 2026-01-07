@@ -48,7 +48,7 @@ export default async function VehiclePage({ params }: Props) {
          <div className="flex gap-4">
             <Link
                href={{
-                  pathname: `/protectedPages/work-orders/${vehicleId}/new`,
+                  pathname: `/protectedPages/work-orders/new/${vehicleId}`,
                   query: { vehicle: JSON.stringify(vehicle), // pass full object 
                   },
                }}

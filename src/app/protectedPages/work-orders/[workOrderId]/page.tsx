@@ -12,6 +12,7 @@ export default async function WorkOrderDetailPage({ params, searchParams }) {
       serviceType: searchParams.serviceType || '',
       location: searchParams.location || '',
       mileage: searchParams.mileage || '',
+      status: searchParams.status || 'open',
       serviceDueDate: searchParams.serviceDueDate || '',
       name: searchParams.name || '',
       type: searchParams.type || '',
