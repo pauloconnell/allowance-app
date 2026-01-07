@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
 import DeleteWorkOrderButton from '@/components/Buttons/DeleteWorkOrderButton';
+import { toast } from "react-hot-toast"; 
 
 export default function WorkOrderForm({ prefill, vehicles }) {
    const router = useRouter();
@@ -52,7 +53,7 @@ export default function WorkOrderForm({ prefill, vehicles }) {
 
    async function handleSubmit(e) {
       e.preventDefault();
-
+      console.log("submitted to API:",form);
       const res = await fetch('/api/work-orders', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },

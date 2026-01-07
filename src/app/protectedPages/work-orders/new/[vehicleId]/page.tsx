@@ -1,5 +1,5 @@
 import { getAllVehicles } from '@/lib/vehicles';
-import RecordServiceForm from '@/components/RecordService/RecordServiceForm';
+import WorkOrderForm from '@/components/Forms/WorkOrderForm';
 
 export default async function NewWorkOrderPage({ params, searchParams }) {
    const { vehicleId } = params;
@@ -25,7 +25,7 @@ export default async function NewWorkOrderPage({ params, searchParams }) {
          <div className="max-w-3xl mx-auto px-6 py-16">
             <h1 className="text-3xl font-semibold mb-8">Create Work Order</h1>
 
-            <RecordServiceForm prefill={prefill} vehicles={vehicles} />
+            <WorkOrderForm prefill={prefill} vehicles={vehicles} />
          </div>
       </div>
    );
