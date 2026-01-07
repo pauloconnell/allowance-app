@@ -3,11 +3,11 @@ import { getAllVehicles } from '@/lib/vehicles';
 
 export default async function WorkOrderDetailPage({ params, searchParams }) {
    const { workOrderId } = params;
-   const workOrder = searchParams?.workOrder ? JSON.parse(searchParams?.workOrder) : null;
+   
 
    // Build a plain prefill object from searchParams
    const prefill = {
-      _id: workOrderId,
+      workOrderId,
       vehicleId: searchParams.vehicleId || '',
       serviceType: searchParams.serviceType || '',
       location: searchParams.location || '',
@@ -17,7 +17,7 @@ export default async function WorkOrderDetailPage({ params, searchParams }) {
       type: searchParams.type || '',
       year: searchParams.year || '',
    };
-   console.log('work order view page got ', workOrder, searchParams, prefill);
+   console.log('work order view page got ', workOrderId, searchParams, prefill);
 
    // Fetch all vehicles (for dropdowns, names, etc.)
    const vehicles = JSON.parse(JSON.stringify(await getAllVehicles()));
