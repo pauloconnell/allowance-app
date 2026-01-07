@@ -7,7 +7,7 @@ const WorkOrderSchema = new mongoose.Schema(
     notes: { type: String, default: "" },
     mileage: { type: Number, required: true },
     status: { type: String, enum: ["open", "completed"], default: "open" },
-    dueDate: { type: Date, default: null },
+    serviceDueDate: { type: Date, default: null },
   },
   { timestamps: true }
 );

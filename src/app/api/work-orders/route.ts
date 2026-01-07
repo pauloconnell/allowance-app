@@ -45,3 +45,43 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Failed to fetch work orders' }, { status: 500 });
    }
 }
+
+
+export async function DELETE(req) {
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Missing work order ID" },
+        { status: 400 }
+      );
+    }
+
+    const deleted = await WorkOrder.findOneAndDelete({
+      $or: [{ _id: id }, { workOrderId: id }],
+    }).lean();
+
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "Work order not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      ...deleted,
+      _id: deleted._id.toString(),
+      vehicleId: deleted.vehicleId?.toString?.() ?? "",
+    });
+  } catch (err) {
+    console.error("Failed to delete work order:", err);
+    return NextResponse.json(
+      { error: "Failed to delete work order" },
+      { status: 500 }
+    );
+  }
+}

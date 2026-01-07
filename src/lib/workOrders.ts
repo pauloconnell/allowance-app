@@ -35,3 +35,20 @@ export async function getWorkOrdersForVehicle(vehicleId) {
     updatedAt: wo.updatedAt?.toISOString?.() ?? null,
   }));
 }
+
+
+export async function deleteWorkOrder(id: string) {
+  await connectDB();
+
+  const deleted = await WorkOrder.findOneAndDelete({
+    $or: [{ _id: id }, { workOrderId: id }],
+  }).lean();
+
+  return deleted
+    ? {
+        ...deleted,
+        _id: deleted._id.toString(),
+        vehicleId: deleted.vehicleId?.toString?.() ?? "",
+      }
+    : null;
+}

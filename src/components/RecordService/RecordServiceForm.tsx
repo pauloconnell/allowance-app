@@ -6,14 +6,15 @@ import { useRouter } from 'next/navigation';
 export default function RecordServiceForm({ prefill, vehicles }) {
    const isWorkOrder = prefill.serviceType?.trim().toLowerCase() === 'work order';
 
-   const derivedVehicleId = prefill.vehicleId ?? prefill._id?.toString?.() ?? '';
+   const derivedVehicleId = prefill.vehicleId ?? '';
 
    const [form, setForm] = useState({
+      _id: isWorkOrder ? prefill._id?.toString() : null,
       vehicleId: derivedVehicleId,
       serviceType: prefill.serviceType,
       // Only one of these matters depending on mode
       date: isWorkOrder ? '' : new Date().toISOString().split('T')[0],
-      serviceDue: isWorkOrder ? prefill.serviceDue || '' : '',
+      serviceDueDate: isWorkOrder ? prefill.serviceDueDate || '' : '',
       mileage: prefill.mileage ?? 0,
       location: prefill.location?.split(',') ?? ['na'],
       notes: '',
@@ -227,6 +228,21 @@ export default function RecordServiceForm({ prefill, vehicles }) {
                Save Service
             </button>
 
+            <button
+               type="button"
+               onClick={async () => {
+                  console.log("delete", form)
+                  if (!form._id) return;
+                  const ok = window.confirm(
+                     'Are you sure you want to delete this work order? This cannot be undone.'
+                  );
+                  if (!ok) return;
+                  await fetch(`/api/work-orders?id=${form._id}`, { method: 'DELETE' });
+               }}
+               className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
+            >
+               Delete this work order
+            </button>
             <button
                type="button"
                onClick={() => router.back()}

@@ -1,18 +1,32 @@
+"use client"
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 
-export default function ServiceDue() {
-   const workOrders = [
-      {
-         title: 'Oil Change',
-         name: '2014 Subaru Forester',
-         vehicleId: 'subaru-forester',
-         due: '2026-01-10',
-         dueKM: '220000',
-         serviceType: 'Oil Change',
-         location: 'N/A',
-      },
-   ];
+
+
+export default function ServiceDue({ vehicleId }) {
+   const [workOrders, setWorkOrders] = useState([]);
+   const [loading, setLoading] = useState(true);
+   useEffect(() => {
+      async function load() {
+         try {
+            const url = vehicleId
+               ? `/api/work-orders?vehicleId=${vehicleId}`
+               : `/api/work-orders`;
+            const res = await fetch(url);
+            const data = await res.json();
+            setWorkOrders(data);
+         } catch (err) {
+            console.error('Failed to load work orders', err);
+         } finally {
+            setLoading(false);
+         }
+      }
+      load();
+   }, [vehicleId]);
+   if (loading) return <div>Loading…</div>;
+   //if (workOrders.length === 0) return <div className="text-gray-500">No outstanding work orders</div>;
 
    return (
       <div className="border rounded-lg p-4 bg-white shadow-sm">
@@ -21,7 +35,7 @@ export default function ServiceDue() {
          <ul className="space-y-3">
             {workOrders.map((wo) => (
                <li
-                  key={wo.vehicleId}
+                  key={wo._id}
                   className="p-3 border rounded-lg hover:bg-gray-50 transition"
                >
                   <Link
@@ -31,6 +45,8 @@ export default function ServiceDue() {
                            vehicleId: wo.vehicleId,
                            serviceType: wo.serviceType,
                            location: wo.location,
+                           _id: wo._id,
+                           serviceDueDate: wo.serviceDueDate
                         },
                      }}
                   >
