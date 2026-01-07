@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function RecordServiceForm({ prefill, vehicles }) {
    const isWorkOrder = prefill.serviceType?.trim().toLowerCase() === 'work order';
-
+   console.log("form component getting ", prefill, isWorkOrder)
    const derivedVehicleId = prefill.vehicleId ?? '';
 
    const [form, setForm] = useState({
@@ -232,7 +232,10 @@ export default function RecordServiceForm({ prefill, vehicles }) {
                type="button"
                onClick={async () => {
                   console.log("delete", form)
-                  if (!form._id) return;
+                  if (!form._id){
+                     alert("Cannot delete: missing work order ID");
+                     return;
+                  } 
                   const ok = window.confirm(
                      'Are you sure you want to delete this work order? This cannot be undone.'
                   );

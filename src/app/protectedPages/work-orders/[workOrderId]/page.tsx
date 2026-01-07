@@ -1,24 +1,34 @@
-import RecordServiceForm from "@/components/RecordService/RecordServiceForm";
-import { getAllVehicles } from "@/lib/vehicles";
+import RecordServiceForm from '@/components/RecordService/RecordServiceForm';
+import { getAllVehicles } from '@/lib/vehicles';
 
-export default function WorkOrderDetailPage({ searchParams }) {
-  const workOrder = searchParams.workOrder
-    ? JSON.parse(searchParams.workOrder)
-    : null;
+export default async function WorkOrderDetailPage({ params, searchParams }) {
+   const { workOrderId } = params;
+   const workOrder = searchParams?.workOrder ? JSON.parse(searchParams?.workOrder) : null;
 
-    console.log("work order view page got ", workOrder)
+   // Build a plain prefill object from searchParams
+   const prefill = {
+      _id: workOrderId,
+      vehicleId: searchParams.vehicleId || '',
+      serviceType: searchParams.serviceType || '',
+      location: searchParams.location || '',
+      mileage: searchParams.mileage || '',
+      serviceDueDate: searchParams.serviceDueDate || '',
+      name: searchParams.name || '',
+      type: searchParams.type || '',
+      year: searchParams.year || '',
+   };
+   console.log('work order view page got ', workOrder, searchParams, prefill);
 
-     // Fetch all vehicles (for dropdowns, names, etc.)
-       const vehicles = JSON.parse(JSON.stringify(getAllVehicles()));
-    
+   // Fetch all vehicles (for dropdowns, names, etc.)
+   const vehicles = JSON.parse(JSON.stringify(await getAllVehicles()));
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-6 py-16">
-        <h1 className="text-3xl font-semibold mb-8">Work Order Details</h1>
+   return (
+      <div className="min-h-screen bg-gray-50">
+         <div className="max-w-3xl mx-auto px-6 py-16">
+            <h1 className="text-3xl font-semibold mb-8">Work Order Details</h1>
 
-        <RecordServiceForm prefill={workOrder} vehicles={vehicles} />
+            <RecordServiceForm prefill={prefill} vehicles={vehicles} />
+         </div>
       </div>
-    </div>
-  );
+   );
 }
