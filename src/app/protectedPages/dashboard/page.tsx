@@ -1,6 +1,6 @@
 import ServiceDue from "@/components/Dashboard/ServiceDue/ServiceDue";
 import { getAllVehicles } from "@/lib/vehicles";
-import VehicleList from "@/components/Vehicle/VehicleList";
+import VehicleList from "@/components/Forms/Vehicle/VehicleList";
 import Link from "next/link";
 
 export default async function DashboardPage() {

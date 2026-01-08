@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Vehicle from "@/models/Vehicle";
 import { connectDB } from "@/lib/mongodb";
 
+
 export async function PUT(req: Request, { params }) {
   try {
     await connectDB();

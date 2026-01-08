@@ -1,5 +1,5 @@
 import Link from "next/link";
-import VehicleForm from "@/components/Vehicle/VehicleForm";
+import VehicleForm from "@/components/Forms/Vehicle/VehicleForm";
 
 export default function NewVehiclePage() {
   // No vehicle passed → VehicleForm will use empty defaults

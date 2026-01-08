@@ -10,7 +10,9 @@ interface DeleteWorkOrderButtonProps {
 export default function DeleteWorkOrderButton({ workOrderId }: DeleteWorkOrderButtonProps) {
   const router = useRouter();
 
-  async function handleDelete() {
+  async function handleDelete(e) {
+    e.preventDefault(); 
+    e.stopPropagation();
     const confirmed = confirm("Are you sure you want to delete this work order?");
     if (!confirmed) return;
 
@@ -39,7 +41,7 @@ export default function DeleteWorkOrderButton({ workOrderId }: DeleteWorkOrderBu
   }
 
   return (
-    <button
+    <button type="button" 
       onClick={handleDelete}
       className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition"
     >

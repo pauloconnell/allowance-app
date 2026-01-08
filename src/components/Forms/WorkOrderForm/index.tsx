@@ -4,23 +4,24 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
 import DeleteWorkOrderButton from '@/components/Buttons/DeleteWorkOrderButton';
-import { toast } from "react-hot-toast"; 
+import { toast } from 'react-hot-toast';
 
 export default function WorkOrderForm({ prefill, vehicles }) {
    const router = useRouter();
 
    const [form, setForm] = useState({
-      workOrderId: prefill.workOrderId?.toString(),
+      workOrderId: prefill?.workOrderId ? prefill.workOrderId.toString() : '',
       vehicleId: prefill.vehicleId ?? '',
-      serviceType: prefill.serviceType,
+      serviceType: prefill?.serviceType ?? '',
       serviceDueDate: prefill.serviceDueDate || '',
       serviceDueKM: prefill.serviceDueKM || '',
-      mileage: prefill.mileage ?? 0,
+      mileage: prefill.mileage ?? '',
       location: prefill.location?.split(',') ?? ['N/A'],
       notes: prefill.notes ?? '',
    });
+  
 
-   console.log("does prefill have notes:", form.notes, prefill)
+   console.log('does prefill have notes:', form.notes, prefill);
    const serviceTypes = [
       'Oil Change',
       'Air Filter Replacement',
@@ -54,19 +55,28 @@ export default function WorkOrderForm({ prefill, vehicles }) {
 
    async function handleSubmit(e) {
       e.preventDefault();
-      console.log("submitted to API:",form);
-      const res = await fetch('/api/work-orders', {
-         method: 'POST',
+      console.log('submitted to API:', form);
+
+      const isEditing = Boolean(form.workOrderId);    // allow updates when viewing work order(add notes ect)
+      const url = isEditing ? `/api/work-orders/${form.workOrderId}` : `/api/work-orders`;
+      const method = isEditing ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+         method,
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(form),
       });
 
+      // const res = await fetch('/api/work-orders', {
+      //    method: 'POST',
+      //    headers: { 'Content-Type': 'application/json' },
+      //    body: JSON.stringify(form),
+      // });
+
       if (res.ok) {
-      
-        toast.success("Work order saved");
+         toast.success('Work order saved');
          router.push(`/protectedPages/vehicles/${form.vehicleId}`);
       } else {
-        toast.error("Failed to save work order");
+         toast.error('Failed to save work order');
          alert('Failed to save work order');
       }
    }
@@ -117,7 +127,8 @@ export default function WorkOrderForm({ prefill, vehicles }) {
             </button>
 
             {prefill.workOrderId && (
-               <DeleteWorkOrderButton workOrderId={form.workOrderId} />
+               
+               <DeleteWorkOrderButton workOrderId={prefill.workOrderId} />
             )}
             <button
                type="button"
