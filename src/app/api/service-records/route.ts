@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServiceRecord } from "@/lib/vehicles";
+import { createServiceRecord } from "@/lib/serviceRecords";
 
 //POST /api/service-records
 

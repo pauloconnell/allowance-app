@@ -16,8 +16,31 @@ export default function ServiceRecordForm({ prefill, vehicles }) {
     notes: "",
   });
 
-  const serviceTypes = [...];
-  const locations = [...];
+    const serviceTypes = [
+      'Oil Change',
+      'Air Filter Replacement',
+      'Tire Rotation',
+      'Tire Replacement',
+      'Brake Caliper Service',
+      'Brake Pads Replace',
+      'Brake Fluid bleed',
+      'Belt Change',
+      'Power Steering Fluid Flush',
+      'Coolant Flush',
+      'Transmission Service',
+      'Inspection',
+      'Electrical work(see notes)',
+      'Other',
+   ];
+   const locations = [
+      { value: 'front', label: 'Front' },
+      { value: 'rear', label: 'Rear' },
+      { value: 'fr', label: 'Front Right (FR)' },
+      { value: 'fl', label: 'Front Left (FL)' },
+      { value: 'rr', label: 'Rear Right (RR)' },
+      { value: 'rl', label: 'Rear Left (RL)' },
+      { value: 'N/A', label: 'N/A' },
+   ]; 
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,7 +48,7 @@ export default function ServiceRecordForm({ prefill, vehicles }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
+    console.log('about to save ', form)
     const res = await fetch("/api/service-records", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
