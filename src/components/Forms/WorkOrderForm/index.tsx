@@ -11,16 +11,9 @@ export default function WorkOrderForm({ workOrderId, vehicles }) {
    const router = useRouter();
    const storeWO = useWorkOrderStore((s) => s.selectedWorkOrder);
    const fetchWorkOrder = useWorkOrderStore((s) => s.fetchWorkOrder);
-   // Fetch on refresh
-   useEffect(() => {
-      // If store is empty OR store has a different workOrderId, fetch it
-      if (!storeWO || storeWO._id !== workOrderId) {
-         fetchWorkOrder(workOrderId);
-      }
-   }, [storeWO, workOrderId, fetchWorkOrder]);
 
 
-   console.log("vehicleId issue?", storeWO)
+   console.log('vehicleId issue?', storeWO);
    const [form, setForm] = useState({
       workOrderId: workOrderId.toString(),
       vehicleId: storeWO?.vehicleId ?? '',
@@ -32,6 +25,36 @@ export default function WorkOrderForm({ workOrderId, vehicles }) {
       notes: storeWO?.notes ?? '',
       completedBy: storeWO?.completedBy ?? '',
    });
+
+
+   // Fetch on refresh
+   useEffect(() => {
+      // If store is empty OR store has a different workOrderId, fetch it
+      if (!storeWO || storeWO._id !== workOrderId) {
+         fetchWorkOrder(workOrderId);
+      }
+   }, [storeWO, workOrderId, fetchWorkOrder]);
+
+   
+   useEffect(() => {
+      if (storeWO) {
+         setForm({
+            workOrderId: workOrderId.toString(),
+            vehicleId: storeWO.vehicleId ?? '',
+            serviceType: storeWO.serviceType ?? '',
+            serviceDueDate: storeWO.serviceDueDate
+               ? storeWO.serviceDueDate.split('T')[0]
+               : '',
+            serviceDueKM: storeWO.serviceDueKM ?? '',
+            mileage: storeWO.mileage ?? '',
+            location: storeWO.location ?? ['N/A'],
+            notes: storeWO.notes ?? '',
+            completedBy: storeWO.completedBy ?? '',
+         });
+      }
+   }, [storeWO, workOrderId]);
+
+
 
    // Build a plain prefill object from searchParams OR Zustand Store
    if (!storeWO) {
@@ -189,9 +212,7 @@ export default function WorkOrderForm({ workOrderId, vehicles }) {
                Save Work Order
             </button>
 
-            {workOrderId && (
-               <DeleteWorkOrderButton workOrderId={workOrderId} />
-            )}
+            {workOrderId && <DeleteWorkOrderButton workOrderId={workOrderId} />}
             <button
                type="button"
                onClick={() => router.back()}
