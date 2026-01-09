@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IWorkOrder } from '@/types/workorder';
-import { useWorkOrderStore } from "@/store/useWorkOrderStore";
+import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 
 export default function ServiceDue({ vehicleId }) {
    const [workOrders, setWorkOrders] = useState<IWorkOrder[]>([]);
@@ -50,17 +50,20 @@ export default function ServiceDue({ vehicleId }) {
                >
                   <Link
                      href={`/protectedPages/work-orders/${wo._id}`}
-                      onClick={() => setSelectedWorkOrder(wo)}
-                     
+                     onClick={() => setSelectedWorkOrder(wo)}
                   >
-                     <div className="font-medium">{wo.serviceType}</div>
-                     <div className="text-sm text-gray-600">
-                        
+                     <div className="text-center font-extrabold text-lg mb-2">
+                     {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre> */}
+                        {wo?.vehicleId}
                      </div>
+                     <div className="font-medium">{wo.serviceType}</div>
+                     <div className="text-sm text-gray-600"></div>
                      <div className="text-sm text-gray-500">
                         Service Due: {wo.serviceDueDate}
                      </div>
-                     <div className="text-sm text-gray-500">Service Due @: {wo.serviceDueKM} KM</div>
+                     <div className="text-sm text-gray-500">
+                        Service Due @: {wo.serviceDueKM} KM
+                     </div>
                   </Link>
                </li>
             ))}
