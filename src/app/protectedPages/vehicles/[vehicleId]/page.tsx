@@ -15,6 +15,8 @@ export default async function VehiclePage({ params }: Props) {
 
    // Fetch vehicle + service history from MongoDB
    const vehicle = await getVehicleById(vehicleId);
+
+
    console.log('vehicle page:',{vehicleId}, { vehicle });
    const history = await getServiceHistory(vehicleId);
 
@@ -59,7 +61,7 @@ export default async function VehiclePage({ params }: Props) {
 
             <Link
                href={{
-                  pathname: '/protectedPages/record-service',
+                  pathname: `/protectedPages/record-service/vehicleId`,
                   query: {
                      vehicleId,
                      serviceType: 'Inspection',
@@ -89,7 +91,7 @@ export default async function VehiclePage({ params }: Props) {
             {/* Service Due */}
                  <section className="flex flex-col gap-6">
                    <h2 className="text-2xl font-semibold">Service Due</h2>
-                   <ServiceDue />
+                   <ServiceDue vehicleId={vehicleId}/>
                  </section>
 
          {/* Service History */}

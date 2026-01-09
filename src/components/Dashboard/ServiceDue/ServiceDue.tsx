@@ -3,13 +3,18 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IWorkOrder } from '@/types/workorder';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
+import { useVehicleStore } from '@/store/useVehicleStore';
+interface ServiceDueProps {
+   vehicleId: string;
+}
 
-export default function ServiceDue({ vehicleId }) {
+export default function ServiceDue({ vehicleId }: ServiceDueProps) {
    const [workOrders, setWorkOrders] = useState<IWorkOrder[]>([]);
    const [loading, setLoading] = useState(true);
 
-   // use Zustand store to contain the Work Order details
+   // use Zustand store to contain the Work Order details and vehicle details
    const setSelectedWorkOrder = useWorkOrderStore((wo) => wo.setSelectedWorkOrder);
+   const { selectedVehicle, fetchVehicle } = useVehicleStore();
 
    useEffect(() => {
       async function load() {
@@ -35,8 +40,20 @@ export default function ServiceDue({ vehicleId }) {
       }
       load();
    }, [vehicleId]);
+
+   // if passed vehicleId in URL, then populate store with vehicle details
+   useEffect(() => {
+      if (vehicleId && !selectedVehicle) {
+         fetchVehicle(vehicleId);
+      }
+   }, [vehicleId, selectedVehicle]);
+
+
+
    if (loading) return <div>Loading…</div>;
    //if (workOrders.length === 0) return <div className="text-gray-500">No outstanding work orders</div>;
+
+   
 
    return (
       <div className="border rounded-lg p-4 bg-white shadow-sm">
@@ -53,8 +70,8 @@ export default function ServiceDue({ vehicleId }) {
                      onClick={() => setSelectedWorkOrder(wo)}
                   >
                      <div className="text-center font-extrabold text-lg mb-2">
-                     {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre> */}
-                        {wo?.vehicleId}
+                        {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre> */}
+                       {selectedVehicle?.name ?? ''} {wo?.vehicleId}
                      </div>
                      <div className="font-medium">{wo.serviceType}</div>
                      <div className="text-sm text-gray-600"></div>

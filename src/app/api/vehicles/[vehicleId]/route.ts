@@ -27,3 +27,15 @@ export async function PUT(req: Request, { params }) {
     );
   }
 }
+
+export async function GET(req: Request, { params }) {
+  const { vehicleId } = params;
+
+  const vehicle = await Vehicle.findById(vehicleId);
+  if (!vehicle) {
+    return new Response(JSON.stringify({ error: `Not found, id:${vehicleId}` }), { status: 404 });
+  }
+
+  return new Response(JSON.stringify(vehicle), { status: 200 });
+}
+

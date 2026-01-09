@@ -6,45 +6,69 @@ import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
 import DeleteWorkOrderButton from '@/components/Buttons/DeleteWorkOrderButton';
 import { toast } from 'react-hot-toast';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
+import { useVehicleStore } from '@/store/useVehicleStore';
 
-export default function WorkOrderForm({ workOrderId, vehicles }) {
+export default function WorkOrderForm({ workOrderId, prefill, vehicles }) {
    const router = useRouter();
+
+   // Zustand stores
    const storeWO = useWorkOrderStore((s) => s.selectedWorkOrder);
    const fetchWorkOrder = useWorkOrderStore((s) => s.fetchWorkOrder);
 
+   const selectedVehicle = useVehicleStore((state) => state.selectedVehicle);
+   const fetchVehicle = useVehicleStore((state) => state.fetchVehicle);
 
-   console.log('vehicleId issue?', storeWO);
-   const [form, setForm] = useState({
-      workOrderId: workOrderId.toString(),
-      vehicleId: storeWO?.vehicleId ?? '',
-      serviceType: storeWO?.serviceType ?? '',
-      serviceDueDate: storeWO?.serviceDueDate ? storeWO.serviceDueDate.split('T')[0] : '',
-      serviceDueKM: storeWO?.serviceDueKM ?? '',
-      mileage: storeWO?.mileage ?? '',
-      location: storeWO?.location ?? ['N/A'],
-      notes: storeWO?.notes ?? '',
-      completedBy: storeWO?.completedBy ?? '',
-   });
+   //console.log('vehicleId issue?', storeWO);
 
+   // Determine mode const
+   const isEditing = Boolean(workOrderId);
 
-   // Fetch on refresh
+   //  1) Fetch Work Order (editing only)
    useEffect(() => {
-      // If store is empty OR store has a different workOrderId, fetch it
-      if (!storeWO || storeWO._id !== workOrderId) {
-         fetchWorkOrder(workOrderId);
+      if (isEditing) {
+         if (!storeWO || storeWO._id !== workOrderId) {
+            // If store is empty OR store has a different workOrderId, fetch it
+            fetchWorkOrder(workOrderId);
+         }
       }
-   }, [storeWO, workOrderId, fetchWorkOrder]);
+   }, [isEditing, storeWO, workOrderId, fetchWorkOrder]);
 
-   
-   useEffect(() => {
-      if (storeWO) {
-         setForm({
-            workOrderId: workOrderId.toString(),
+   // 2) Form State
+   const [form, setForm] = useState(() => {
+      if (isEditing && storeWO) {
+         return {
+            workOrderId: storeWO._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
-            serviceDueDate: storeWO.serviceDueDate
-               ? storeWO.serviceDueDate.split('T')[0]
-               : '',
+            serviceDueDate: storeWO.serviceDueDate?.split('T')[0] ?? '',
+            serviceDueKM: storeWO.serviceDueKM ?? '',
+            mileage: storeWO.mileage ?? '',
+            location: storeWO.location ?? ['N/A'],
+            notes: storeWO.notes ?? '',
+            completedBy: storeWO.completedBy ?? '',
+         };
+      } // New Work Order → use prefill
+      return {
+         workOrderId: '',
+         vehicleId: prefill?.vehicleId ?? '',
+         serviceType: prefill?.serviceType ?? '',
+         serviceDueDate: prefill?.serviceDueDate ?? '',
+         serviceDueKM: prefill?.serviceDueKM ?? '',
+         mileage: prefill?.mileage ?? '',
+         location: prefill?.location ?? ['N/A'],
+         notes: prefill?.notes ?? '',
+         completedBy: '',
+      };
+   });
+
+   //3 update form when storeWO loads(edit mode)
+   useEffect(() => {
+      if (isEditing && storeWO) {
+         setForm({
+            workOrderId: storeWO._id,
+            vehicleId: storeWO.vehicleId ?? '',
+            serviceType: storeWO.serviceType ?? '',
+            serviceDueDate: storeWO.serviceDueDate?.split('T')[0] ?? '',
             serviceDueKM: storeWO.serviceDueKM ?? '',
             mileage: storeWO.mileage ?? '',
             location: storeWO.location ?? ['N/A'],
@@ -52,15 +76,30 @@ export default function WorkOrderForm({ workOrderId, vehicles }) {
             completedBy: storeWO.completedBy ?? '',
          });
       }
-   }, [storeWO, workOrderId]);
+   }, [isEditing, storeWO]);
 
+   //4 fetch vehicle
 
+   const vehicleId = isEditing ? storeWO?.vehicleId : prefill?.vehicleId;
+   useEffect(() => {
+      if (vehicleId && !selectedVehicle) {
+         // add check here to ensure not stale
+         fetchVehicle(vehicleId);
+      }
+   }, [vehicleId, selectedVehicle, fetchVehicle]);
 
-   // Build a plain prefill object from searchParams OR Zustand Store
-   if (!storeWO) {
+   // 5. Block rendering ONLY when editing and store isn't loaded
+
+   if (isEditing && !storeWO) {
       return <div>Loading…</div>;
    }
-   const isEditing = Boolean(form.workOrderId);
+
+
+   
+
+
+
+
    // allow updates when viewing work order(add notes ect)
 
    console.log('does prefill have notes:', form.notes);
