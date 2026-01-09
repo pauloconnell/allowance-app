@@ -8,8 +8,8 @@ interface Props {
    params: { vehicleId: string };
 }
 
-export default async function VehiclePage({ params }: Props) {
-   const { vehicleId } = await params;
+export default async function VehiclePage({ params }: { params: { vehicleId: string } }) {
+   const { vehicleId } = params;
 
    // done in the layout for protected folder await requireAuth(); // 🔐 protect the page
 

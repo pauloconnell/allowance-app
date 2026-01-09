@@ -1,10 +1,10 @@
 import ServiceDue from "@/components/Dashboard/ServiceDue/ServiceDue";
 import { getAllVehicles } from "@/lib/vehicles";
-import VehicleList from "@/components/Forms/Vehicle/VehicleList";
+import VehicleList from "@/components/vehicle/VehicleList";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-    const vehicles = await getAllVehicles();
+    const vehicles = await getAllVehicles();      // on server so hit  DB directly
     
   return (
     <div className="min-h-screen bg-gray-50"> 
