@@ -26,10 +26,11 @@ export default function WorkOrderForm({
 
    const selectedVehicle = useVehicleStore((state) => state.selectedVehicle);
    const fetchVehicle = useVehicleStore((state) => state.fetchVehicle);
+   const setSelectedVehicle = useVehicleStore((s) => s.setSelectedVehicle);
 
    //console.log('vehicleId issue?', storeWO);
 
-   // Determine mode const
+   // Determine mode
    const isEditing = Boolean(workOrderId);
 
    //  1) Fetch Work Order (editing only)
@@ -42,10 +43,25 @@ export default function WorkOrderForm({
       }
    }, [isEditing, storeWO, workOrderId, fetchWorkOrder]);
 
+   // BLOCK URL: if No IDs → redirect
+   useEffect(() => {
+      if (!workOrderId && !vehicleId) {
+         router.push('/protectedPages/vehicles');
+      }
+   }, [workOrderId, vehicleId, router]);
+
+   // 2) derive id
+   const derivedVehicleId =
+      (isEditing ? storeWO?.vehicleId : vehicleId || selectedVehicle?._id) ?? '';
+
+   // 4) Fetch vehicle (new WO only)
+   useEffect(() => {
+      if (!isEditing && derivedVehicleId && !selectedVehicle) {
+         fetchVehicle(derivedVehicleId);
+      }
+   }, [isEditing, derivedVehicleId, selectedVehicle, fetchVehicle]);
+
    // 2) Form State
-   const derivedVehicleId = isEditing
-      ? storeWO?.vehicleId
-      : vehicleId || selectedVehicle?._id;
 
    const [form, setForm] = useState(() => {
       if (isEditing && storeWO) {
@@ -91,15 +107,7 @@ export default function WorkOrderForm({
       }
    }, [isEditing, storeWO]);
 
-   //4 fetch vehicle
-
-   useEffect(() => {
-      if (derivedVehicleId && !selectedVehicle) {
-         fetchVehicle(derivedVehicleId);
-      }
-   }, [derivedVehicleId, selectedVehicle, fetchVehicle]);
-
-   // 5. Block rendering ONLY when editing and store isn't loaded
+   // 4. Block rendering ONLY when editing and store isn't loaded
 
    if (isEditing && !storeWO) {
       return <div>Loading…</div>;
@@ -136,6 +144,13 @@ export default function WorkOrderForm({
    function handleChange(e) {
       const { name, value, type } = e.target;
       setForm({ ...form, [name]: type === 'number' ? Number(value) : value });
+      console.log("event ", name)
+      // If the user changed the vehicle dropdown, update the store
+      if (name === 'vehicleId') {
+         const v = vehicles.find((veh) => veh._id === value);
+         console.log("changed vehicle ", v)
+         setSelectedVehicle(v);
+      }
    }
 
    async function handleSubmit(e) {
@@ -147,12 +162,15 @@ export default function WorkOrderForm({
       }
       const url = isEditing ? `/api/work-orders/${form.workOrderId}` : `/api/work-orders`;
       const method = isEditing ? 'PUT' : 'POST';
+
+      const workOrderName = `${selectedVehicle.year} ${selectedVehicle.make} — ${selectedVehicle.name}`;
+      const payload = { ...form, name: workOrderName };
+      console.log('saving ', payload);
       const res = await fetch(url, {
          method,
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify(form),
+         body: JSON.stringify(payload),
       });
-
 
       if (res.ok) {
          toast.success('Work order saved');

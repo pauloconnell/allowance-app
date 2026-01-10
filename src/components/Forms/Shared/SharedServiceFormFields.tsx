@@ -16,7 +16,7 @@ export default function SharedServiceFormFields({
         <select
           name="vehicleId"
           value={form.vehicleId}
-          onChange={(e) => setForm({ ...form, vehicleId: e.target.value })}
+         onChange={handleChange}
           className="border rounded px-3 py-2 w-full"
         >
           <option value="">Select a vehicle</option>

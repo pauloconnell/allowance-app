@@ -49,11 +49,7 @@ export default async function VehiclePage({ params }: { params: { vehicleId: str
          {/* Action Buttons */}
          <div className="flex gap-4">
             <Link
-               href={{
-                  pathname: `/protectedPages/work-orders/new/${vehicleId}`,
-                  query: { vehicle: JSON.stringify(vehicle), // pass full object 
-                  },
-               }}
+               href={`/protectedPages/work-orders/new/${vehicleId}`}
                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
             >
                Create Work Order

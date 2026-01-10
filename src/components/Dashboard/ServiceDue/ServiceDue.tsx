@@ -70,8 +70,8 @@ export default function ServiceDue({ vehicleId }: ServiceDueProps) {
                      onClick={() => setSelectedWorkOrder(wo)}
                   >
                      <div className="text-center font-extrabold text-lg mb-2">
-                        {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre> */}
-                       {selectedVehicle?.name ?? ''} {wo?.vehicleId}
+                         {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre>  */}
+                       {wo?.name ?? ''} 
                      </div>
                      <div className="font-medium">{wo.serviceType}</div>
                      <div className="text-sm text-gray-600"></div>
