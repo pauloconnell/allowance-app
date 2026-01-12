@@ -13,6 +13,9 @@ const ServiceRecordSchema = new Schema(
     location: [String],
     notes: String,
     completedBy: { type: String },
+    serviceFrequencyKM: { type: Number, default: null },
+    serviceFrequencyWeeks: { type: Number, default: null },
+
   },
   { timestamps: true }
 );

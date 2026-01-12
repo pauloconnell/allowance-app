@@ -32,6 +32,10 @@ export default function ServiceRecordForm({ vehicleId }) {
       mileage: 0,
       location: ['N/A'],
       notes: '',
+      completedBy: '',
+      isRecurring: false, 
+      serviceFrequencyKM: '', 
+      serviceFrequencyWeeks: '',
    });
 
    // Update form.vehicleId when selectedVehicle loads

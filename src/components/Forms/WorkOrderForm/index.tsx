@@ -75,6 +75,9 @@ export default function WorkOrderForm({
             location: storeWO.location ?? ['N/A'],
             notes: storeWO.notes ?? '',
             completedBy: storeWO.completedBy ?? '',
+            isRecurring: storeWO.isRecurring ?? false,
+            serviceFrequencyKM: storeWO.serviceFrequencyKM ?? '',
+            serviceFrequencyWeeks: storeWO.serviceFrequencyWeeks ?? '',
          };
       } // New Work Order
       return {
@@ -87,14 +90,16 @@ export default function WorkOrderForm({
          location: ['N/A'],
          notes: '',
          completedBy: '',
-      };
+         isRecurring: false, serviceFrequencyKM: '', serviceFrequencyWeeks: '',
+       };
+      
    });
 
    //3 update form when storeWO loads(edit mode)
    useEffect(() => {
       if (isEditing && storeWO) {
          setForm({
-            workOrderId: storeWO._id,
+            workOrderId: storeWO?._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
             serviceDueDate: storeWO.serviceDueDate?.split('T')[0] ?? '',
@@ -103,6 +108,9 @@ export default function WorkOrderForm({
             location: storeWO.location ?? ['N/A'],
             notes: storeWO.notes ?? '',
             completedBy: storeWO.completedBy ?? '',
+              isRecurring: storeWO.isRecurring ?? false,
+            serviceFrequencyKM: storeWO.serviceFrequencyKM ?? '',
+            serviceFrequencyWeeks: storeWO.serviceFrequencyWeeks ?? '',
          });
       }
    }, [isEditing, storeWO]);
@@ -144,11 +152,11 @@ export default function WorkOrderForm({
    function handleChange(e) {
       const { name, value, type } = e.target;
       setForm({ ...form, [name]: type === 'number' ? Number(value) : value });
-      console.log("event ", name)
+      console.log('event ', name);
       // If the user changed the vehicle dropdown, update the store
       if (name === 'vehicleId') {
          const v = vehicles.find((veh) => veh._id === value);
-         console.log("changed vehicle ", v)
+         console.log('changed vehicle ', v);
          setSelectedVehicle(v);
       }
    }

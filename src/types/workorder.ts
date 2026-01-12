@@ -13,4 +13,7 @@ export interface IWorkOrder {
    name?: string;
    type?: string;
    year?: string;
+   isRecurring: boolean;
+   serviceFrequencyKM?: number | null;
+   serviceFrequencyWeeks?: number | null;
 }
