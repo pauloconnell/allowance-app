@@ -1,6 +1,6 @@
 import { connectDB } from "./mongodb";
 import Vehicle from "@/models/Vehicle";
-import type { IVehicle } from "@/types/vehicle";
+import type { VehicleCreateInput } from "@/types/vehicle";
 
 export async function getVehicleById(vehicleId: string) {
   await connectDB();
@@ -34,7 +34,7 @@ export async function getAllVehicles() {
   }));
 }
 
-export async function createVehicle(data: IVehicle) {
+export async function createVehicle(data: VehicleCreateInput) {
   await connectDB();
 
   const v = await Vehicle.create(data);

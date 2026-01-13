@@ -4,7 +4,7 @@ import type { IWorkOrder } from '@/types/workorder';
 import type { IVehicle } from '@/types/vehicle';
 
 // helper to normalize Records
-function normalizeServiceRecord(record: any) {
+export function normalizeServiceRecord(record: any) {
    return {
       ...record,
       _id: record._id?.toString() ?? '',

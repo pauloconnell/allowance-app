@@ -2,23 +2,22 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import { IWorkOrder } from '@/types/workorder';
+import { sanitizeCreate } from '@/lib/sanitizeCreate';
+import { sanitizeUpdate } from '@/lib/sanitizeUpdate';
+import { IWorkOrderInput } from '@/types/workorder';
+import { normalizeRecord } from '@/lib/normalizeRecord';
 
 export async function POST(req: Request) {
    try {
       await connectDB();
 
-      const data: IWorkOrder = await req.json();
-      console.log('Schema paths:', Object.keys(WorkOrder.schema.paths));
+      const body: IWorkOrder = await req.json();
+      const sanitized = sanitizeCreate(WorkOrder, body);
 
-      const wo = await WorkOrder.create(data);
-      console.log('server got new work order with details: ', data, wo);
-      return NextResponse.json({
-         ...wo.toObject(),
-         workOrderId: wo._id.toString(),
-         vehicleId: wo.vehicleId.toString(),
-         createdAt: wo.createdAt.toISOString(),
-         updatedAt: wo.updatedAt.toISOString(),
-      });
+      // Create work order
+      const wo = await WorkOrder.create(sanitized as IWorkOrderInput);
+
+      return NextResponse.json(normalizeRecord(wo), { status: 201 });
    } catch (err) {
       console.error('Failed to create work order:', err);
       return NextResponse.json({ error: 'Failed to create work order' }, { status: 500 });
@@ -26,14 +25,24 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req, { params }) {
-   await connectDB();
-   const body = await req.json();
-   const id = params.id;
-   const updated = await WorkOrder.findByIdAndUpdate(id, body, { new: true }).lean();
-   return NextResponse.json(updated);
+   try {
+      await connectDB();
+      const body = await req.json();
+      const id = params.id;
+      const sanitized = sanitizeUpdate(WorkOrder, body);
+      const updated = await WorkOrder.findByIdAndUpdate(id, sanitized, {
+         new: true,
+      }).lean();
+      if (!updated) {
+         return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
+      }
+      return NextResponse.json(normalizeRecord(updated));
+   } catch (e) {
+      console.error('Failed to update work order:', e);
+   }
 }
 
-export async function GET(req) {
+export async function GET(req: Request) {
    try {
       await connectDB();
       const { searchParams } = new URL(req.url);
@@ -41,22 +50,20 @@ export async function GET(req) {
       const baseQuery = { status: 'open' }; // only get 'open'
       const query = vehicleId ? { ...baseQuery, vehicleId } : baseQuery; // handles both cases: all or just for this vehicle
       const workOrders = await WorkOrder.find(query).lean();
-      return NextResponse.json(
-         workOrders.map((wo) => ({
-            ...wo,
-            _id: wo._id.toString(),
-            vehicleId: wo.vehicleId?.toString?.() ?? '',
-            createdAt: wo.createdAt?.toISOString?.() ?? null,
-            updatedAt: wo.updatedAt?.toISOString?.() ?? null,
-         }))
-      );
+    // Normalize each record 
+    const normalized = workOrders.map((wo) => { 
+      const n = normalizeRecord(wo); 
+      n.workOrderId = n._id; // add model-specific ID field 
+     return n;
+    });
+     return NextResponse.json(normalized); 
    } catch (err) {
       console.error('Failed to fetch work orders:', err);
       return NextResponse.json({ error: 'Failed to fetch work orders' }, { status: 500 });
    }
 }
 
-export async function DELETE(req) {
+export async function DELETE(req: Request) {
    try {
       await connectDB();
 

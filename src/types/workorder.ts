@@ -17,3 +17,9 @@ export interface IWorkOrder {
    serviceFrequencyKM?: number | null;
    serviceFrequencyWeeks?: number | null;
 }
+
+// Payload shape for creating a new work order
+export type IWorkOrderInput = Omit<
+  IWorkOrder,
+  "_id" | "createdAt" | "updatedAt"
+>;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Vehicle from "@/models/Vehicle";
 import { connectDB } from "@/lib/mongodb";
+import { sanitizeUpdate } from "@/lib/sanitizeUpdate";
 
 
 
@@ -10,13 +11,14 @@ export async function PUT(req: Request, { params}:{ params: {vehicleId: string }
     await connectDB();
 
     const body = await req.json();
+    const sanitized = sanitizeUpdate(Vehicle, body);
 
     // Clean mileage input
-    if (body.mileage) {
-      body.mileage = Number(body.mileage.toString().replace(/,/g, ""));
+    if (sanitized.mileage) {
+      sanitized.mileage = Number(sanitized.mileage.toString().replace(/,/g, ""));
     }
 
-    const updated = await Vehicle.findByIdAndUpdate(params.vehicleId, body, {
+    const updated = await Vehicle.findByIdAndUpdate(params.vehicleId, sanitized, {
       new: true,
     });
 
