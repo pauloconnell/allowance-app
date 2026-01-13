@@ -4,15 +4,17 @@ import WorkOrder from '@/models/WorkOrder';
 import ServiceRecord from '@/models/ServiceRecord';
 import { createNextWorkOrder } from '@/lib/createNextWorkOrder';
 
-export async function PUT(req, { params }) {
+export async function PUT(req: Request,
+  { params: { vehicleId } }: { params: { vehicleId: string } }) {
   await connectDB();
 
-  const id = params.id;
-  const body = await req.json(); // contains completedBy
-
+  const id = vehicleId;
   if (!id) {
     return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
   }
+  const body = await req.json(); // contains completedBy
+
+
 
   const workOrder = await WorkOrder.findById(id).lean();
   if (!workOrder) {
@@ -42,10 +44,11 @@ export async function PUT(req, { params }) {
   });
 
   if (workOrder.isRecurring) {
-    try { await createNextWorkOrder(workOrder); 
+    try {
+      await createNextWorkOrder(workOrder);
     } catch (err) {
       console.error("Failed to create next recurring work order:", err); // Do NOT throw — completion should still succeed 
     }
   }
-    return NextResponse.json({ serviceRecordId: serviceRecord._id });
-  }
+  return NextResponse.json({ serviceRecordId: serviceRecord._id });
+}

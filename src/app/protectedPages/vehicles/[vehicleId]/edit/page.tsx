@@ -3,11 +3,11 @@ import { getVehicleById } from "@/lib/vehicles";
 //import VehicleForm from "@/components/Vehicle/VehicleForm";
 import EditFormWrapper from "./EditFormWrapper";
 
-export default async function EditVehiclePage({ params }) {
-  const { id } = await params;
+export default async function EditVehiclePage({ params }: { params: { vehicleId: string } }) {
+  const { vehicleId } = await params;
 
   // Fetch vehicle from DB (lean() returns plain object)
-  const doc = await getVehicleById(id);
+  const doc = await getVehicleById(vehicleId);
 
   // Extra safety: ensure fully JSON-serializable
   const vehicle = JSON.parse(JSON.stringify(doc));
@@ -19,7 +19,7 @@ export default async function EditVehiclePage({ params }) {
       {/* Back Button */}
       <div className="flex justify-between items-center mb-6 mt-3 mx-6">
         <Link
-          href={`/protectedPages/vehicles/${id}`}
+          href={`/protectedPages/vehicles/${vehicleId}`}
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
         >
           Back to Vehicle

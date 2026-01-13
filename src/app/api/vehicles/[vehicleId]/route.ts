@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import Vehicle from "@/models/Vehicle";
 import { connectDB } from "@/lib/mongodb";
 import { sanitizeUpdate } from "@/lib/sanitizeUpdate";
-
+import { normalizeVehicle } from "@/lib/normalizeVehicle";
+import mongoose from "mongoose";
 
 
 
@@ -32,14 +33,16 @@ export async function PUT(req: Request, { params}:{ params: {vehicleId: string }
   }
 }
 
-export async function GET(req: Request, { params }) {
+export async function GET(req: Request, { params }:{ params: {vehicleId: string }} ) {
   const { vehicleId } = params;
+
+  if (!mongoose.isValidObjectId(vehicleId)) { return new Response(JSON.stringify({ error: "Invalid ID format" }), { status: 400 }); }
 
   const vehicle = await Vehicle.findById(vehicleId);
   if (!vehicle) {
     return new Response(JSON.stringify({ error: `Not found, id:${vehicleId}` }), { status: 404 });
   }
-
-  return new Response(JSON.stringify(vehicle), { status: 200 });
+const normalized = normalizeVehicle(vehicle);
+  return new Response(JSON.stringify(normalized), { status: 200 });
 }
 

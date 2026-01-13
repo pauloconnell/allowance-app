@@ -3,7 +3,7 @@ import WorkOrderForm from '@/components/Forms/WorkOrderForm';
 import { getAllVehicles } from '@/lib/vehicles';
 
 
-export default async function WorkOrderDetailPage({ params, searchParams }) {
+export default async function WorkOrderDetailPage({ params}: { params: { workOrderId: string } }) {
    const { workOrderId } = await params;
  
 
