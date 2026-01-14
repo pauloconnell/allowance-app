@@ -28,7 +28,7 @@ export default function ServiceRecordForm({ vehicleId }) {
    const [form, setForm] = useState({
       vehicleId: vehicleId || '',
       serviceType: '',
-      date: new Date().toISOString().split('T')[0],
+      serviceDate: new Date().toISOString().split('T')[0],
       mileage: 0,
       location: ['N/A'],
       notes: '',
@@ -72,7 +72,16 @@ export default function ServiceRecordForm({ vehicleId }) {
    ];
 
    function handleChange(e) {
-      setForm({ ...form, [e.target.name]: e.target.value });
+     const { name, value } = e.target; 
+     // Special case: vehicle selection 
+     if (name === "vehicleId") { 
+      const v = vehicles.find((veh) => veh._id === value); 
+      setForm((prev) => ({ ...prev, vehicleId: value, name: v?.name || "", // REQUIRED by WorkOrder schema 
+      mileage: v?.mileage ?? prev.mileage, // set mileage to last known
+      })); 
+       return; } 
+       // Generic update 
+       setForm((prev) => ({ ...prev, [name]: value }));
    }
 
    async function handleSubmit(e) {
@@ -110,8 +119,8 @@ export default function ServiceRecordForm({ vehicleId }) {
             Date Service Performed
             <input
                type="date"
-               name="date"
-               value={form.date}
+               name="serviceDate"
+               value={form.serviceDate}
                onChange={handleChange}
                className="border rounded-full px-4 py-2"
                required

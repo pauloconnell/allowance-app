@@ -4,6 +4,7 @@ export interface IVehicle {
    name: string;
    make: string;
    model: string;
+   mileage: number;
    year: number;
    vin: string;
 

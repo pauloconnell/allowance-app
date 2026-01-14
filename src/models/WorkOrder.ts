@@ -3,7 +3,10 @@ import mongoose from 'mongoose';
 const WorkOrderSchema = new mongoose.Schema(
    {
       vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle', required: true },
+      workOrderId: { type: String }, 
       name: { type: String, required: true },
+      year: { type: String },
+      type: { type: String },
       serviceType: { type: String, required: true },
       notes: { type: String, default: '' },
       location: [String],

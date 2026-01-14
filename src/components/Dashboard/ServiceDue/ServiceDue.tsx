@@ -42,14 +42,14 @@ export default function ServiceDue({ vehicleId }: ServiceDueProps) {
    //if (workOrders.length === 0) return <div className="text-gray-500">No outstanding work orders</div>;
 
    return (
-      <div className="border rounded-lg p-4 bg-white shadow-sm">
+      <div className="border border-yellow-200  rounded-lg p-4 bg-yellow-100 shadow-sm">
          {workOrders.length === 0 && <p className="text-gray-500">No service due.</p>}
 
-         <ul className="space-y-3">
+         <ul className="space-y-3 ">
             {workOrders.map((wo) => (
                <li
                   key={wo._id}
-                  className="p-3 border rounded-lg hover:bg-gray-50 transition"
+                  className="p-3 border rounded-lg bg-yellow-50 hover:bg-gray-50 transition"
                >
                   <Link
                      href={`/protectedPages/work-orders/${wo._id}`}
@@ -60,19 +60,22 @@ export default function ServiceDue({ vehicleId }: ServiceDueProps) {
                         {wo?.name ?? ''}
                      </div>
 
-                     <div className="font-medium">{wo.serviceType}</div>
+                     <div className="font-bold">{wo.serviceType}
                      {wo.serviceType === 'Other' && wo.notes && (
-                        <div className="mt-2 text-sm text-gray-700">
+                        <div className="mb-2 text-sm ">
                            {wo.notes}
                         </div>
                      )}
-                   
-                     <div className="text-sm text-gray-500">
-                        Service Due: {wo.serviceDueDate}
+    
                      </div>
+                                       
+                    {wo.serviceDueDate && ( <div className="text-sm text-gray-500">
+                        Service Due: {wo.serviceDueDate?.split("T")[0]}
+                     </div>)}
+                     {wo.serviceDueKM && (
                      <div className="text-sm text-gray-500">
                         Service Due @: {wo.serviceDueKM} KM
-                     </div>
+                     </div>)}
                   </Link>
                </li>
             ))}

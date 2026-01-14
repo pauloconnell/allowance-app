@@ -5,10 +5,10 @@ import ServiceRecord from '@/models/ServiceRecord';
 import { createNextWorkOrder } from '@/lib/createNextWorkOrder';
 
 export async function PUT(req: Request,
-  { params: { vehicleId } }: { params: { vehicleId: string } }) {
+  { params: { id } }: { params: { id: string } }) {
   await connectDB();
 
-  const id = vehicleId;
+ 
   if (!id) {
     return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
   }
@@ -23,7 +23,7 @@ export async function PUT(req: Request,
 
   // 1. Update the work order to mark 'completed'
   await WorkOrder.findByIdAndUpdate(id, {
-    status: 'Completed',
+    status: 'completed',
     completedBy: body.completedBy,
     completedDate: new Date(),
   });
@@ -33,14 +33,14 @@ export async function PUT(req: Request,
     vehicleId: workOrder.vehicleId,
     serviceType: workOrder.serviceType,
     serviceDate: new Date(),
-    serviceDueDate: workOrder.serviceDueDate,
-    serviceDueKM: workOrder.serviceDueKM,
+    serviceDueDate: workOrder.serviceDueDate ?? null,
+    serviceDueKM: workOrder.serviceDueKM ?? null,
     mileage: workOrder.mileage,
-    location: workOrder.location,
-    notes: workOrder.notes,
-    completedBy: workOrder.completedBy,
-    serviceFrequencyKM: workOrder.serviceFrequencyKM,
-    serviceFrequencyWeeks: workOrder.serviceFrequencyWeeks,
+    location: workOrder.location?? [],
+    notes: workOrder.notes?? "",
+    completedBy: body.completedBy,
+    serviceFrequencyKM: workOrder.serviceFrequencyKM?? null,
+    serviceFrequencyWeeks: workOrder.serviceFrequencyWeeks?? null,
   });
 
   if (workOrder.isRecurring) {

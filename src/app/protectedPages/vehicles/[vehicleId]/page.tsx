@@ -104,6 +104,10 @@ export default async function VehiclePage({ params }: { params: { vehicleId: str
                      { item.notes && (<label>Notes<div className="border p-3 bg-white rounded-lg">
                         {item.notes}
                      </div></label>)}
+                     { item.completedBy && (<label>Completed By:<div className="border p-3 bg-white rounded-lg">
+                        {item.completedBy}
+                     </div></label>)}
+                     
                   </li>
                ))}
             </ul>
