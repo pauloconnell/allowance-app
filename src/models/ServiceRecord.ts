@@ -3,6 +3,8 @@ import mongoose, { Schema } from 'mongoose';
 const ServiceRecordSchema = new Schema(
    {
       vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
+      workOrderId: { type: mongoose.Schema.Types.ObjectId, ref: 'WorkOrder' },
+
       serviceType: { type: String, required: true }, 
       // Completed service date 
       serviceDate: { type: Date, required: true },

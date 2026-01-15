@@ -11,11 +11,11 @@ export async function POST(req: Request) {
    try {
       await connectDB();
 
-      const body: IWorkOrder = await req.json();
+      const body: Partial<IWorkOrder> = await req.json();
       const sanitized = sanitizeCreate(WorkOrder, body);
 
       // Create work order
-      const wo = await WorkOrder.create(sanitized as IWorkOrderInput);
+      const wo = await WorkOrder.create(sanitized);
 
       return NextResponse.json({ success: true }, { status: 201 });
    } catch (err) {

@@ -30,7 +30,7 @@ export const useWorkOrderStore = create<WorkOrderState>((set, get) => ({
          if (!res.ok) {
             throw new Error(`Failed to fetch work order: ${res.statusText}`);
          }
-         const data = await res.json();
+         const data: IWorkOrder[] = await res.json();
          set({ workOrders: data });
       } catch (e) {
          console.error("error getting work orders:", e)
@@ -45,7 +45,7 @@ export const useWorkOrderStore = create<WorkOrderState>((set, get) => ({
          if (!res.ok) {
             throw new Error(`Failed to fetch work order: ${res.statusText}`);
          }
-         const data = await res.json();
+         const data: IWorkOrder = await res.json();
          set({ selectedWorkOrder: data });
       }
       catch (e) {

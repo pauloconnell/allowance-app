@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IWorkOrder } from '@/types/workorder';
-import { useWorkOrderStore, getWorkOrdersForVehicle } from '@/store/useWorkOrderStore';
+import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 import { useVehicleStore } from '@/store/useVehicleStore';
 interface ServiceDueProps {
    vehicleId?: string;

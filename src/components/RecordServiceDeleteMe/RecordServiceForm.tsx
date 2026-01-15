@@ -7,10 +7,10 @@ import { SERVICE_TYPES } from '@/constants/service'
 import { LOCATIONS } from '@/constants/locations'
 import { toast } from "react-hot-toast";
 import { IVehicle } from '@/types/vehicle'
-import { IWorkOrder } from '@/types/workorder'
+import { IServiceRecord } from '@/types/IServiceRecord'
 
 interface RecordServiceFormProps { 
-   prefill?: Partial<IWorkOrder>; // or your actual type 
+   prefill?: Partial<IServiceRecord>; // or your actual type 
    vehicles: IVehicle[]; 
 }
 

@@ -3,7 +3,7 @@ import WorkOrder from "@/models/WorkOrder";
 import { IWorkOrder } from "@/types/workorder";
 
 
-export async function createWorkOrder(data:IWorkOrder) {
+export async function createWorkOrder(data:Partial<IWorkOrder>): Promise<IWorkOrder> {
   await connectDB();
   const wo = await WorkOrder.create(data);
   return {
@@ -14,19 +14,9 @@ export async function createWorkOrder(data:IWorkOrder) {
   };
 }
 
-export async function getAllWorkOrders() {
-  await connectDB();
-  const workOrders = await WorkOrder.find({ status: "open", }).sort({ createdAt: -1 }).lean();
-  return workOrders.map((wo) => ({
-    ...wo,
-    _id: wo._id.toString(),
-    vehicleId: wo?.vehicleId?.toString(),
-    createdAt: wo.createdAt?.toISOString() ?? null,
-    updatedAt: wo.updatedAt?.toISOString() ?? null,
-  }));
-}
 
-export async function getWorkOrdersForVehicle(vehicleId: string) {
+
+export async function getWorkOrdersForVehicle(vehicleId: string):Promise<IWorkOrder[]> {
   await connectDB();
   const workOrders = await WorkOrder.find({ vehicleId, status: "open", }).sort({ createdAt: -1 }).lean();
   return workOrders.map((wo) => ({

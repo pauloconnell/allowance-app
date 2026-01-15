@@ -23,5 +23,5 @@ export function sanitizeCreate<T>(model: any, body: unknown): Partial<T>  {
       if (input[key] !== undefined) sanitized[key] = input[key];
    }
 
- return sanitized as T;
+ return sanitized as Partial<T>;
 }
