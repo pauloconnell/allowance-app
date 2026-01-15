@@ -7,9 +7,10 @@ import DeleteWorkOrderButton from '@/components/Buttons/DeleteWorkOrderButton';
 import { toast } from 'react-hot-toast';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 import { useVehicleStore } from '@/store/useVehicleStore';
-import { IVehicle } from '@/types/vehicle';
-import { SERVICE_TYPES } from '@/constants/service'
-import { LOCATIONS } from '@/constants/locations'
+import { IVehicle } from '@/types/IVehicle';
+import { SERVICE_TYPES } from '@/constants/service';
+import { LOCATIONS } from '@/constants/locations';
+import { IFormWorkOrder } from '@/types/IFormWorkOrder';
 
 interface WorkOrderFormProps {
    workOrderId?: string;
@@ -68,21 +69,26 @@ export default function WorkOrderForm({
 
    // 2) Form State
 
-   const [form, setForm] = useState(() => {
+   const [form, setForm] = useState<IFormWorkOrder>(() => {
       if (isEditing && storeWO) {
          return {
             workOrderId: storeWO._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
-            serviceDueDate: storeWO.serviceDueDate?.split('T')[0] ?? '',
-            serviceDueKM: storeWO.serviceDueKM ?? '',
-            mileage: storeWO.mileage ?? '',
+            serviceDueDate: storeWO.serviceDueDate
+               ? String(storeWO.serviceDueDate).split('T')[0]
+               : '',
+            serviceDueKM: String(storeWO.serviceDueKM) ?? '',
+            mileage: String(storeWO.mileage) ?? '',
             location: storeWO.location ?? ['N/A'],
             notes: storeWO.notes ?? '',
+            serviceDate: storeWO.serviceDate
+               ? String(storeWO.serviceDate).split('T')[0]
+               : '',
             completedBy: storeWO.completedBy ?? '',
             isRecurring: storeWO.isRecurring ?? false,
-            serviceFrequencyKM: storeWO.serviceFrequencyKM ?? '',
-            serviceFrequencyWeeks: storeWO.serviceFrequencyWeeks ?? '',
+            serviceFrequencyKM: String(storeWO.serviceFrequencyKM) ?? '',
+            serviceFrequencyWeeks: String(storeWO.serviceFrequencyWeeks) ?? '',
          };
       } // New Work Order
       return {
@@ -94,6 +100,7 @@ export default function WorkOrderForm({
          mileage: '',
          location: ['N/A'],
          notes: '',
+         serviceDate: '',
          completedBy: '',
          isRecurring: false,
          serviceFrequencyKM: '',
@@ -108,15 +115,16 @@ export default function WorkOrderForm({
             workOrderId: storeWO?._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
-            serviceDueDate: storeWO.serviceDueDate?.split('T')[0] ?? '',
-            serviceDueKM: storeWO.serviceDueKM ?? '',
-            mileage: storeWO.mileage ?? '',
+            serviceDueDate: String(storeWO.serviceDueDate)?.split('T')[0] ?? '',
+            serviceDueKM: String(storeWO.serviceDueKM) ?? '',
+            mileage: String(storeWO.mileage) ?? '',
             location: storeWO.location ?? ['N/A'],
             notes: storeWO.notes ?? '',
+            serviceDate: storeWO.serviceDate ? String(storeWO.serviceDate).split('T')[0] : '',
             completedBy: storeWO.completedBy ?? '',
             isRecurring: storeWO.isRecurring ?? false,
-            serviceFrequencyKM: storeWO.serviceFrequencyKM ?? '',
-            serviceFrequencyWeeks: storeWO.serviceFrequencyWeeks ?? '',
+            serviceFrequencyKM: String(storeWO.serviceFrequencyKM) ?? '',
+            serviceFrequencyWeeks: String(storeWO.serviceFrequencyWeeks ?? ''),
          });
       }
    }, [isEditing, storeWO]);
@@ -130,9 +138,8 @@ export default function WorkOrderForm({
    // allow updates when viewing work order(add notes ect)
 
    const serviceTypes = SERVICE_TYPES;
-   
 
-   const locations= LOCATIONS;
+   const locations = LOCATIONS;
 
    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
       const { name, value, type } = e.target;
@@ -142,10 +149,9 @@ export default function WorkOrderForm({
       if (name === 'vehicleId') {
          const v = vehicles.find((veh) => veh._id === value);
          console.log('changed vehicle ', v);
-         if(v){
+         if (v) {
             setSelectedVehicle(v);
          }
-         
       }
    }
 
@@ -174,7 +180,6 @@ export default function WorkOrderForm({
          router.push(`/protectedPages/vehicles/${form.vehicleId}`);
       } else {
          toast.error('Failed to save work order');
-         
       }
    }
 

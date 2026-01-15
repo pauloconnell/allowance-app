@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
-import { IWorkOrder } from '@/types/workorder';
+import { IWorkOrder } from '@/types/IWorkOrder';
 import { sanitizeCreate } from '@/lib/sanitizeCreate';
 import { sanitizeUpdate } from '@/lib/sanitizeUpdate';
-import { IWorkOrderInput } from '@/types/workorder';
+import { IWorkOrderInput } from '@/types/IWorkOrder';
 import { normalizeRecord } from '@/lib/normalizeRecord';
 
 export async function POST(req: Request) {

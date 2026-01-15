@@ -6,7 +6,7 @@ import  DeleteWorkOrderButton  from '@/components/Buttons/DeleteWorkOrderButton'
 import { SERVICE_TYPES } from '@/constants/service'
 import { LOCATIONS } from '@/constants/locations'
 import { toast } from "react-hot-toast";
-import { IVehicle } from '@/types/vehicle'
+import { IVehicle } from '@/types/IVehicle'
 import { IServiceRecord } from '@/types/IServiceRecord'
 
 interface RecordServiceFormProps { 

@@ -1,7 +1,7 @@
 import { connectDB } from './mongodb';
 import ServiceRecord from '@/models/ServiceRecord';
-import type { IWorkOrder } from '@/types/workorder';
-import type { IVehicle } from '@/types/vehicle';
+import type { IWorkOrder } from '@/types/IWorkOrder';
+import type { IVehicle } from '@/types/IVehicle';
 import { IServiceRecord } from "@/types/IServiceRecord"
 
 // helper to normalize Records

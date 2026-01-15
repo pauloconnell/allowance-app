@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { IVehicle } from '@/types/vehicle';
+import type { IVehicle } from '@/types/IVehicle';
 
 interface VehicleState {
   // Single vehicle (detail view)

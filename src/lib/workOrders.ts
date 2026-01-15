@@ -1,6 +1,6 @@
 import { connectDB } from "./mongodb";
 import WorkOrder from "@/models/WorkOrder";
-import { IWorkOrder } from "@/types/workorder";
+import { IWorkOrder } from "@/types/IWorkOrder";
 
 
 export async function createWorkOrder(data:Partial<IWorkOrder>): Promise<IWorkOrder> {

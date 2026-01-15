@@ -3,7 +3,7 @@ import { getAllVehicles, createVehicle } from '@/lib/vehicles';
 import { sanitizeCreate } from "@/lib/sanitizeCreate";
 import { normalizeRecord } from "@/lib/normalizeRecord"; 
 import Vehicle from '@/models/Vehicle';
-import {IVehicle} from '@/types/vehicle'
+import {IVehicle} from '@/types/IVehicle'
 
 
 export async function GET() { 

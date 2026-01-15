@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
 import { useVehicleStore } from '@/store/useVehicleStore';
+import { SERVICE_TYPES } from '@/constants/service';
+import { LOCATIONS } from '@/constants/locations';
 
 export default function ServiceRecordForm({ vehicleId }) {
    const router = useRouter();
@@ -33,8 +35,8 @@ export default function ServiceRecordForm({ vehicleId }) {
       location: ['N/A'],
       notes: '',
       completedBy: '',
-      isRecurring: false, 
-      serviceFrequencyKM: '', 
+      isRecurring: false,
+      serviceFrequencyKM: '',
       serviceFrequencyWeeks: '',
    });
 
@@ -45,43 +47,24 @@ export default function ServiceRecordForm({ vehicleId }) {
       }
    }, [selectedVehicle, form.vehicleId]);
 
-   const serviceTypes = [
-      'Oil Change',
-      'Air Filter Replacement',
-      'Tire Rotation',
-      'Tire Replacement',
-      'Brake Caliper Service',
-      'Brake Pads Replace',
-      'Brake Fluid bleed',
-      'Belt Change',
-      'Power Steering Fluid Flush',
-      'Coolant Flush',
-      'Transmission Service',
-      'Inspection',
-      'Electrical work(see notes)',
-      'Other',
-   ];
-   const locations = [
-      { value: 'front', label: 'Front' },
-      { value: 'rear', label: 'Rear' },
-      { value: 'fr', label: 'Front Right (FR)' },
-      { value: 'fl', label: 'Front Left (FL)' },
-      { value: 'rr', label: 'Rear Right (RR)' },
-      { value: 'rl', label: 'Rear Left (RL)' },
-      { value: 'N/A', label: 'N/A' },
-   ];
+   const serviceTypes = SERVICE_TYPES; // using Constants
+   const locations = LOCATIONS;
 
    function handleChange(e) {
-     const { name, value } = e.target; 
-     // Special case: vehicle selection 
-     if (name === "vehicleId") { 
-      const v = vehicles.find((veh) => veh._id === value); 
-      setForm((prev) => ({ ...prev, vehicleId: value, name: v?.name || "", // REQUIRED by WorkOrder schema 
-      mileage: v?.mileage ?? prev.mileage, // set mileage to last known
-      })); 
-       return; } 
-       // Generic update 
-       setForm((prev) => ({ ...prev, [name]: value }));
+      const { name, value } = e.target;
+      // Special case: vehicle selection
+      if (name === 'vehicleId') {
+         const v = vehicles.find((veh) => veh._id === value);
+         setForm((prev) => ({
+            ...prev,
+            vehicleId: value,
+            name: v?.name || '', // REQUIRED by WorkOrder schema
+            mileage: v?.mileage ?? prev.mileage, // set mileage to last known
+         }));
+         return;
+      }
+      // Generic update
+      setForm((prev) => ({ ...prev, [name]: value }));
    }
 
    async function handleSubmit(e) {

@@ -1,6 +1,6 @@
 import { getAllVehicles } from '@/lib/vehicles';
 import WorkOrderForm from '@/components/Forms/WorkOrderForm';
-import { IVehicle } from '@/types/vehicle';
+import { IVehicle } from '@/types/IVehicle';
 
 export default async function NewWorkOrderPage({ params }: {params: { vehicleId: string }}) {
    const { vehicleId } = params;

@@ -10,10 +10,8 @@ export interface IWorkOrder extends IBaseService {
    serviceDate: Date | string;
    serviceDueDate?: Date | string | null;
    serviceDueKM?: number | null;
-   mileage?: number | null;
    createdAt?: Date | string;
    updatedAt?: Date | string;
-
    completedDate?: Date | string | null;
 
    isRecurring?: boolean;

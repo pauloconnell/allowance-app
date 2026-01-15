@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { IVehicle } from '@/types/vehicle';
+import { IVehicle } from '@/types/IVehicle';
 
 interface LocationOption {
   value: string;

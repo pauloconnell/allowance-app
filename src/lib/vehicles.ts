@@ -1,6 +1,6 @@
 import { connectDB } from "./mongodb";
 import Vehicle from "@/models/Vehicle";
-import type { VehicleCreateInput } from "@/types/vehicle";
+import type { VehicleCreateInput } from "@/types/IVehicle";
 import mongoose from "mongoose";
 
 

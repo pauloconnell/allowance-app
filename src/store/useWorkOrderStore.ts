@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { IWorkOrder } from '@/types/workorder';
+import type { IWorkOrder } from '@/types/IWorkOrder';
 
 interface WorkOrderState {
    workOrders: IWorkOrder[];
