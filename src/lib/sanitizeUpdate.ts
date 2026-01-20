@@ -1,4 +1,7 @@
-export function sanitizeUpdate<T extends Record<string, any>>(model: any, body: Partial<T>):Partial<T> {
+export function sanitizeUpdate<T extends Record<string, any>>(
+   model: any,
+   body: Partial<T>
+): Partial<T> {
    // Block MongoDB operators
    if (Object.keys(body).some((k) => k.startsWith('$'))) {
       throw new Error('Invalid update payload');
@@ -18,7 +21,7 @@ export function sanitizeUpdate<T extends Record<string, any>>(model: any, body: 
       .map(([key]) => key);
 
    // Build sanitized object
-   const sanitized: Partial<T>= {};
+   const sanitized: Partial<T> = {};
 
    for (const key of allowed) {
       if (!(key in body)) continue;
@@ -26,9 +29,11 @@ export function sanitizeUpdate<T extends Record<string, any>>(model: any, body: 
       // Normalize numeric fields ->mongodb will blow up if it tries to convert 'null' to a number
       if (numericFields.includes(key)) {
          if (value === '' || value === null || value === 'null') {
-           continue; // skip this field entirely
+            continue; // skip this field entirely
          } else {
-            value = Number(value) as T[keyof T];
+            const num = Number(value);
+            if (Number.isNaN(num)) continue;    // ensure no letters are going to blow up in db(don't ever store NaN )
+            value = num as T[keyof T];
          }
       }
       sanitized[key as keyof T] = value;

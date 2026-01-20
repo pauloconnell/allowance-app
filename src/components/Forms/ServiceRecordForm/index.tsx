@@ -48,7 +48,7 @@ export default function ServiceRecordForm({ vehicleId }: { vehicleId: string } )
    }, [selectedVehicle, form.vehicleId]);
 
   
-   function handleChange(e) {
+   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
       const { name, value } = e.target;
      
       // Special case: vehicle selection
