@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import { IWorkOrder } from '@/types/IWorkOrder';
@@ -7,7 +7,7 @@ import { sanitizeUpdate } from '@/lib/sanitizeUpdate';
 import { IWorkOrderInput } from '@/types/IWorkOrder';
 import { normalizeRecord } from '@/lib/normalizeRecord';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
    try {
       await connectDB();
 
@@ -24,11 +24,11 @@ export async function POST(req: Request) {
    }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest) {
    try {
       await connectDB();
       const body = await req.json();
-      const id = params.id;
+      const id = body.id || body.workOrderId;
       const sanitized = sanitizeUpdate(WorkOrder, body);
       const updated = await WorkOrder.findByIdAndUpdate(id, sanitized, {
          new: true,
@@ -43,7 +43,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
    }
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
    try {
       await connectDB();
       const { searchParams } = new URL(req.url);
@@ -67,7 +67,7 @@ export async function GET(req: Request) {
    }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
    try {
       await connectDB();
 
