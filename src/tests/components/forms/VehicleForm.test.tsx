@@ -3,15 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import VehicleForm from '@/components/Forms/Vehicle/VehicleForm';
 import '@testing-library/jest-dom';
 
-const mockRouter = {
-  push: vi.fn(),
-  back: vi.fn(),
-  refresh: vi.fn(),
-};
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => mockRouter,
-}));
+vi.mock('next/navigation', () => {
+  const mockRouter = {
+    push: vi.fn(),
+    back: vi.fn(),
+    refresh: vi.fn(),
+  };
+  return { useRouter: () => mockRouter };
+});
 
 // Mock toast
 vi.mock('react-hot-toast', () => ({
@@ -121,13 +120,14 @@ describe('VehicleForm', () => {
     });
   });
 
-  it('cancel button calls router.back()', () => {
-    const router = require('next/navigation').useRouter();
+  it('cancel button calls router.back()', async () => {
+    const { useRouter } = await import('next/navigation');
+    const mockRouter = vi.mocked(useRouter)();
 
     render(<VehicleForm />);
 
     fireEvent.click(screen.getByText('Cancel'));
 
-    expect(router.back).toHaveBeenCalled();
+    expect(mockRouter.back).toHaveBeenCalled();
   });
 });

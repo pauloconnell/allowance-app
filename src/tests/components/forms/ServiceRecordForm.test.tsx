@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ServiceRecordForm from '@/components/Forms/ServiceRecordForm';
+import '@testing-library/jest-dom';
 
 // Mock router
 vi.mock('next/navigation', () => ({
@@ -16,40 +17,42 @@ vi.mock('@/lib/sanitizeInput', () => ({
 }));
 
 // Mock Zustand store
-const mockFetchAllVehicles = vi.fn().mockResolvedValue(undefined);
-const mockFetchVehicle = vi.fn().mockResolvedValue(undefined);
+vi.mock('@/store/useVehicleStore', () => {
+   const mockFetchAllVehicles = vi.fn().mockResolvedValue(undefined);
+   const mockFetchVehicle = vi.fn().mockResolvedValue(undefined);
 
-const mockStoreState = {
-   allVehicles: [
-      {
+   const mockStoreState = {
+      allVehicles: [
+         {
+            _id: 'veh1',
+            year: 2020,
+            make: 'Subaru',
+            nickName: 'Scooby',
+            mileage: 150000,
+         },
+         {
+            _id: 'veh2',
+            year: 2018,
+            make: 'Toyota',
+            nickName: 'Yota',
+            mileage: 200000,
+         },
+      ],
+      fetchAllVehicles: mockFetchAllVehicles,
+      selectedVehicle: {
          _id: 'veh1',
          year: 2020,
          make: 'Subaru',
          nickName: 'Scooby',
          mileage: 150000,
       },
-      {
-         _id: 'veh2',
-         year: 2018,
-         make: 'Toyota',
-         nickName: 'Yota',
-         mileage: 200000,
-      },
-   ],
-   fetchAllVehicles: mockFetchAllVehicles,
-   selectedVehicle: {
-      _id: 'veh1',
-      year: 2020,
-      make: 'Subaru',
-      nickName: 'Scooby',
-      mileage: 150000,
-   },
-   fetchVehicle: mockFetchVehicle,
-};
+      fetchVehicle: mockFetchVehicle,
+   };
 
-vi.mock('@/store/useVehicleStore', () => ({
-   useVehicleStore: ((selector: any) => selector(mockStoreState)) as any,
-}));
+   return {
+      useVehicleStore: ((selector: any) => selector(mockStoreState)) as any,
+   };
+});
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -69,11 +72,11 @@ describe('ServiceRecordForm', () => {
    it('auto-fills nickname and mileage when vehicleId changes', () => {
       render(<ServiceRecordForm vehicleId="veh1" />);
 
-      const vehicleSelect = screen.getByRole('combobox', { name: /vehicle/i });
+      const vehicleSelect = screen.getByDisplayValue('2020 Subaru Scooby');
 
-      fireEvent.change(vehicleSelect, { target: { name: 'vehicleId', value: 'veh2' } });
+      fireEvent.change(vehicleSelect, { target: { value: 'veh2' } });
 
-      expect(screen.getByDisplayValue('Toyota')).toBeTruthy();
+      expect(screen.getByDisplayValue('2018 Toyota Yota')).toBeTruthy();
       expect(screen.getByDisplayValue('200000')).toBeTruthy();
    });
 
