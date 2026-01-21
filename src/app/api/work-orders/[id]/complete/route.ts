@@ -1,12 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import ServiceRecord from '@/models/ServiceRecord';
 import { createNextWorkOrder } from '@/lib/createNextWorkOrder';
 import { IWorkOrder } from '@/types/IWorkOrder';
 
-export async function PUT(req: Request, { params: { id } }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
    await connectDB();
+
+   const { id } = await params;
 
    if (!id) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });

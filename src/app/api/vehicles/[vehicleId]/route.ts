@@ -1,16 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import Vehicle from "@/models/Vehicle";
 import { connectDB } from "@/lib/mongodb";
 import { sanitizeUpdate } from "@/lib/sanitizeUpdate";
 import { normalizeRecord } from "@/lib/normalizeRecord";
 import mongoose from "mongoose";
 
-
-
-export async function PUT(req: Request, { params }: { params: { vehicleId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ vehicleId: string }> }) {
   try {
+    const { vehicleId } = await params;
     await connectDB();
-    if (!mongoose.isValidObjectId(params.vehicleId)) { return new Response(JSON.stringify({ error: "Invalid ID format" }), { status: 400 }); }
+    if (!mongoose.isValidObjectId(vehicleId)) { return new Response(JSON.stringify({ error: "Invalid ID format" }), { status: 400 }); }
     const body = await req.json();
     const sanitized = sanitizeUpdate(Vehicle, body);
 
@@ -19,7 +18,7 @@ export async function PUT(req: Request, { params }: { params: { vehicleId: strin
       sanitized.mileage = Number(sanitized.mileage.toString().replace(/,/g, ""));
     }
 
-    const updated = await Vehicle.findByIdAndUpdate(params.vehicleId, sanitized, {
+    const updated = await Vehicle.findByIdAndUpdate(vehicleId, sanitized, {
       new: true,
     });
 
@@ -33,7 +32,7 @@ export async function PUT(req: Request, { params }: { params: { vehicleId: strin
   }
 }
 
-export async function GET(req: Request, { params }: { params: { vehicleId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ vehicleId: string }> }) {
   const { vehicleId } = await params;
   try {
     await connectDB();

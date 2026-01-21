@@ -1,15 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import { sanitizeUpdate } from '@/lib/sanitizeUpdate';
 import { normalizeRecord } from '@/lib/normalizeRecord';
-import { NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
    await connectDB();
 
-   const id = params?.id;
+   const { id } = await params;
 
    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
@@ -31,9 +30,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
 // get a specific work order given id (in the url of API)
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
    await connectDB();
-   const id = params?.id;
+   const { id } = await params;
    if (!id) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
    }
