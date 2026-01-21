@@ -141,7 +141,7 @@ export default function WorkOrderForm({
 
   
 
-   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
       const { name, value, type } = e.target;
 
       // If the user changed the vehicle dropdown, update the store

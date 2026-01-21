@@ -11,8 +11,8 @@ interface LocationOption {
 }
 
 interface SharedFieldsFormProps <T extends IFormBaseService> { 
-   form: Partial<T>; 
-   setForm: React.Dispatch<React.SetStateAction<Partial<T>>>; 
+   form: T; 
+   setForm: React.Dispatch<React.SetStateAction<T>>; 
    vehicles: IVehicle[]; 
    handleChange: ( e: React.ChangeEvent< HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement > ) => void; 
 }
@@ -100,10 +100,10 @@ export default function SharedServiceFormFields<T extends IFormBaseService>({
                      <input
                         type="checkbox"
                         value={loc.value}
-                        checked={form.location.includes(loc.value)}
+                        checked={form?.location.includes(loc.value)}
                         onChange={(e) => {
                            const value = e.target.value;
-                           let updated = [...form.location];
+                           let updated = [...form?.location];
 
                            if (updated.includes(value)) {
                               updated = updated.filter((l) => l !== value);

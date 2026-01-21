@@ -65,7 +65,7 @@ export default function ServiceDue({ vehicleId }: ServiceDueProps) {
                   >
                      <div className="text-center font-extrabold text-lg mb-2">
                         {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre>  */}
-                        {wo?.name ?? ''}
+                        {wo?.nickName ?? ''}
                      </div>
 
                      <div className="font-bold">{wo.serviceType}

@@ -99,7 +99,7 @@ export default async function VehiclePage({ params }: Props) {
                       {item.location && (  <div> Location: {item.location} </div>)}
                      </div>
                      <div className="text-sm text-gray-600">
-                        {item.date} — {item.mileage} km
+                        {item?.serviceDate} — {item?.mileage} km
                      </div>
                      { item.notes && (<label>Notes<div className="border p-3 bg-white rounded-lg">
                         {item.notes}

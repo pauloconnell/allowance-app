@@ -4,13 +4,13 @@ export interface IBaseService {
    nickName: string;
    serviceType: string;
 
-   mileage: number; // Form version: string (input) → number (DB)
+   mileage: string; // Form version: string (input) → number (DB)
    location?: string[];
    notes?: string;
    completedBy: string;
 
    // Recurrence fields
    isRecurring: boolean;
-   serviceFrequencyKM?: number | null;
-   serviceFrequencyWeeks?: number | null;
+   serviceFrequencyKM?: number ;
+   serviceFrequencyWeeks?: number;
 }

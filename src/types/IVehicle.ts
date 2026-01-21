@@ -4,8 +4,8 @@ export interface IVehicle {
    nickName: string;
    make: string;
    model: string;
-   mileage?: number;
-   year: number;
+   mileage: string;
+   year: string;
    vin?: string;
 
 }

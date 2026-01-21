@@ -7,6 +7,7 @@ export function normalizeRecord<T extends Record<string, any>>(doc: T) {
     ...obj,
     _id: obj._id?.toString() ?? "",
     vehicleId: obj.vehicleId?.toString() ?? obj.vehicleId ?? "",
+    
     //createdAt: obj.createdAt?.toISOString() ?? null,
     //updatedAt: obj.updatedAt?.toISOString() ?? null,
   };

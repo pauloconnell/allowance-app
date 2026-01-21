@@ -50,7 +50,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
          isRecurring: true,
          location: workOrder.location ?? [],
          notes: workOrder.notes ?? '',
-         mileage: workOrder.mileage ?? null,
+         mileage: String(workOrder.mileage),
          serviceFrequencyKM: workOrder.serviceFrequencyKM ?? null,
          serviceFrequencyWeeks: workOrder.serviceFrequencyWeeks ?? null,
       };
@@ -64,7 +64,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       if (workOrder.serviceFrequencyWeeks) {
          const nextDate = new Date(workOrder.serviceDate ?? Date.now());
          nextDate.setDate(nextDate.getDate() + workOrder.serviceFrequencyWeeks * 7);
-         next.serviceDueDate = nextDate;
+         next.serviceDueDate = nextDate.toISOString().split('T')[0];
       }
 
       try {

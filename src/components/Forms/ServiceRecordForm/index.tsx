@@ -7,7 +7,7 @@ import { useVehicleStore } from '@/store/useVehicleStore';
 import { sanitizeInput } from '@/lib/sanitizeInput';
 import type { IFormServiceRecord } from '@/types/IFormServiceRecord';
 
-export default function ServiceRecordForm({ vehicleId }: { vehicleId: string }) {
+export default function ServiceRecordForm({ vehicleId }: { vehicleId?: string }) {
    const router = useRouter();
 
    // Zustand
@@ -46,6 +46,8 @@ export default function ServiceRecordForm({ vehicleId }: { vehicleId: string }) 
 
    // Fetch selected vehicle if vehicleId provided
    useEffect(() => {
+      // Guard against undefined/null vehicleId
+      if (!vehicleId) return;
       // If no selectedVehicle OR wrong selectedVehicle, fetch it
       if (!selectedVehicle || selectedVehicle._id !== vehicleId) {
          fetchVehicle(vehicleId);   // this sets selectedVehicle in store
@@ -66,7 +68,7 @@ export default function ServiceRecordForm({ vehicleId }: { vehicleId: string }) 
 
 
 
-   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
       const { name, value } = e.target;
 
       // Special case: vehicle selection

@@ -7,14 +7,14 @@ export interface IWorkOrder extends IBaseService {
 
    status: 'open' | 'completed';
 
-   serviceDate: Date | string;
-   serviceDueDate?: Date | string | null;
-   serviceDueKM?: number | null;
+   serviceDate:  string;
+   serviceDueDate?: string;
+   serviceDueKM?: string;
 
-   createdAt?: Date | string;
-   updatedAt?: Date | string;
+   createdAt?:  string;
+   updatedAt?:  string;
    
-   completedDate?: Date | string | null;
+   completedDate?: string;
 
    
 }

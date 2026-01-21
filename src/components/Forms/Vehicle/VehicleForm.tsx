@@ -4,27 +4,31 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { sanitizeInput } from '@/lib/sanitizeInput';
-
+import type { IVehicle } from '@/types/IVehicle';
+import type { IFormVehicle } from '@/types/IFormVehicle';
 interface VehicleFormProps {
-   vehicle?: {
-      year: number | string;
-      make: string;
-      model: string;
-      nickName: string;
-      mileage: number | string;
-      vin: string;
-      _id?: string;
-      vehicleId: string;
-   };
+   vehicle?: IVehicle | IFormVehicle;
 }
+// interface VehicleFormProps {
+//    vehicle?: {
+//       year: number | string;
+//       make: string;
+//       model: string;
+//       nickName: string;
+//       mileage: number | string;
+//       vin?: string;
+//       _id?: string;
+//       vehicleId: string;
+//    };
+// }
 
 export default function VehicleForm({ vehicle }: VehicleFormProps) {
    const router = useRouter();
 
    const isEdit = !!vehicle; //is in edit mode if we have been passed a vehicle
 
-   const derivedVehicleId = vehicle?.vehicleId ?? vehicle?._id?.toString() ?? ''; // vehicleId comes from the _id, but new vehicles will not have this until mongodb assigns it
-
+//   const derivedVehicleId = vehicle?.vehicleId ?? vehicle?._id?.toString() ?? ''; // vehicleId comes from the _id, but new vehicles will not have this until mongodb assigns it
+const derivedVehicleId = (vehicle && '_id' in vehicle) ? vehicle._id : (vehicle?.vehicleId ?? '');   // would never have vehicleId without _id, but extra safe here
    const [form, setForm] = useState({
       year: vehicle?.year ?? '',
       make: vehicle?.make ?? '',
@@ -40,11 +44,13 @@ export default function VehicleForm({ vehicle }: VehicleFormProps) {
       setForm({ ...form, [e.target.name]: cleaned });
    };
 
-   const handleSubmit = async (e) => {
+   const handleSubmit = async (e:React.FormEvent) => {
       e.preventDefault();
-      if (isEdit) {
+      if (isEdit && vehicle) {
+
+         const savedVehicle = vehicle as IVehicle;
          // UPDATE existing vehicle
-         let res = await fetch(`/api/vehicles/${vehicle._id}`, {
+         let res = await fetch(`/api/vehicles/${savedVehicle._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
@@ -53,7 +59,7 @@ export default function VehicleForm({ vehicle }: VehicleFormProps) {
          if (!res.ok) throw new Error('Failed to update vehicle');
          toast.success('Vehicle updated');
 
-         router.push(`/protectedPages/vehicles/${vehicle._id}`);
+         router.push(`/protectedPages/vehicles/${savedVehicle._id}`);
          router.refresh();
       } else {
          // CREATE new vehicle
