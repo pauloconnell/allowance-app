@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       await connectDB();
 
       const body: Partial<IWorkOrder> = await req.json();
-      const sanitized = sanitizeCreate(WorkOrder, body);
+      const sanitized = sanitizeCreate<Partial<IWorkOrder>>(WorkOrder, body);
 
       // Create work order
       const wo = await WorkOrder.create(sanitized);

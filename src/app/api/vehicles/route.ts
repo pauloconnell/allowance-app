@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getAllVehicles, createVehicle } from '@/lib/vehicles';
 import { sanitizeCreate } from '@/lib/sanitizeCreate';
 import { normalizeRecord } from '@/lib/normalizeRecord';
@@ -20,7 +20,7 @@ export async function GET() {
    }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
    try {
       const body = (await req.json()) as IFormVehicle;
       //console.log('body:', body);
