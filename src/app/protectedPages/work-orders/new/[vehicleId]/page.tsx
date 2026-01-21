@@ -2,8 +2,8 @@ import { getAllVehicles } from '@/lib/vehicles';
 import WorkOrderForm from '@/components/Forms/WorkOrderForm';
 import { IVehicle } from '@/types/IVehicle';
 
-export default async function NewWorkOrderPage({ params }: {params: { vehicleId: string }}) {
-   const { vehicleId } = params;
+export default async function NewWorkOrderPage({ params }: {params: Promise<{ vehicleId: string }>}) {
+   const { vehicleId } = await params;
    let vehicles:IVehicle[] = [];
    try{
    // Fetch all vehicles (for dropdowns, names, etc.)

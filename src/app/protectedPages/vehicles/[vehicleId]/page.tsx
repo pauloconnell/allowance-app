@@ -5,11 +5,11 @@ import ServiceDue from "@/components/Dashboard/ServiceDue/ServiceDue";
 //import { requireAuth } from '@/lib/requireAuth';
 
 interface Props {
-   params: { vehicleId: string };
+   params: Promise<{ vehicleId: string }>;
 }
 
-export default async function VehiclePage({ params }: { params: { vehicleId: string } }) {
-   const { vehicleId } = params;
+export default async function VehiclePage({ params }: Props) {
+   const { vehicleId } = await params;
 
    // done in the layout for protected folder await requireAuth(); // 🔐 protect the page
 

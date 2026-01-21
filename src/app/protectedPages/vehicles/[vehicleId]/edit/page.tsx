@@ -5,7 +5,7 @@ import EditFormWrapper from "./EditFormWrapper";
 import mongoose from "mongoose";
 import { toast } from "react-hot-toast";
 
-export default async function EditVehiclePage({ params }: { params: { vehicleId: string } }) {
+export default async function EditVehiclePage({ params }: { params: Promise<{ vehicleId: string }> }) {
   const { vehicleId } = await params;
 
  if (!mongoose.isValidObjectId(vehicleId)) {

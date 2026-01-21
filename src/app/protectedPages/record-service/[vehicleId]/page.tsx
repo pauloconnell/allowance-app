@@ -2,8 +2,8 @@ import ServiceRecordForm from '@/components/Forms/ServiceRecordForm';
 
 
   
-export default async function RecordServicePage({ params }: { params: { vehicleId: string }}) {
-  const { vehicleId } = params;
+export default async function RecordServicePage({ params }: { params: Promise<{ vehicleId: string }>}) {
+  const { vehicleId } = await params;
 
   return (
     <div className="min-h-screen bg-gray-50">
