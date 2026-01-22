@@ -1,5 +1,6 @@
 export interface IVehicle {
    _id: string;
+   companyId: string;
    vehicleId?: string;
    nickName: string;
    make: string;
@@ -7,5 +8,6 @@ export interface IVehicle {
    mileage: string;
    year: string;
    vin?: string;
-
+   createdAt?: string;
+   updatedAt?: string;
 }

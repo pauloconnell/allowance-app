@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const WorkOrderSchema = new mongoose.Schema(
    {
+      companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
       vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle', required: true },
       workOrderId: { type: String }, 
       previousWorkOrderId: { type: mongoose.Schema.Types.ObjectId, ref: 'WorkOrder', default: null },
