@@ -1,4 +1,7 @@
 import { getSession } from "@auth0/nextjs-auth0";
+import  CompanySwitcher  from "@/components/CompanySwitcher/CompanySwitcher";
+import { getUserCompanies } from "@/lib/companyContext";
+import type { ICompany } from "@/types/ICompany";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +17,18 @@ try {
 
 const href = session ? "/protectedPages/dashboard" : "/api/auth/login?screen_hint=signup";
 const isLoggedIn = !!session;
+
+let companies: (ICompany & { role: string })[] = [];
+let activeCompanyId = '';
+
+if (isLoggedIn && session?.user) {
+  try {
+    companies = await getUserCompanies(session.user.sub);
+    activeCompanyId = companies[0]?._id || '';
+  } catch (error) {
+    console.error('Failed to fetch companies:', error);
+  }
+}
 
 
   return (
@@ -39,6 +54,9 @@ const isLoggedIn = !!session;
            >
               {isLoggedIn ? "Dashboard" : "Get Started"}
            </a>
+           {isLoggedIn && companies.length > 0 ? (
+              <CompanySwitcher companies={companies} activeCompanyId={activeCompanyId} />
+           ) : null}
         </section>
 
         {/* Sports Car (single row, centered) */}
