@@ -31,7 +31,7 @@ export default async function DashboardPage({ params }: PageProps) {
           </h1>
 
           <Link
-            href="/protectedPages/record-service"
+            href={`/protectedPages/${companyId}/record-service`}
             className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
           >
             Record Service
@@ -46,7 +46,7 @@ export default async function DashboardPage({ params }: PageProps) {
 
         {/* Vehicles */}
         <section className="flex flex-col gap-6">
-              <Link href="/protectedPages/vehicles/new" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" >
+              <Link href={`/protectedPages/${companyId}/vehicles/new`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" >
           Add Vehicle
         </Link>
           <h2 className="text-2xl font-semibold">Vehicles</h2>

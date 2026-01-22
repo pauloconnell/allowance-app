@@ -28,7 +28,7 @@ const setActiveCompanyId = useCompanyStore((s) => s.setActiveCompanyId);
          {vehicles.map((v) => (
             <Link
                key={v._id}
-               href={`/protectedPages/vehicles/${v._id}?companyId=${companyId}`}
+               href={`/protectedPages/${companyId}/vehicles/${v._id}`}
                onClick={() => setSelectedVehicle(v)}
                className="p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition"
             >
