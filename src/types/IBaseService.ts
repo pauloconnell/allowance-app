@@ -12,6 +12,6 @@ export interface IBaseService {
 
    // Recurrence fields
    isRecurring: boolean;
-   serviceFrequencyKM?: number ;
-   serviceFrequencyWeeks?: number;
+   serviceFrequencyKM?: string ;
+   serviceFrequencyWeeks?: string;
 }

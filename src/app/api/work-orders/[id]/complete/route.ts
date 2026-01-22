@@ -46,6 +46,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
    if (workOrder.isRecurring) {
       const next: Partial<IWorkOrder> = {
          vehicleId: workOrder.vehicleId,
+         nickName: workOrder.nickName,
+         companyId: workOrder.companyId,
+         previousWorkOrderId: workOrder._id,
          serviceType: workOrder.serviceType,
          isRecurring: true,
          location: workOrder.location ?? [],

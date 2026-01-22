@@ -5,7 +5,7 @@ const ServiceRecordSchema = new Schema(
       companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
       vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
       workOrderId: { type: mongoose.Schema.Types.ObjectId, ref: 'WorkOrder' },
-
+      
       serviceType: { type: String, required: true }, 
       // Completed service date 
       serviceDate: { type: Date, required: true },

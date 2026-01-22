@@ -4,19 +4,19 @@ export interface IWorkOrder extends IBaseService {
    nickName: string;
    year?: string;
    type?: string;
-
+   companyId: string;
    status: 'open' | 'completed';
-
-   serviceDate:  string;
+   previousWorkOrderId?: string;
+   serviceDate: string;
    serviceDueDate?: string;
    serviceDueKM?: string;
 
-   createdAt?:  string;
-   updatedAt?:  string;
-   
+   createdAt?: string;
+   updatedAt?: string;
+
    completedDate?: string;
 
-   
+
 }
 
 // Payload shape for creating a new work order
