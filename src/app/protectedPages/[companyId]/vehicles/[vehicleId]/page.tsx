@@ -56,7 +56,7 @@ export default async function VehiclePage({ params }: Props) {
             </Link>
 
             <Link
-               href={`/protectedPages/${companyId}/record-service?vehicleId=${vehicleId}`}
+               href={`/protectedPages/${companyId}/record-service/${vehicleId}`}
                className="bg-green-600 text-white px-4 py-2 rounded-lg"
             >
                Record Service

@@ -15,7 +15,18 @@ export async function createWorkOrder(data:Partial<IWorkOrder>): Promise<IWorkOr
   };
 }
 
-
+export async function getAllWorkOrders(companyId: string): Promise<IWorkOrder[]> {
+  await connectDB();
+  const workOrders = await WorkOrder.find({ companyId }).sort({ createdAt: -1 }).lean();
+  return workOrders.map((wo) => ({
+    ...wo,
+    _id: wo._id?.toString(),
+    companyId: wo.companyId?.toString?.() ?? '',
+    vehicleId: wo.vehicleId?.toString(),
+    createdAt: wo.createdAt?.toISOString() ?? null,
+    updatedAt: wo.updatedAt?.toISOString() ?? null,
+  }));
+}
 
 export async function getWorkOrdersForVehicle(vehicleId: string, companyId?: string):Promise<IWorkOrder[]> {
   await connectDB();

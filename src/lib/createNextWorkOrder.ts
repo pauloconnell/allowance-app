@@ -46,7 +46,7 @@ export async function createNextWorkOrder(nextWO: Partial<IWorkOrder>) {
          : null;
 
       const nextDate = nextWO.serviceFrequencyWeeks
-         ? new Date(Date.now() + nextWO.serviceFrequencyWeeks * 7 * 24 * 60 * 60 * 1000)
+         ? new Date(Date.now() + Number(nextWO.serviceFrequencyWeeks) * 7 * 24 * 60 * 60 * 1000)
          : null;
 
       await WorkOrder.create({

@@ -13,12 +13,14 @@ import { sanitizeInput } from '@/lib/sanitizeInput';
 
 
 interface WorkOrderFormProps {
+   companyId: string;
    workOrderId?: string;
    vehicleId?: string;
    vehicles: IVehicle[];
 }
 
 export default function WorkOrderForm({
+   companyId,
    workOrderId,
    vehicleId,
    vehicles,
@@ -52,9 +54,9 @@ export default function WorkOrderForm({
    // BLOCK URL: if No IDs → redirect
    useEffect(() => {
       if (!workOrderId && !vehicleId) {
-         router.push('/protectedPages/vehicles');
+         router.push(`/protectedPages/${companyId}/vehicles`);
       }
-   }, [workOrderId, vehicleId, router]);
+   }, [workOrderId, vehicleId, companyId, router]);
 
    // 2) derive id
    const derivedVehicleId =
@@ -72,6 +74,7 @@ export default function WorkOrderForm({
    const [form, setForm] = useState<IFormWorkOrder>(() => {
       if (isEditing && storeWO) {
          return {
+            companyId,
             workOrderId: storeWO._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
@@ -92,6 +95,7 @@ export default function WorkOrderForm({
          };
       } // New Work Order
       return {
+         companyId,
          workOrderId: '',
          vehicleId: derivedVehicleId || '',
          serviceType: '',
@@ -112,6 +116,7 @@ export default function WorkOrderForm({
    useEffect(() => {
       if (isEditing && storeWO) {
          setForm({
+            companyId,
             workOrderId: storeWO?._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
@@ -129,7 +134,7 @@ export default function WorkOrderForm({
             serviceFrequencyWeeks: String(storeWO.serviceFrequencyWeeks ?? ''),
          });
       }
-   }, [isEditing, storeWO]);
+   }, [isEditing, storeWO, companyId]);
 
    // 4. Block rendering ONLY when editing and store isn't loaded
 
@@ -170,7 +175,7 @@ export default function WorkOrderForm({
       const method = isEditing ? 'PUT' : 'POST';
 
       const workOrderName = `${selectedVehicle?.year} ${selectedVehicle?.make} — ${selectedVehicle?.nickName}`;
-      const payload = { ...form, nickName: workOrderName };
+      const payload = { ...form, companyId, nickName: workOrderName };
       console.log('saving ', payload);
       const res = await fetch(url, {
          method,
@@ -180,8 +185,8 @@ export default function WorkOrderForm({
 
       if (res.ok) {
          toast.success('Work order saved');
-         await fetchAllWorkOrders(); // refresh Zustand store
-         router.push(`/protectedPages/vehicles/${form.vehicleId}`);
+         await fetchAllWorkOrders(companyId); // refresh Zustand store
+         router.push(`/protectedPages/${companyId}/vehicles/${form.vehicleId}`);
       } else {
          toast.error('Failed to save work order');
       }
@@ -192,14 +197,14 @@ export default function WorkOrderForm({
       const res = await fetch(`/api/work-orders/${form.workOrderId}/complete`, {
          method: 'PUT',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ completedBy: form.completedBy }),
+         body: JSON.stringify({ companyId, completedBy: form.completedBy }),
       });
 
       const data = await res.json();
 
       toast.success('Work order completed');
-      await fetchAllWorkOrders(); // refresh Zustand store
-      router.push(`/protectedPages/vehicles/${form.vehicleId}`);
+      await fetchAllWorkOrders(companyId); // refresh Zustand store
+      router.push(`/protectedPages/${companyId}/vehicles/${form.vehicleId}`);
 
       router.refresh();
    };

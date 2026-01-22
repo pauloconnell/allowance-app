@@ -7,7 +7,7 @@ import { useVehicleStore } from '@/store/useVehicleStore';
 import { sanitizeInput } from '@/lib/sanitizeInput';
 import type { IFormServiceRecord } from '@/types/IFormServiceRecord';
 
-export default function ServiceRecordForm({ vehicleId }: { vehicleId?: string }) {
+export default function ServiceRecordForm({ companyId, vehicleId }: { companyId: string; vehicleId?: string }) {
    const router = useRouter();
 
    // Zustand
@@ -19,6 +19,7 @@ export default function ServiceRecordForm({ vehicleId }: { vehicleId?: string })
 
       // Form state
    const [form, setForm] = useState<IFormServiceRecord>({
+      companyId,
       vehicleId: vehicleId || '',
       serviceType: '',
       serviceDate: new Date().toISOString().split('T')[0],
@@ -100,7 +101,7 @@ export default function ServiceRecordForm({ vehicleId }: { vehicleId?: string })
       });
 
       if (res.ok) {
-         router.push(`/protectedPages/vehicles/${form.vehicleId}`);
+         router.push(`/protectedPages/${companyId}/vehicles/${form.vehicleId}`);
       } else {
          alert('Failed to save record');
       }
