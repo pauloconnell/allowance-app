@@ -1,17 +1,23 @@
-'use client'
+'use client';
 import Link from 'next/link';
-import { useVehicleStore } from "@/store/useVehicleStore";
-import { IVehicle } from '@/types/IVehicle'
-
-
+import { useVehicleStore } from '@/store/useVehicleStore';
+import { useCompanyStore } from '@/store/useCompanyStore';
+import { IVehicle } from '@/types/IVehicle';
+import { useEffect } from 'react';
 
 interface VehicleListProps {
    vehicles: IVehicle[];
+   companyId: string;
 }
 
-export default function VehicleList({ vehicles }: VehicleListProps) {
-
-const setSelectedVehicle = useVehicleStore((s) => s.setSelectedVehicle);
+export default function VehicleList({ vehicles, companyId }: VehicleListProps) {
+   const setSelectedVehicle = useVehicleStore((s) => s.setSelectedVehicle);
+   // Get the current companyId from the store
+   
+const setActiveCompanyId = useCompanyStore((s) => s.setActiveCompanyId);
+   useEffect(() => {
+      if (companyId) setActiveCompanyId(companyId);
+   }, [companyId, setActiveCompanyId]);
 
    if (!vehicles || vehicles.length === 0) {
       return <p className="text-gray-500">No vehicles yet.</p>;
@@ -22,7 +28,7 @@ const setSelectedVehicle = useVehicleStore((s) => s.setSelectedVehicle);
          {vehicles.map((v) => (
             <Link
                key={v._id}
-               href={`/protectedPages/vehicles/${v._id}`}
+               href={`/protectedPages/vehicles/${v._id}?companyId=${companyId}`}
                onClick={() => setSelectedVehicle(v)}
                className="p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition"
             >

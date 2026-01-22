@@ -50,7 +50,7 @@ export default async function DashboardPage({ params }: PageProps) {
           Add Vehicle
         </Link>
           <h2 className="text-2xl font-semibold">Vehicles</h2>
-          <VehicleList vehicles={vehicles} />
+          <VehicleList vehicles={vehicles} companyId={companyId} />
         </section>
       </div>
     </div>
