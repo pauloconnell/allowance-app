@@ -1,5 +1,5 @@
-import { getSession } from '@auth0/nextjs-auth0/edge';
-import { NextResponse } from 'next/server';
+import { getSession } from '@auth0/nextjs-auth0';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Session context extracted from Auth0
@@ -21,9 +21,9 @@ export interface AuthContext {
  * Extract Auth0 session from request
  * Returns null if not authenticated
  */
-export async function getAuthSession(): Promise<SessionContext | null> {
+export async function getAuthSession(req?: NextRequest): Promise<SessionContext | null> {
    try {
-      const session = await getSession();
+      const session =req ? await getSession(req, new NextResponse()) : await getSession();
       if (!session?.user) return null;
 
       return {

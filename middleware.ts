@@ -1,4 +1,4 @@
-import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
+import { withMiddlewareAuthRequired, getSession } from '@auth0/nextjs-auth0/edge';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -8,6 +8,11 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export default withMiddlewareAuthRequired(async function middleware(req: NextRequest) {
    const pathname = req.nextUrl.pathname;
+   const res = NextResponse.next();
+
+// 1. "Touch" the session. This handles session rolling/refresh 
+   // and prevents the "Set Cookie" error in Server Components.
+   const session = await getSession(req, res);
 
    // Allow these paths without company check
    const allowedPaths = [

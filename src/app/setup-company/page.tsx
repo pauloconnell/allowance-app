@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react';
 import { createCompany } from '@/lib/actions/company';
 import { useRouter } from 'next/navigation';
+import { sanitizeInput } from '@/lib/sanitizeInput';
 
 export default function SetupCompanyPage() {
    const [companyName, setCompanyName] = useState('');
@@ -14,9 +15,15 @@ export default function SetupCompanyPage() {
       e.preventDefault();
       setError('');
       setLoading(true);
+      let sanitizedCompanyName = "";
+      try{
+        sanitizedCompanyName = sanitizeInput(companyName);
+      }catch(e){
+        setError('Replacing Invalid characters in company name failed.');
+      }
 
       try {
-         const result = await createCompany(companyName);
+         const result = await createCompany(sanitizedCompanyName);
          if (result?.error) {
             setError(result.error);
          }
