@@ -5,6 +5,9 @@ import { IWorkOrder } from '@/types/IWorkOrder';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 import { useVehicleStore } from '@/store/useVehicleStore';
 import { LoadingSpinner} from '@/components/UI/LoadingSpinner';
+import { CardWorkOrder } from '@/components/UI/CardWorkOrder';
+
+
 interface ServiceDueProps {
    vehicleId?: string;
    companyId: string;
@@ -62,12 +65,14 @@ export default function ServiceDue({ vehicleId, companyId }: ServiceDueProps) {
                   key={wo._id}
                   className="p-3 border rounded-lg bg-yellow-50 hover:bg-gray-50 transition"
                >
-                  <Link
+
+                  <CardWorkOrder wo={wo} companyId={companyId} />
+                  {/* <Link
                      href={`/protectedPages/${companyId}/work-orders/${wo._id}`}
                      onClick={() => setSelectedWorkOrder(wo)}
                   >
                      <div className="text-center font-extrabold text-lg mb-2">
-                        {/* <pre className="text-xs text-left"> {JSON.stringify(wo, null, 2)} </pre>  */}
+              
                         {wo?.nickName ?? ''}
                      </div>
 
@@ -87,7 +92,7 @@ export default function ServiceDue({ vehicleId, companyId }: ServiceDueProps) {
                      <div className="text-sm text-gray-500">
                         Service Due @: {wo.serviceDueKM} KM
                      </div>)}
-                  </Link>
+                  </Link> */}
                </li>
             ))}
          </ul>

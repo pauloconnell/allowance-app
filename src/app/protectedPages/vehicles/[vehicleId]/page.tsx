@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getServiceHistory } from '@/lib/serviceRecords';
 import { getVehicleById } from '@/lib/vehicles';
-import ServiceDue from '@/components/Dashboard/ServiceDue/ServiceDue';
+import ServiceDue from '@/components/ServiceDue/ServiceDue';
 //import { requireAuth } from '@/lib/requireAuth';
 
 interface Props {

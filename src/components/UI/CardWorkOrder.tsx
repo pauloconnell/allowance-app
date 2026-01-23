@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Calendar, Gauge, ChevronRight, AlertCircle, Info } from 'lucide-react';
+import { Calendar, Gauge, ChevronRight, AlertCircle, Info, Wrench } from 'lucide-react';
 import { IWorkOrder } from '@/types/IWorkOrder';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 
@@ -46,21 +46,27 @@ export const CardWorkOrder = ({ wo, companyId }: WorkOrderProps) => {
                 ? 'bg-red-50 text-red-700 border-red-100' 
                 : 'bg-primary-50 text-primary-700 border-primary-100'
             }`}>
-              {isOverdue ? 'Action Required' : wo.serviceType}
+              {isOverdue ? 'Action Required' : ""}
             </span>
           </div>
 
           {/* Details Row */}
           <div className="flex flex-wrap items-center gap-y-2 gap-x-6">
+
+               <div className="flex items-center text-md text-secondary-500 font-medium">
+              <Wrench className={`w-4 h-4 mr-2 ${isOverdue ? 'text-red-500' : 'text-primary-500'}`} />
+              
+              { wo.serviceType}
+            </div>
             <div className="flex items-center text-sm text-secondary-500 font-medium">
               <Calendar className={`w-4 h-4 mr-2 ${isOverdue ? 'text-red-500' : 'text-primary-500'}`} />
-              {dateFormatted}
+              Due: {dateFormatted}
             </div>
 
             {wo.serviceDueKM && (
               <div className="flex items-center text-sm text-secondary-500 font-medium">
                 <Gauge className="w-4 h-4 mr-2 text-primary-500" />
-                {wo.serviceDueKM.toLocaleString()} <span className="ml-1 text-[10px] uppercase opacity-60">km</span>
+                Due:{wo.serviceDueKM.toLocaleString()} <span className="ml-1 text-[10px] uppercase opacity-60">km</span>
               </div>
             )}
 
