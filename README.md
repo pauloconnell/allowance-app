@@ -36,11 +36,11 @@ TODOD (nice to have):
 remove list of vehicles from work orders and 
 
 // ui dashboard
-=> move 'record service' down and center 'dashboard'
-=> same for 'add vehicle' - move down and flex align to start finish
-/vehicles/
-=> spread create work order, 3 buttons flex across width space even
+=> move 'record service' into 'quick actions'
 
+/vehicles/
+
+add 'quick actions here too' just like record service
 
 
 // BUGS
