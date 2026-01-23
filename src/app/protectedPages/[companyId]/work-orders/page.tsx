@@ -43,7 +43,8 @@ export default async function WorkOrdersPage({ params }: { params: Promise<{ com
               //   href={`/protectedPages/${companyId}/work-orders/${wo._id}`}
               //   className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow"
               // >
-              <CardWorkOrder wo={wo} companyId={companyId} />
+             
+              <CardWorkOrder key={wo._id} wo={wo} companyId={companyId} />
               
             ))}
           </div>
