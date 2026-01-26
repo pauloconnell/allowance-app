@@ -36,11 +36,11 @@ export async function createFamily(name: string) {
         .replace(/^-|-$/g, ''),
       isActive: true,
     });
-
+console.log("family created")
     await UserFamily.create({
       userId: session.user.sub,
       familyId: company._id,
-      role: 'owner',
+      role: 'parent',
       email: session.user.email,
       firstName: session.user.given_name || '',
       lastName: session.user.family_name || '',
@@ -48,6 +48,7 @@ export async function createFamily(name: string) {
     });
 
     newFamilyId = company._id.toString();
+    console.log("userFamily created", newFamilyId)
   } catch (error: any) {
     if (error.code === 11000) {
       return { error: 'A family with this name already exists. Please try a different name.' };
@@ -57,7 +58,7 @@ export async function createFamily(name: string) {
   }
 
   if (newFamilyId) {
-    redirect(`/dashboard?familyId=${newFamilyId}`);
+    redirect(`/dashboard/${newFamilyId}`);
   }
 }
 

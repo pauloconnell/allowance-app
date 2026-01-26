@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { IWorkOrder } from '@/types/IWorkOrder';
-import { useCompanyStore } from './useCompanyStore';
+import { useCompanyStore } from './useFamilyStore';
 
 interface WorkOrderState {
    workOrders: IWorkOrder[];

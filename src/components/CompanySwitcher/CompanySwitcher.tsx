@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IFamily } from '@/types/IFamily';
 import { useState, useEffect } from 'react';
-import { useFamilyStore } from '@/store/useCompanyStore';
+import { useFamilyStore } from '@/store/useFamilyStore';
 
 interface CompanySwitcherProps {
    companies: (IFamily & { role: string })[];

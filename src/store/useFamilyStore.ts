@@ -26,4 +26,4 @@ export const useFamilyStore = create<useFamilyState>((set) => ({
 }));
 
 // Backward compatibility alias
-export const useCompanyStore = useFamilyStore;
+export const useFamilyStore;

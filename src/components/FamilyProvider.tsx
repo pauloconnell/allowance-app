@@ -1,14 +1,14 @@
 'use client';
 
-import { useCompanyStore } from '@/store/useFamilyStore';
+import { useFamilyStore } from '@/store/useFamilyStore';
 import { useEffect } from 'react';
 
 /**
- * CompanyProvider: Initializes activefamilyId in the store
+ * FamilyProvider: Initializes activefamilyId in the store
  * Place this at the [familyId] route level to ensure all child components
  * have access to the active company context
  */
-export default function CompanyProvider({
+export default function FamilyProvider({
    children,
    familyId,
 }: {
@@ -16,7 +16,7 @@ export default function CompanyProvider({
    familyId: string;
 }) {
    useEffect(() => {
-      useCompanyStore.setState({ activefamilyId: familyId });
+      useFamilyStore.setState({ activefamilyId: familyId });
    }, [familyId]);
 
    return <>{children}</>;

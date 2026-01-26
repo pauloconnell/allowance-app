@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useChildStore } from '@/store/useVehicleStore';
-import { useFamilyStore } from '@/store/useCompanyStore';
+import { useFamilyStore } from '@/store/useFamilyStore';
 import { IVehicle } from '@/types/IVehicle';
 import { useEffect } from 'react';
 
