@@ -65,7 +65,7 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
       'daily-record': ['read', 'write', 'create'],
    },family
  * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
  * @returns User's role or null if not a member
  */
 export async function getUserRoleInFamily(
@@ -74,14 +74,14 @@ export async function getUserRoleInFamily(
  */
 export async function getUserRoleInCompany(
    userId: string,
-   companyId: string
+   familyId: string
 ): Promise<UserRole | null> {
    try {
       await connectDB();
 
       const userCompany = await UserCompany.findOne({
          userId,
-         companyId: familyId,
+         familyId: familyId,
          isActive: true,
       }).lean();
 
@@ -97,7 +97,7 @@ export async function getUserRoleInCompany(
 /**
  * Check if a user can perform an action on a resource in a family
  * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
  * @param resource - Type of resource (child, chore, daily-record)
  * @param action - Action to perform (create, read, update, delete, complete, approve)
  * @returns true if user has permission, false otherwise
@@ -136,7 +136,7 @@ export async function hasPermission(
 /**
  * Assert that a user has permission for an action (throws if not authorized)
  * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
  * @param resource - Type of resource
  * @param action - Action to perform
  * @throws Error if user lacks permission
@@ -160,7 +160,7 @@ export async function assertPermission(
  * Get all permissions for a user in a family
  * Useful for frontend conditional rendering
  * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
  * @returns Object mapping resources to their allowed actions, or null if not a member
  */
 export async function getUserPermissions(
@@ -178,7 +178,7 @@ export async function getUserPermissions(
  * Get the user's role information for a family
  * Useful for UI/logging purposes
  * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
  * @returns User's family role info or null
  */
 export async function getUserFamilyInfo(userId: string, familyId: string) {
@@ -187,7 +187,7 @@ export async function getUserFamilyInfo(userId: string, familyId: string) {
 
       const userCompany = await UserCompany.findOne({
          userId,
-         companyId: familyId,
+         familyId: familyId,
       }).lean();
 
       if (!userCompany) return null;

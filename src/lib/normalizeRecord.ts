@@ -11,6 +11,6 @@ export function normalizeRecord<T extends Record<string, any>>(doc: T) {
     familyId: obj.familyId?.toString() ?? obj.familyId ?? "",
     // Legacy aliases for backward compatibility
     vehicleId: obj.childId?.toString() ?? obj.vehicleId ?? "",
-    companyId: obj.familyId?.toString() ?? obj.companyId ?? "",
+    familyId: obj.familyId?.toString() ?? obj.familyId ?? "",
   };
 }

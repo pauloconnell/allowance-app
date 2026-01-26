@@ -4,15 +4,15 @@ import { getChildById } from '@/lib/children';
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
 
 interface Props {
-   params: Promise<{ companyId: string; vehicleId: string }>;
+   params: Promise<{ familyId: string; vehicleId: string }>;
 }
 
 export default async function VehiclePage({ params }: Props) {
-   const { companyId, vehicleId } = await params;
+   const { familyId, vehicleId } = await params;
 
    // Fetch child + daily record history from MongoDB
-   const vehicle = await getChildById(vehicleId, companyId);
-   const history = await getDailyHistory(vehicleId, companyId);
+   const vehicle = await getChildById(vehicleId, familyId);
+   const history = await getDailyHistory(vehicleId, familyId);
 
    if (!vehicle) {
       return (
@@ -27,13 +27,13 @@ export default async function VehiclePage({ params }: Props) {
          {/* Back Button */}
          <div className="flex justify-between items-center mb-6 mt-3 mx-6">
             <Link
-               href={`/protectedPages/${companyId}/dashboard`}
+               href={`/protectedPages/${familyId}/dashboard`}
                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
             >
                Back to Dashboard
             </Link>
             <Link
-               href={`/protectedPages/${companyId}/vehicles/${vehicleId}/edit`}
+               href={`/protectedPages/${familyId}/vehicles/${vehicleId}/edit`}
                className="bg-yellow-600 text-white px-4 py-2 rounded-lg"
             >
                Edit Vehicle
@@ -49,14 +49,14 @@ export default async function VehiclePage({ params }: Props) {
          {/* Action Buttons */}
          <div className="flex gap-4">
             <Link
-               href={`/protectedPages/${companyId}/work-orders/new?vehicleId=${vehicleId}`}
+               href={`/protectedPages/${familyId}/work-orders/new?vehicleId=${vehicleId}`}
                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
             >
                Create Work Order
             </Link>
 
             <Link
-               href={`/protectedPages/${companyId}/record-service/${vehicleId}`}
+               href={`/protectedPages/${familyId}/record-service/${vehicleId}`}
                className="bg-green-600 text-white px-4 py-2 rounded-lg"
             >
                Record Service
@@ -66,7 +66,7 @@ export default async function VehiclePage({ params }: Props) {
          {/* Service Due */}
          <section className="flex flex-col gap-6 min-h-[150px]">
             <h2 className="text-2xl font-semibold">Service Due</h2>
-            <ServiceDue companyId={companyId} />
+            <ServiceDue familyId={familyId} />
          </section>
 
          {/* Service History */}

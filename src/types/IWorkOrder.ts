@@ -4,7 +4,7 @@ export interface IWorkOrder extends IBaseService {
    nickName: string;
    year?: string;
    type?: string;
-   companyId: string;
+   familyId: string;
    status: 'open' | 'completed';
    previousWorkOrderId?: string;
    serviceDate: string;

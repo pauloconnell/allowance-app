@@ -304,7 +304,7 @@ Tomorrow's Record Will Include:
 ## Component Integration
 
 ### Main Page Component
-Location: `src/app/protectedPages/[companyId]/daily-records/page.tsx`
+Location: `src/app/protectedPages/[familyId]/daily-records/page.tsx`
 
 **Flow**:
 ```
@@ -523,7 +523,7 @@ fetch('/api/children/CHILD_ID')
 | [permissions.ts](src/lib/access-control/permissions.ts) | RBAC permission matrix |
 | [DailyRecordView.tsx](src/components/DailyRecord/DailyRecordView.tsx) | Child/Parent view component |
 | [ParentReview.tsx](src/components/DailyRecord/ParentReview.tsx) | Parent approval component |
-| [daily-records/page.tsx](src/app/protectedPages/[companyId]/daily-records/page.tsx) | Main page |
+| [daily-records/page.tsx](src/app/protectedPages/[familyId]/daily-records/page.tsx) | Main page |
 
 ---
 

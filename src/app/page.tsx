@@ -19,15 +19,15 @@ export default async function Home() {
       ? '/protectedPages/dashboard'
       : '/api/auth/login?screen_hint=signup';
    let families: (IFamily & { role: string })[] = [];
-   let activeCompanyId = '';
+   let activefamilyId = '';
 
    if (isLoggedIn && session?.user) {
       try {
          console.log('FETCHING families FOR USER ID:', session.user.sub);
          families = await getUserFamilies(session.user.sub);
          if (families.length > 0) {
-            const firstCompanyId = families[0]._id;
-            href = `/protectedPages/${firstCompanyId}/dashboard`;
+            const firstfamilyId = families[0]._id;
+            href = `/protectedPages/${firstfamilyId}/dashboard`;
          } else {
             href = '/setup-family';
          }
@@ -106,7 +106,7 @@ export default async function Home() {
                         <div className="w-full sm:w-auto">
                            <FamilySwitcher
                               families={families}
-                              activeFamilyId={activeCompanyId}
+                              activeFamilyId={activefamilyId}
                            />
                         </div>
                      )}

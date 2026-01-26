@@ -66,9 +66,9 @@ export default function ServiceDue({ childId, familyId }: ServiceDueProps) {
                   className="p-3 border rounded-lg bg-yellow-50 hover:bg-gray-50 transition"
                >
 
-                  <CardWorkOrder wo={wo} companyId={companyId} />
+                  <CardWorkOrder wo={wo} familyId={familyId} />
                   {/* <Link
-                     href={`/protectedPages/${companyId}/work-orders/${wo._id}`}
+                     href={`/protectedPages/${familyId}/work-orders/${wo._id}`}
                      onClick={() => setSelectedWorkOrder(wo)}
                   >
                      <div className="text-center font-extrabold text-lg mb-2">

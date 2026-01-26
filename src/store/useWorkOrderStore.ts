@@ -9,7 +9,7 @@ interface WorkOrderState {
    setSelectedWorkOrder: (wo: IWorkOrder | null) => void;
    clearSelectedWorkOrder: () => void;
    // Fetchers
-   fetchAllWorkOrders: (companyId: string) => Promise<void>;
+   fetchAllWorkOrders: (familyId: string) => Promise<void>;
    fetchWorkOrder: (id: string) => Promise<void>;
    // Derived selectors
    getWorkOrdersForVehicle: (vehicleId: string) => IWorkOrder[];
@@ -25,15 +25,15 @@ export const useWorkOrderStore = create<WorkOrderState>((set, get) => ({
 
    clearSelectedWorkOrder: () => set({ selectedWorkOrder: null }),
 
-   fetchAllWorkOrders: async (companyId: string) => {
+   fetchAllWorkOrders: async (familyId: string) => {
 
-      //const companyId = useCompanyStore.getState().activeCompanyId;
-      if (!companyId){
-         console.log("No active companyId in store, cannot fetch work orders");
+      //const familyId = useCompanyStore.getState().activefamilyId;
+      if (!familyId){
+         console.log("No active familyId in store, cannot fetch work orders");
       } 
 
       try {
-         const res = await fetch(`/api/work-orders?companyId=${companyId}`);
+         const res = await fetch(`/api/work-orders?familyId=${familyId}`);
          if (!res.ok) {
             throw new Error(`Failed to fetch work order: ${res.statusText}`);
          }
@@ -48,8 +48,8 @@ export const useWorkOrderStore = create<WorkOrderState>((set, get) => ({
          // id = workorderId
    fetchWorkOrder: async (workOrderId: string) => {
       try {
-         const companyId = useCompanyStore.getState().activeCompanyId;
-         const res = await fetch(`/api/work-orders/${workOrderId}?companyId=${companyId}`);
+         const familyId = useCompanyStore.getState().activefamilyId;
+         const res = await fetch(`/api/work-orders/${workOrderId}?familyId=${familyId}`);
          if (!res.ok) {
             throw new Error(`Failed to fetch work order: ${res.statusText}`);
          }

@@ -39,7 +39,7 @@ export async function createFamily(name: string) {
 
     await UserFamily.create({
       userId: session.user.sub,
-      companyId: company._id,
+      familyId: company._id,
       role: 'owner',
       email: session.user.email,
       firstName: session.user.given_name || '',
@@ -78,7 +78,7 @@ export async function inviteFamilyMember(familyId: string, email: string, role: 
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7); // 7 days
 
     await Invite.create({
-      companyId: familyId,
+      familyId: familyId,
       email: email.toLowerCase().trim(),
       role,
       token,

@@ -9,10 +9,10 @@ import type { IFormVehicle } from '@/types/IFormVehicle';
 
 interface VehicleFormProps {
    vehicle?: IVehicle | IFormVehicle;
-   companyId?: string;
+   familyId?: string;
 }
 
-export default function VehicleForm({ vehicle, companyId }: VehicleFormProps) {
+export default function VehicleForm({ vehicle, familyId }: VehicleFormProps) {
    const router = useRouter();
 
    const isEdit = !!vehicle;
@@ -26,7 +26,7 @@ export default function VehicleForm({ vehicle, companyId }: VehicleFormProps) {
       mileage: vehicle?.mileage ?? '',
       vin: vehicle?.vin ?? '',
       vehicleId: derivedVehicleId,
-      companyId: companyId ?? '',
+      familyId: familyId ?? '',
    });
 
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,26 +42,26 @@ export default function VehicleForm({ vehicle, companyId }: VehicleFormProps) {
          let res = await fetch(`/api/vehicles/${savedVehicle._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...form, companyId }),
+            body: JSON.stringify({ ...form, familyId }),
          });
 
          if (!res.ok) throw new Error('Failed to update vehicle');
          toast.success('Vehicle updated');
 
-         router.push(`/protectedPages/${companyId}/vehicles/${savedVehicle._id}`);
+         router.push(`/protectedPages/${familyId}/vehicles/${savedVehicle._id}`);
          router.refresh();
       } else {
          // CREATE new vehicle
          let res = await fetch('/api/vehicles', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...form, companyId }),
+            body: JSON.stringify({ ...form, familyId }),
          });
 
          if (!res.ok) throw new Error('Failed to create vehicle');
          toast.success('Vehicle created');
 
-         router.push(`/protectedPages/${companyId}/dashboard`);
+         router.push(`/protectedPages/${familyId}/dashboard`);
          router.refresh();
       }
    };

@@ -74,7 +74,7 @@ export default function WorkOrderForm({
    const [form, setForm] = useState<IFormWorkOrder>(() => {
       if (isEditing && storeWO) {
          return {
-            companyId: familyId,
+            familyId: familyId,
             workOrderId: storeWO._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
@@ -95,7 +95,7 @@ export default function WorkOrderForm({
          };
       } // New Work Order
       return {
-         companyId: familyId,
+         familyId: familyId,
          workOrderId: '',
          vehicleId: derivedChildId || '',
          serviceType: '',
@@ -116,7 +116,7 @@ export default function WorkOrderForm({
    useEffect(() => {
       if (isEditing && storeWO) {
          setForm({
-            companyId: familyId,
+            familyId: familyId,
             workOrderId: storeWO?._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
@@ -175,7 +175,7 @@ export default function WorkOrderForm({
       const method = isEditing ? 'PUT' : 'POST';
 
       const workOrderName = `${selectedVehicle?.year} ${selectedVehicle?.make} — ${selectedVehicle?.nickName}`;
-      const payload = { ...form, companyId, nickName: workOrderName };
+      const payload = { ...form, familyId, nickName: workOrderName };
       console.log('saving ', payload);
       const res = await fetch(url, {
          method,
@@ -185,8 +185,8 @@ export default function WorkOrderForm({
 
       if (res.ok) {
          toast.success('Work order saved');
-         await fetchAllWorkOrders(companyId); // refresh Zustand store
-         router.push(`/protectedPages/${companyId}/vehicles/${form.vehicleId}`);
+         await fetchAllWorkOrders(familyId); // refresh Zustand store
+         router.push(`/protectedPages/${familyId}/vehicles/${form.vehicleId}`);
       } else {
          toast.error('Failed to save work order');
       }
@@ -197,14 +197,14 @@ export default function WorkOrderForm({
       const res = await fetch(`/api/work-orders/${form.workOrderId}/complete`, {
          method: 'PUT',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ companyId, completedBy: form.completedBy }),
+         body: JSON.stringify({ familyId, completedBy: form.completedBy }),
       });
 
       const data = await res.json();
 
       toast.success('Work order completed');
-      await fetchAllWorkOrders(companyId); // refresh Zustand store
-      router.push(`/protectedPages/${companyId}/vehicles/${form.vehicleId}`);
+      await fetchAllWorkOrders(familyId); // refresh Zustand store
+      router.push(`/protectedPages/${familyId}/vehicles/${form.vehicleId}`);
 
       router.refresh();
    };

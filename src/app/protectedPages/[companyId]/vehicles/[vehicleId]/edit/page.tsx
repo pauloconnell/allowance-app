@@ -4,11 +4,11 @@ import EditFormWrapper from "./EditFormWrapper";
 import mongoose from "mongoose";
 
 interface Props {
-   params: Promise<{ companyId: string; vehicleId: string }>;
+   params: Promise<{ familyId: string; vehicleId: string }>;
 }
 
 export default async function EditVehiclePage({ params }: Props) {
-   const { companyId, vehicleId } = await params;
+   const { familyId, vehicleId } = await params;
 
    if (!mongoose.isValidObjectId(vehicleId)) {
       return (
@@ -21,7 +21,7 @@ export default async function EditVehiclePage({ params }: Props) {
    let vehicle = null;
    try {
       // Fetch child from DB with family scope
-      const doc = await getChildById(vehicleId, companyId);
+      const doc = await getChildById(vehicleId, familyId);
       vehicle = JSON.parse(JSON.stringify(doc));
    } catch (err) {
       console.error('Failed to load child:', err);
@@ -45,7 +45,7 @@ export default async function EditVehiclePage({ params }: Props) {
          {/* Back Button */}
          <div className="flex justify-between items-center mb-6 mt-3 mx-6">
             <Link
-               href={`/protectedPages/${companyId}/vehicles/${vehicleId}`}
+               href={`/protectedPages/${familyId}/vehicles/${vehicleId}`}
                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
             >
                Back to Vehicle
@@ -57,7 +57,7 @@ export default async function EditVehiclePage({ params }: Props) {
 
          {/* Form */}
          <div className="max-w-3xl mx-auto px-6 py-6">
-            <EditFormWrapper vehicle={vehicle} companyId={companyId} />
+            <EditFormWrapper vehicle={vehicle} familyId={familyId} />
          </div>
       </div>
    );

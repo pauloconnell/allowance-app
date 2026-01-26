@@ -4,11 +4,11 @@ import ChildList from '@/components/vehicle/VehicleList';
 import Link from 'next/link';
 
 interface PageProps {
-   params: Promise<{ companyId: string }>;
+   params: Promise<{ familyId: string }>;
 }
 
 export default async function DashboardPage({ params }: PageProps) {
-   const { companyId: familyId } = await params;
+   const { familyId: familyId } = await params;
    let children = [];
    try {
       children = await getAllChildren(familyId);

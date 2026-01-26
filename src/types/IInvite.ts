@@ -1,6 +1,6 @@
 export interface IInvite {
    _id: string;
-   companyId: string;
+   familyId: string;
    email: string;
    role: 'admin' | 'manager' | 'user';
    token: string;

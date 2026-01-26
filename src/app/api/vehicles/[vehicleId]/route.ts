@@ -20,21 +20,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ vehi
     }
 
     const body = await req.json();
-    const companyId = body.companyId;
+    const familyId = body.familyId;
 
-    if (!companyId) {
-      return validationErrorResponse('companyId is required');
+    if (!familyId) {
+      return validationErrorResponse('familyId is required');
     }
 
     // RBAC: Check update permission
     try {
-      await assertPermission(session.userId, companyId, 'vehicle', 'update');
+      await assertPermission(session.userId, familyId, 'vehicle', 'update');
     } catch (err) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Query with companyId for security
-    const existing = await Vehicle.findOne({ _id: vehicleId, companyId }).lean();
+    // Query with familyId for security
+    const existing = await Vehicle.findOne({ _id: vehicleId, familyId }).lean();
     if (!existing) {
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
@@ -47,7 +47,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ vehi
     }
 
     const updated = await Vehicle.findOneAndUpdate(
-      { _id: vehicleId, companyId },
+      { _id: vehicleId, familyId },
       sanitized,
       { new: true }
     );
@@ -74,19 +74,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ vehi
       return validationErrorResponse("Invalid ID format");
     }
 
-    const companyId = new URL(req.url).searchParams.get('companyId');
-    if (!companyId) {
-      return validationErrorResponse('companyId is required');
+    const familyId = new URL(req.url).searchParams.get('familyId');
+    if (!familyId) {
+      return validationErrorResponse('familyId is required');
     }
 
     // RBAC: Check read permission
-    const canRead = await hasPermission(session.userId, companyId, 'vehicle', 'read');
+    const canRead = await hasPermission(session.userId, familyId, 'vehicle', 'read');
     if (!canRead) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Query with companyId for security
-    const vehicle = await Vehicle.findOne({ _id: vehicleId, companyId });
+    // Query with familyId for security
+    const vehicle = await Vehicle.findOne({ _id: vehicleId, familyId });
     if (!vehicle) {
       return NextResponse.json({ error: `Vehicle not found` }, { status: 404 });
     }

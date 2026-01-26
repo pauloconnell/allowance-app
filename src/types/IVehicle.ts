@@ -1,6 +1,6 @@
 export interface IVehicle {
    _id: string;
-   companyId: string;
+   familyId: string;
    vehicleId?: string;
    nickName: string;
    make: string;

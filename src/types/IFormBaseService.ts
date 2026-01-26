@@ -2,7 +2,7 @@
 // All fields are strings because HTML inputs return strings
 export interface IFormBaseService {
     _id?: string;                // DB version: string (required after creation)
-    companyId: string;
+    familyId: string;
     vehicleId?: string;           // DB version: has this, but form may not yet
     nickName?: string;
     serviceType: string;         // DB version: string

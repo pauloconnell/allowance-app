@@ -1,6 +1,6 @@
 export interface IBaseService {
    _id: string; // Form version: string (optional during creation)
-   companyId: string;
+   familyId: string;
    vehicleId: string;
    nickName: string;
    serviceType: string;

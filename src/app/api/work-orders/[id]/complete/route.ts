@@ -30,26 +30,26 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return validationErrorResponse('completedBy is required');
    }
 
-   // 1. Fetch the work order to get companyId
+   // 1. Fetch the work order to get familyId
    const workOrder = await WorkOrder.findById(id).lean();
    if (!workOrder) {
       return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
    }
 
-   const companyId = workOrder.companyId?.toString() ?? '';
-   if (!companyId) {
+   const familyId = workOrder.familyId?.toString() ?? '';
+   if (!familyId) {
       return NextResponse.json({ error: 'Work order missing company context' }, { status: 400 });
    }
 
    // 2. RBAC: Verify user belongs to family
-   const canComplete = await hasPermission(session.userId, companyId, 'chore', 'complete');
+   const canComplete = await hasPermission(session.userId, familyId, 'chore', 'complete');
    if (!canComplete) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
    }
 
-   // 3. Update the work order to mark 'completed' with companyId in query
+   // 3. Update the work order to mark 'completed' with familyId in query
    await WorkOrder.findOneAndUpdate(
-      { _id: id, companyId },
+      { _id: id, familyId },
       {
          status: 'completed',
          completedBy: body.completedBy,
@@ -57,9 +57,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
    );
 
-   // 4. Create the service record with companyId
+   // 4. Create the service record with familyId
    const serviceRecord = await ServiceRecord.create({
-      companyId, // Explicitly set companyId
+      familyId, // Explicitly set familyId
       vehicleId: workOrder.vehicleId,
       workOrderId: workOrder._id,
       serviceType: workOrder.serviceType,
@@ -78,7 +78,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
    // 5. Handle recurring work orders
    if (workOrder.isRecurring) {
       const next: Partial<IWorkOrder> = {
-         companyId, // Explicitly set companyId
+         familyId, // Explicitly set familyId
          vehicleId: workOrder.vehicleId,
          nickName: workOrder.nickName,
          previousWorkOrderId: workOrder._id,

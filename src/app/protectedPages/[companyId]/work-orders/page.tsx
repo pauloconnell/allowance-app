@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   title: 'Work Orders',
 };
 
-export default async function WorkOrdersPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { companyId } = await params;
+export default async function WorkOrdersPage({ params }: { params: Promise<{ familyId: string }> }) {
+  const { familyId } = await params;
 
-  const workOrders = await getAllChores(companyId);
+  const workOrders = await getAllChores(familyId);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,7 +18,7 @@ export default async function WorkOrdersPage({ params }: { params: Promise<{ com
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-semibold">Work Orders</h1>
           <Link
-            href={`/protectedPages/${companyId}/work-orders/new`}
+            href={`/protectedPages/${familyId}/work-orders/new`}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
             Create Work Order
@@ -29,7 +29,7 @@ export default async function WorkOrdersPage({ params }: { params: Promise<{ com
           <div className="text-center py-12">
             <p className="text-gray-500">No work orders yet</p>
             <Link
-              href={`/protectedPages/${companyId}/work-orders/new`}
+              href={`/protectedPages/${familyId}/work-orders/new`}
               className="text-blue-600 hover:underline mt-4 inline-block"
             >
               Create the first one
@@ -40,11 +40,11 @@ export default async function WorkOrdersPage({ params }: { params: Promise<{ com
             {workOrders.map((wo) => (
               // <Link
               //   key={wo._id}
-              //   href={`/protectedPages/${companyId}/work-orders/${wo._id}`}
+              //   href={`/protectedPages/${familyId}/work-orders/${wo._id}`}
               //   className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow"
               // >
              
-              <CardWorkOrder key={wo._id} wo={wo} companyId={companyId} />
+              <CardWorkOrder key={wo._id} wo={wo} familyId={familyId} />
               
             ))}
           </div>

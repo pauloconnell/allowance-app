@@ -8,15 +8,15 @@ export const metadata: Metadata = {
 export default async function RecordServiceDetailPage({
   params,
 }: {
-  params: Promise<{ companyId: string; vehicleId: string }>;
+  params: Promise<{ familyId: string; vehicleId: string }>;
 }) {
-  const { companyId, vehicleId } = await params;
+  const { familyId, vehicleId } = await params;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-semibold mb-8">Record Service</h1>
-        <ServiceRecordFormWrapper companyId={companyId} vehicleId={vehicleId} />
+        <ServiceRecordFormWrapper familyId={familyId} vehicleId={vehicleId} />
       </div>
     </div>
   );

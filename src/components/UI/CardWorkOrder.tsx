@@ -7,10 +7,10 @@ import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 
 interface WorkOrderProps {
    wo: IWorkOrder;
-   companyId: string;
+   familyId: string;
 }
 
-export const CardWorkOrder = ({ wo, companyId }: WorkOrderProps) => {
+export const CardWorkOrder = ({ wo, familyId }: WorkOrderProps) => {
    const { setSelectedWorkOrder } = useWorkOrderStore.getState();
   // Logic: Check if service is past due
   const isOverdue = wo.serviceDueDate && new Date(wo.serviceDueDate) < new Date();
@@ -27,7 +27,7 @@ export const CardWorkOrder = ({ wo, companyId }: WorkOrderProps) => {
   return (
     <li className="list-none">
       <Link
-        href={`/protectedPages/${companyId}/work-orders/${wo._id}`}
+        href={`/protectedPages/${familyId}/work-orders/${wo._id}`}
         onClick={() => setSelectedWorkOrder(wo)}
         className="wo-card group flex items-center justify-between"
       >

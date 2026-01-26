@@ -4,20 +4,20 @@ import { useCompanyStore } from '@/store/useCompanyStore';
 import { useEffect } from 'react';
 
 /**
- * CompanyProvider: Initializes activeCompanyId in the store
- * Place this at the [companyId] route level to ensure all child components
+ * CompanyProvider: Initializes activefamilyId in the store
+ * Place this at the [familyId] route level to ensure all child components
  * have access to the active company context
  */
 export default function CompanyProvider({
    children,
-   companyId,
+   familyId,
 }: {
    children: React.ReactNode;
-   companyId: string;
+   familyId: string;
 }) {
    useEffect(() => {
-      useCompanyStore.setState({ activeCompanyId: companyId });
-   }, [companyId]);
+      useCompanyStore.setState({ activefamilyId: familyId });
+   }, [familyId]);
 
    return <>{children}</>;
 }

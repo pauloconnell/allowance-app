@@ -8,7 +8,7 @@
  * STRATEGY 1: URL Parameter (Recommended)
  * =====================================
  * 
- * Pattern: /[companyId]/dashboard, /[companyId]/vehicles, etc.
+ * Pattern: /[familyId]/dashboard, /[familyId]/vehicles, etc.
  * 
  * Pros:
  * - Clean separation of routes by company
@@ -22,15 +22,15 @@
  * - Requires route refactoring
  * 
  * Implementation:
- * - Restructure app routes to include [companyId] param
- * - Update all navigation to include companyId
+ * - Restructure app routes to include [familyId] param
+ * - Update all navigation to include familyId
  * - Use searchParams as fallback for other routes
  * 
  * 
  * STRATEGY 2: Query Parameter (Current Approach)
  * ==========================================
  * 
- * Pattern: /dashboard?companyId=123, /vehicles?companyId=123
+ * Pattern: /dashboard?familyId=123, /vehicles?familyId=123
  * 
  * Pros:
  * - Minimal routing changes needed
@@ -45,7 +45,7 @@
  * - Can be forgotten when navigating
  * 
  * Implementation:
- * - Pass companyId in all navigation
+ * - Pass familyId in all navigation
  * - Store in URL searchParams
  * - Client components can read from useSearchParams()
  * 
@@ -53,7 +53,7 @@
  * STRATEGY 3: Cookie (Session-based)
  * ===============================
  * 
- * Pattern: Store activeCompanyId in httpOnly cookie
+ * Pattern: Store activefamilyId in httpOnly cookie
  * 
  * Pros:
  * - Persistent across navigations
@@ -85,7 +85,7 @@
  * - Flexible
  * 
  * Implementation:
- * - Always include companyId in URL params
+ * - Always include familyId in URL params
  * - Store in cookie for convenience
  * - Middleware checks: param > cookie > redirect to choose
  * 
@@ -95,17 +95,17 @@
  * 
  * Phase 1 (Now): Use query params with createCompany redirect
  * - Minimal changes, fast to implement
- * - createCompany redirects to /dashboard?companyId=123
+ * - createCompany redirects to /dashboard?familyId=123
  * 
- * Phase 2 (Future): Migrate to [companyId] route groups
+ * Phase 2 (Future): Migrate to [familyId] route groups
  * - Cleaner architecture
  * - Better multi-tenant isolation
  * - More professional URLs
  * 
  * Current Implementation:
- * - createCompany() redirects to /dashboard?companyId={id}
- * - Layouts/pages read companyId from searchParams
- * - API routes require companyId param/body
+ * - createCompany() redirects to /dashboard?familyId={id}
+ * - Layouts/pages read familyId from searchParams
+ * - API routes require familyId param/body
  * - getUserCompanies() helps user choose company
  */
 
@@ -115,14 +115,14 @@ import { IFamily } from '@/types/IFamily';
  * Helper: Get active company from request context
  * Works in both client and server components
  */
-export function getActiveCompanyId(
+export function getActivefamilyId(
    searchParams?: Record<string, string | string[] | undefined>
 ): string | null {
    if (!searchParams) return null;
 
-   const companyId = searchParams.companyId;
-   if (typeof companyId === 'string') {
-      return companyId;
+   const familyId = searchParams.familyId;
+   if (typeof familyId === 'string') {
+      return familyId;
    }
    return null;
 }
@@ -131,11 +131,11 @@ export function getActiveCompanyId(
  * Future: Helper for cookie-based active company
  * Once implemented with middleware support
  */
-export async function setActiveCompanyId(companyId: string): Promise<void> {
+export async function setActivefamilyId(familyId: string): Promise<void> {
    // Implementation: Set httpOnly cookie via server action
    // await fetch('/api/company/set-active', {
    //   method: 'POST',
-   //   body: JSON.stringify({ companyId }),
+   //   body: JSON.stringify({ familyId }),
    // });
 }
 
@@ -145,25 +145,25 @@ export async function setActiveCompanyId(companyId: string): Promise<void> {
  */
 export interface CompanySwitcherProps {
    companies: (IFamily & { role: string })[];
-   activeCompanyId: string;
-   onSwitch: (companyId: string) => void;
+   activefamilyId: string;
+   onSwitch: (familyId: string) => void;
 }
 
 /**
  * Migration Notes for Route Groups:
  * 
  * From: /dashboard, /vehicles, /work-orders
- * To:   /[companyId]/dashboard, /[companyId]/vehicles, /[companyId]/work-orders
+ * To:   /[familyId]/dashboard, /[familyId]/vehicles, /[familyId]/work-orders
  * 
  * Steps:
- * 1. Create [companyId] route group in app/protectedPages
+ * 1. Create [familyId] route group in app/protectedPages
  * 2. Move dashboard/, vehicles/, work-orders/ inside
- * 3. Update all links to include [companyId]
- * 4. Update API calls to include companyId param
+ * 3. Update all links to include [familyId]
+ * 4. Update API calls to include familyId param
  * 5. Update middleware to validate company access
  * 
  * This provides:
  * - Clear tenant isolation at route level
  * - Type-safe company context
- * - Better DX with automatic companyId availability
+ * - Better DX with automatic familyId availability
  */

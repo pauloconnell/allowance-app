@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const VehicleSchema = new Schema(
    {
-      companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+      familyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
       vehicleId: { type: String },
       year: { type: Number, required: true },
       make: { type: String, required: true },

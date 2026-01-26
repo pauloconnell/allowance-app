@@ -17,25 +17,25 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
          userId,
          isActive: true,
       })
-         .populate('companyId')
+         .populate('familyId')
          .lean();
 
       return userCompanies.map((uc: any) => ({
-         _id: uc.companyId._id.toString(),
-         name: uc.companyId.name,
-         slug: uc.companyId.slug,
-         description: uc.companyId.description,
-         email: uc.companyId.email,
-         phone: uc.companyId.phone,
-         address: uc.companyId.address,
-         city: uc.companyId.city,
-         state: uc.companyId.state,
-         zipCode: uc.companyId.zipCode,
-         country: uc.companyId.country,
-         logo: uc.companyId.logo,
-         isActive: uc.companyId.isActive,
-         createdAt: uc.companyId.createdAt?.toISOString?.() ?? '',
-         updatedAt: uc.companyId.updatedAt?.toISOString?.() ?? '',
+         _id: uc.familyId._id.toString(),
+         name: uc.familyId.name,
+         slug: uc.familyId.slug,
+         description: uc.familyId.description,
+         email: uc.familyId.email,
+         phone: uc.familyId.phone,
+         address: uc.familyId.address,
+         city: uc.familyId.city,
+         state: uc.familyId.state,
+         zipCode: uc.familyId.zipCode,
+         country: uc.familyId.country,
+         logo: uc.familyId.logo,
+         isActive: uc.familyId.isActive,
+         createdAt: uc.familyId.createdAt?.toISOString?.() ?? '',
+         updatedAt: uc.familyId.updatedAt?.toISOString?.() ?? '',
          role: uc.role,
       }));
    } catch (error) {
@@ -79,32 +79,32 @@ export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & {
          isActive: true,
       })
          .sort({ createdAt: 1 })
-         .populate('companyId')
+         .populate('familyId')
          .lean();
 
       if (!userCompany) return null;
 
       return {
-         _id: userCompany.companyId._id.toString(),
-         name: userCompany.companyId.name,
-         slug: userCompany.companyId.slug,
-         description: userCompany.companyId.description,
-         email: userCompany.companyId.email,
-         phone: userCompany.companyId.phone,
-         address: userCompany.companyId.address,
-         city: userCompany.companyId.city,
-         state: userCompany.companyId.state,
-         zipCode: userCompany.companyId.zipCode,
-         country: userCompany.companyId.country,
-         logo: userCompany.companyId.logo,
-         isActive: userCompany.companyId.isActive,
-         createdAt: userCompany.companyId.createdAt,
+         _id: userCompany.familyId._id.toString(),
+         name: userCompany.familyId.name,
+         slug: userCompany.familyId.slug,
+         description: userCompany.familyId.description,
+         email: userCompany.familyId.email,
+         phone: userCompany.familyId.phone,
+         address: userCompany.familyId.address,
+         city: userCompany.familyId.city,
+         state: userCompany.familyId.state,
+         zipCode: userCompany.familyId.zipCode,
+         country: userCompany.familyId.country,
+         logo: userCompany.familyId.logo,
+         isActive: userCompany.familyId.isActive,
+         createdAt: userCompany.familyId.createdAt,
       };
       
    }catch (err) {
           console.error(`Failed to get user family membership: ${error}`);
          return null;?.toISOString?.() ?? '',
-         updatedAt: userCompany.companyId.updatedAt?.toISOString?.() ?? '',
+         updatedAt: userCompany.familyId.updatedAt?.toISOString?.() ?? '',
          role: userCompany.role,
       };
    } catch (error) {

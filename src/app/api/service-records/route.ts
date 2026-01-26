@@ -13,20 +13,20 @@ export async function POST(req: NextRequest) {
     const session = await getAuthSession();
     if (!session) return unauthenticatedResponse();
 
-    const body: Partial<IServiceRecord> & { companyId?: string } = await req.json();
-    const companyId = body.companyId;
+    const body: Partial<IServiceRecord> & { familyId?: string } = await req.json();
+    const familyId = body.familyId;
 
-    if (!companyId) {
-      return validationErrorResponse('companyId is required');
+    if (!familyId) {
+      return validationErrorResponse('familyId is required');
     }
 
     // RBAC: Check create permission
-    const canCreate = await hasPermission(session.userId, companyId, 'daily-record', 'create');
+    const canCreate = await hasPermission(session.userId, familyId, 'daily-record', 'create');
     if (!canCreate) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const sanitized = sanitizeCreate<Partial<IServiceRecord>>(ServiceRecord, { ...body, companyId });
+    const sanitized = sanitizeCreate<Partial<IServiceRecord>>(ServiceRecord, { ...body, familyId });
 
     const record = await createDailyRecord(sanitized);
     return NextResponse.json("Success", { status: 201 });

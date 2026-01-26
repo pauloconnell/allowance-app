@@ -37,14 +37,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
    }
 
    // Query with familyId for security - never query by _id alone
-   const existing = await WorkOrder.findOne({ _id: id, companyId: familyId }).lean();
+   const existing = await WorkOrder.findOne({ _id: id, familyId: familyId }).lean();
    if (!existing) {
       return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
    }
 
    let sanitized = sanitizeUpdate(WorkOrder, body);
 
-   const updated = await WorkOrder.findOneAndUpdate({ _id: id, companyId: familyId }, sanitized, { new: true }).lean();
+   const updated = await WorkOrder.findOneAndUpdate({ _id: id, familyId: familyId }, sanitized, { new: true }).lean();
    if (!updated) {
       return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
    }
@@ -68,27 +68,27 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return validationErrorResponse('Invalid ID format');
    }
 
-   const companyId = new URL(req.url).searchParams.get('familyId');
-   if (!companyId) {
+   const familyId = new URL(req.url).searchParams.get('familyId');
+   if (!familyId) {
       return validationErrorResponse('familyId is required');
    }
 
    // RBAC: Check read permission
-   const canRead = await hasPermission(session.userId, companyId, 'workOrder', 'read');
+   const canRead = await hasPermission(session.userId, familyId, 'workOrder', 'read');
    if (!canRead) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
    }
 
    try {
       // Query with familyId for security - never query by _id alone
-      const wo = await WorkOrder.findOne({ _id: id, companyId }).lean();
+      const wo = await WorkOrder.findOne({ _id: id, familyId }).lean();
       if (!wo) {
          return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
       }
       return NextResponse.json({
          ...wo,
          _id: wo._id.toString(),
-         companyId: wo.companyId?.toString?.() ?? '',
+         familyId: wo.familyId?.toString?.() ?? '',
          vehicleId: wo.vehicleId?.toString?.() ?? '',
          createdAt: wo.createdAt?.toISOString?.() ?? null,
          updatedAt: wo.updatedAt?.toISOString?.() ?? null,

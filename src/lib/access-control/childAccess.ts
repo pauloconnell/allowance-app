@@ -64,7 +64,7 @@ export async function isParentInFamily(userId: string, familyId: string): Promis
       // Map family managers/admins as parents in this context
       const userCompany = await UserCompany.findOne({
          userId,
-         companyId: familyId,
+         familyId: familyId,
          role: { $in: ['admin', 'manager'] },
       });
 

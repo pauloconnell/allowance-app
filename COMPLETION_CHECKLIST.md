@@ -1,47 +1,47 @@
 /**
  * COMPLETION CHECKLIST - Multi-Tenant Refactoring
  * 
- * Tasks to complete the [companyId] route migration and API integration
+ * Tasks to complete the [familyId] route migration and API integration
  */
 
 // ============================================================================
 // PHASE 2: ROUTE MIGRATION
 // ============================================================================
 
-// [ ] Task 1: Move /vehicles under /[companyId]
+// [ ] Task 1: Move /vehicles under /[familyId]
 //     Files to create:
-//     - /protectedPages/[companyId]/vehicles/page.tsx
-//     - /protectedPages/[companyId]/vehicles/[vehicleId]/page.tsx
-//     - /protectedPages/[companyId]/vehicles/[vehicleId]/edit/page.tsx
-//     - /protectedPages/[companyId]/vehicles/new/page.tsx
+//     - /protectedPages/[familyId]/vehicles/page.tsx
+//     - /protectedPages/[familyId]/vehicles/[vehicleId]/page.tsx
+//     - /protectedPages/[familyId]/vehicles/[vehicleId]/edit/page.tsx
+//     - /protectedPages/[familyId]/vehicles/new/page.tsx
 //
 //     Each should:
-//     - Accept params: Promise<{ companyId: string; vehicleId?: string }>
-//     - Pass companyId to client components as prop
-//     - Update navigation links to include [companyId]
+//     - Accept params: Promise<{ familyId: string; vehicleId?: string }>
+//     - Pass familyId to client components as prop
+//     - Update navigation links to include [familyId]
 
-// [ ] Task 2: Move /work-orders under /[companyId]
+// [ ] Task 2: Move /work-orders under /[familyId]
 //     Files to create:
-//     - /protectedPages/[companyId]/work-orders/page.tsx
-//     - /protectedPages/[companyId]/work-orders/[workOrderId]/page.tsx
-//     - /protectedPages/[companyId]/work-orders/new/page.tsx
+//     - /protectedPages/[familyId]/work-orders/page.tsx
+//     - /protectedPages/[familyId]/work-orders/[workOrderId]/page.tsx
+//     - /protectedPages/[familyId]/work-orders/new/page.tsx
 //
 //     Each should:
-//     - Accept params and extract companyId
-//     - Initialize store with activeCompanyId
-//     - Pass companyId to forms/lists
+//     - Accept params and extract familyId
+//     - Initialize store with activefamilyId
+//     - Pass familyId to forms/lists
 
-// [ ] Task 3: Move /record-service under /[companyId]
+// [ ] Task 3: Move /record-service under /[familyId]
 //     Files to create:
-//     - /protectedPages/[companyId]/record-service/page.tsx
-//     - /protectedPages/[companyId]/record-service/[vehicleId]/page.tsx
+//     - /protectedPages/[familyId]/record-service/page.tsx
+//     - /protectedPages/[familyId]/record-service/[vehicleId]/page.tsx
 
 // ============================================================================
 // PHASE 2B: UPDATE OLD ROUTE REDIRECTS (if any)
 // ============================================================================
 
 // [ ] Task 4: Add redirect middleware or layout
-//     Old URLs like /vehicles should redirect to /[companyId]/vehicles
+//     Old URLs like /vehicles should redirect to /[familyId]/vehicles
 //     Could use middleware to catch old patterns and redirect
 
 // ============================================================================
@@ -50,32 +50,32 @@
 
 // [ ] Task 5: Update VehicleList component
 //     Changes:
-//     - Accept companyId prop: string
-//     - Use in fetch: `/api/vehicles?companyId=${companyId}`
-//     - Initialize store: useCompanyStore.setState({ activeCompanyId: companyId })
+//     - Accept familyId prop: string
+//     - Use in fetch: `/api/vehicles?familyId=${familyId}`
+//     - Initialize store: useCompanyStore.setState({ activefamilyId: familyId })
 //
 //     File: /src/components/vehicle/VehicleList.tsx
 
 // [ ] Task 6: Update WorkOrderForm component
 //     Changes:
-//     - Accept companyId prop: string
-//     - Include in form submission: { ...formData, companyId }
-//     - Update POST/PUT calls to include companyId
+//     - Accept familyId prop: string
+//     - Include in form submission: { ...formData, familyId }
+//     - Update POST/PUT calls to include familyId
 //
 //     File: /src/components/Forms/WorkOrderForm/index.tsx
 
 // [ ] Task 7: Update ServiceRecordForm component
 //     Changes:
-//     - Accept companyId prop: string
-//     - Include in form submission: { ...formData, companyId }
+//     - Accept familyId prop: string
+//     - Include in form submission: { ...formData, familyId }
 //     - Update API calls
 //
 //     File: /src/components/Forms/ServiceRecordForm/index.tsx
 
 // [ ] Task 8: Update VehicleForm component
 //     Changes:
-//     - Accept companyId prop: string
-//     - Include in form submission: { ...formData, companyId }
+//     - Accept familyId prop: string
+//     - Include in form submission: { ...formData, familyId }
 //     - Update API calls
 //
 //     File: /src/components/Forms/Vehicle/VehicleForm.tsx
@@ -85,11 +85,11 @@
 // ============================================================================
 
 // [ ] Task 9: Create CompanyProvider/Wrapper
-//     Create: /src/app/protectedPages/[companyId]/layout.tsx or use root wrapper
+//     Create: /src/app/protectedPages/[familyId]/layout.tsx or use root wrapper
 //     
 //     This component should:
-//     - Accept params.companyId
-//     - Initialize useCompanyStore.setState({ activeCompanyId: companyId })
+//     - Accept params.familyId
+//     - Initialize useCompanyStore.setState({ activefamilyId: familyId })
 //     - Ensure all child components have active company context
 //
 //     Pattern:
@@ -100,14 +100,14 @@
 //     
 //     export default function CompanyProvider({ 
 //        children, 
-//        companyId 
+//        familyId 
 //     }: { 
 //        children: React.ReactNode;
-//        companyId: string;
+//        familyId: string;
 //     }) {
 //        useEffect(() => {
-//           useCompanyStore.setState({ activeCompanyId: companyId });
-//        }, [companyId]);
+//           useCompanyStore.setState({ activefamilyId: familyId });
+//        }, [familyId]);
 //        
 //        return children;
 //     }
@@ -119,9 +119,9 @@
 
 // [ ] Task 10: Verify /api/vehicles routes
 //     Check:
-//     - GET accepts ?companyId query param
-//     - POST includes companyId in body
-//     - PUT/DELETE use companyId in queries
+//     - GET accepts ?familyId query param
+//     - POST includes familyId in body
+//     - PUT/DELETE use familyId in queries
 //     
 //     Files:
 //     - /src/app/api/vehicles/route.ts
@@ -131,16 +131,16 @@
 //     Check:
 //     - Has auth session check
 //     - Has RBAC permission check
-//     - POST includes companyId in body
-//     - Queries use companyId filter
+//     - POST includes familyId in body
+//     - Queries use familyId filter
 //
 //     File: /src/app/api/service-records/route.ts
 
 // [ ] Task 12: Verify /api/work-orders routes
 //     Already mostly done, but verify:
-//     - GET with ?companyId filters correctly
-//     - DELETE with ?companyId query param
-//     - Complete route uses companyId throughout
+//     - GET with ?familyId filters correctly
+//     - DELETE with ?familyId query param
+//     - Complete route uses familyId throughout
 //
 //     Files:
 //     - /src/app/api/work-orders/route.ts
@@ -153,8 +153,8 @@
 
 // [ ] Task 13: Test authentication flow
 //     - Login → redirected to /setup-company (new user)
-//     - Create company → redirected to /[companyId]/dashboard
-//     - Access /dashboard without [companyId] → 404 or redirect
+//     - Create company → redirected to /[familyId]/dashboard
+//     - Access /dashboard without [familyId] → 404 or redirect
 
 // [ ] Task 14: Test authorization flow
 //     - User without company access → 403 on API calls
@@ -164,7 +164,7 @@
 // [ ] Task 15: Test company switching
 //     - CompanySwitcher on home page works
 //     - Switching companies updates URL
-//     - Store updates activeCompanyId
+//     - Store updates activefamilyId
 //     - Pages show data for correct company
 
 // [ ] Task 16: Test multi-company data isolation
@@ -179,16 +179,16 @@
 /*
 // Copy old route structure to new:
 // cd src/app/protectedPages
-// mkdir -p [companyId]/vehicles
-// mkdir -p [companyId]/work-orders
-// mkdir -p [companyId]/record-service
-// cp vehicles/page.tsx [companyId]/vehicles/page.tsx
-// cp work-orders/page.tsx [companyId]/work-orders/page.tsx
-// cp record-service/page.tsx [companyId]/record-service/page.tsx
+// mkdir -p [familyId]/vehicles
+// mkdir -p [familyId]/work-orders
+// mkdir -p [familyId]/record-service
+// cp vehicles/page.tsx [familyId]/vehicles/page.tsx
+// cp work-orders/page.tsx [familyId]/work-orders/page.tsx
+// cp record-service/page.tsx [familyId]/record-service/page.tsx
 
 // Then update each page.tsx to:
-// 1. Accept params: Promise<{ companyId: string }>
-// 2. Extract companyId: const { companyId } = await params;
+// 1. Accept params: Promise<{ familyId: string }>
+// 2. Extract familyId: const { familyId } = await params;
 // 3. Pass to client components as prop
 // 4. Update navigation links
 */

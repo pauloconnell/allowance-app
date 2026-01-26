@@ -1,7 +1,7 @@
 export interface IUserCompany {
    _id: string;
    userId: string;
-   companyId: string;
+   familyId: string;
    role: 'admin' | 'manager' | 'user';
    email: string;
    firstName?: string;

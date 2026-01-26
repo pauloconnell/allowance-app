@@ -13,19 +13,19 @@ export async function GET(req: NextRequest) {
       if (!session) return unauthenticatedResponse();
 
       const { searchParams } = new URL(req.url);
-      const companyId = searchParams.get('companyId');
+      const familyId = searchParams.get('familyId');
 
-      if (!companyId) {
-         return validationErrorResponse('companyId is required');
+      if (!familyId) {
+         return validationErrorResponse('familyId is required');
       }
 
       // RBAC: Check read permission
-      const canRead = await hasPermission(session.userId, companyId, 'child', 'read');
+      const canRead = await hasPermission(session.userId, familyId, 'child', 'read');
       if (!canRead) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const vehicles = await getAllChildren(companyId);
+      const vehicles = await getAllChildren(familyId);
       const normalized = vehicles.map((v) => {
          const n = normalizeRecord(v);
          n.vehicleId = n._id; // model-specific ID field
@@ -43,15 +43,15 @@ export async function POST(req: NextRequest) {
       const session = await getAuthSession();
       if (!session) return unauthenticatedResponse();
 
-      const body = (await req.json()) as IFormVehicle & { companyId?: string };
-      const companyId = body.companyId;
+      const body = (await req.json()) as IFormVehicle & { familyId?: string };
+      const familyId = body.familyId;
 
-      if (!companyId) {
-         return validationErrorResponse('companyId is required');
+      if (!familyId) {
+         return validationErrorResponse('familyId is required');
       }
 
       // RBAC: Check create permission
-      const canCreate = await hasPermission(session.userId, companyId, 'child', 'create');
+      const canCreate = await hasPermission(session.userId, familyId, 'child', 'create');
       if (!canCreate) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Sanitize input based on Child schema
-      const sanitized = sanitizeCreate(Vehicle, { ...body, companyId });
+      const sanitized = sanitizeCreate(Vehicle, { ...body, familyId });
 
       const vehicle = await createChild(sanitized);
 

@@ -13,7 +13,7 @@ const UserFamilySchema = new Schema(
    { timestamps: true }
 );
 
-// Compound index for userId + companyId uniqueness
-UserFamilySchema.index({ userId: 1, companyId: 1 }, { unique: true });
+// Compound index for userId + familyId uniqueness
+UserFamilySchema.index({ userId: 1, familyId: 1 }, { unique: true });
 
 export default mongoose.models.UserFamily || mongoose.model('UserFamily', UserFamilySchema);

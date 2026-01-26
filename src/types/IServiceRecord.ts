@@ -7,7 +7,7 @@ export interface IServiceRecord extends IBaseService {
 
     // Track originating work order
     workOrderId?: string;
-    companyId: string;
+    familyId: string;
     // Work order scheduling info preserved for history
     serviceDueDate?:  string;
     serviceDueKM?: string;

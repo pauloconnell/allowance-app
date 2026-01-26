@@ -12,17 +12,17 @@
  * POST /api/vehicles
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (create permission)
- * ✅ companyId validation: Yes (required in body)
+ * ✅ familyId validation: Yes (required in body)
  * ✅ Scoped queries: N/A (create)
- * ✅ companyId saved to document: Yes
+ * ✅ familyId saved to document: Yes
  */
 
 /**
- * GET /api/vehicles?companyId=xyz
+ * GET /api/vehicles?familyId=xyz
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (read permission)
- * ✅ companyId validation: Yes (required in query)
- * ✅ Scoped queries: Yes (getAllVehicles filters by companyId)
+ * ✅ familyId validation: Yes (required in query)
+ * ✅ Scoped queries: Yes (getAllVehicles filters by familyId)
  * ✅ Data isolation: Yes
  */
 
@@ -30,17 +30,17 @@
  * PUT /api/vehicles/[vehicleId]
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (update permission)
- * ✅ companyId validation: Yes (required in body)
- * ✅ Scoped queries: Yes ({ _id, companyId })
+ * ✅ familyId validation: Yes (required in body)
+ * ✅ Scoped queries: Yes ({ _id, familyId })
  * ✅ Data isolation: Yes
  */
 
 /**
- * GET /api/vehicles/[vehicleId]?companyId=xyz
+ * GET /api/vehicles/[vehicleId]?familyId=xyz
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (read permission)
- * ✅ companyId validation: Yes (required in query)
- * ✅ Scoped queries: Yes ({ _id, companyId })
+ * ✅ familyId validation: Yes (required in query)
+ * ✅ Scoped queries: Yes ({ _id, familyId })
  * ✅ Data isolation: Yes
  */
 
@@ -48,26 +48,26 @@
  * POST /api/service-records
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (create permission)
- * ✅ companyId validation: Yes (required in body)
+ * ✅ familyId validation: Yes (required in body)
  * ✅ Scoped queries: N/A (create)
- * ✅ companyId saved to document: Yes
+ * ✅ familyId saved to document: Yes
  */
 
 /**
  * POST /api/work-orders
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (create permission)
- * ✅ companyId validation: Yes (required in body)
+ * ✅ familyId validation: Yes (required in body)
  * ✅ Scoped queries: N/A (create)
- * ✅ companyId saved to document: Yes
+ * ✅ familyId saved to document: Yes
  */
 
 /**
- * GET /api/work-orders?companyId=xyz
+ * GET /api/work-orders?familyId=xyz
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (read permission)
- * ✅ companyId validation: Yes (required in query)
- * ✅ Scoped queries: Yes (query includes companyId)
+ * ✅ familyId validation: Yes (required in query)
+ * ✅ Scoped queries: Yes (query includes familyId)
  * ✅ Data isolation: Yes
  */
 
@@ -75,26 +75,26 @@
  * PUT /api/work-orders/[id]
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (update permission)
- * ✅ companyId validation: Yes (required in body)
- * ✅ Scoped queries: Yes ({ _id, companyId })
+ * ✅ familyId validation: Yes (required in body)
+ * ✅ Scoped queries: Yes ({ _id, familyId })
  * ✅ Data isolation: Yes
  */
 
 /**
- * GET /api/work-orders/[id]?companyId=xyz
+ * GET /api/work-orders/[id]?familyId=xyz
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (read permission)
- * ✅ companyId validation: Yes (required in query)
- * ✅ Scoped queries: Yes ({ _id, companyId })
+ * ✅ familyId validation: Yes (required in query)
+ * ✅ Scoped queries: Yes ({ _id, familyId })
  * ✅ Data isolation: Yes
  */
 
 /**
- * DELETE /api/work-orders?workOrderId=xyz&companyId=abc
+ * DELETE /api/work-orders?workOrderId=xyz&familyId=abc
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (delete permission)
- * ✅ companyId validation: Yes (required in query)
- * ✅ Scoped queries: Yes (query includes companyId)
+ * ✅ familyId validation: Yes (required in query)
+ * ✅ Scoped queries: Yes (query includes familyId)
  * ✅ Data isolation: Yes
  */
 
@@ -102,10 +102,10 @@
  * PUT /api/work-orders/[id]/complete
  * ✅ Auth check: Yes
  * ✅ RBAC check: Yes (complete permission, allows 'owner'/'manager'/'user')
- * ✅ companyId extraction: Yes (from work order document)
- * ✅ Scoped queries: Yes (all queries use { _id, companyId })
- * ✅ ServiceRecord created with companyId: Yes
- * ✅ Next WorkOrder created with companyId: Yes
+ * ✅ familyId extraction: Yes (from work order document)
+ * ✅ Scoped queries: Yes (all queries use { _id, familyId })
+ * ✅ ServiceRecord created with familyId: Yes
+ * ✅ Next WorkOrder created with familyId: Yes
  */
 
 // ============================================================================
@@ -120,25 +120,25 @@
  * - Middleware gatekeeper
  * 
  * PHASE 2: ROUTE MIGRATION ✅
- * - Created /[companyId]/vehicles route structure
- * - Updated all vehicle pages to use [companyId] param
+ * - Created /[familyId]/vehicles route structure
+ * - Updated all vehicle pages to use [familyId] param
  * - Updated VehicleList component to use new routes
- * - Updated VehicleForm to accept companyId prop
+ * - Updated VehicleForm to accept familyId prop
  * - Updated dashboard links to new route structure
  * 
  * PHASE 3: STORE PROVIDER ✅
  * - Created CompanyProvider component
- * - Created [companyId] layout to wrap with provider
- * - Provider initializes activeCompanyId in store
+ * - Created [familyId] layout to wrap with provider
+ * - Provider initializes activefamilyId in store
  * - All child components have company context available
  * 
  * PHASE 4: API AUDIT ✅
  * - Verified all API routes have auth checks
  * - Verified all API routes have RBAC checks
- * - Verified all queries are scoped by companyId
- * - Verified all created documents include companyId
+ * - Verified all queries are scoped by familyId
+ * - Verified all created documents include familyId
  * - Verified data isolation between companies
- * - Verified 'complete' route handles companyId correctly
+ * - Verified 'complete' route handles familyId correctly
  */
 
 // ============================================================================
@@ -148,16 +148,16 @@
 /**
  * NEXT STEPS (Estimated: 2-3 hours)
  * 
- * 1. Migrate /work-orders to /[companyId]/work-orders
+ * 1. Migrate /work-orders to /[familyId]/work-orders
  *    Files: Create new route structure, update links
  *    
- * 2. Migrate /record-service to /[companyId]/record-service  
+ * 2. Migrate /record-service to /[familyId]/record-service  
  *    Files: Create new route structure, update links
  *    
- * 3. Update WorkOrderForm to accept/use companyId
+ * 3. Update WorkOrderForm to accept/use familyId
  *    Files: components/Forms/WorkOrderForm/index.tsx
  *    
- * 4. Update ServiceRecordForm to accept/use companyId
+ * 4. Update ServiceRecordForm to accept/use familyId
  *    Files: components/Forms/ServiceRecordForm/index.tsx
  *    
  * 5. Test complete user flow:
@@ -167,7 +167,7 @@
  * 
  * 6. Test error cases:
  *    - Access other company's data (should 403)
- *    - Tamper with companyId param (should fail)
+ *    - Tamper with familyId param (should fail)
  *    - Delete without permissions (should 403)
  */
 
@@ -189,18 +189,18 @@
  *   - 'user' role has limited access (read vehicles, read/complete work orders)
  * 
  * ✅ Data Isolation
- *   - All queries include companyId filter
+ *   - All queries include familyId filter
  *   - Never query by _id alone
  *   - Never return cross-company data
- *   - CompanyId validated before any DB operation
+ *   - familyId validated before any DB operation
  * 
  * ✅ Input Validation
- *   - companyId required and validated
+ *   - familyId required and validated
  *   - All inputs sanitized
  *   - ObjectId format validated
  * 
  * ✅ Route Structure
- *   - Company context in URL: /[companyId]/dashboard
+ *   - Company context in URL: /[familyId]/dashboard
  *   - Explicit tenant identification
  *   - Easy to audit data access
  * 
@@ -216,18 +216,18 @@
 
 /*
 Files Created: 12
-- /[companyId]/vehicles/page.tsx
-- /[companyId]/vehicles/[vehicleId]/page.tsx
-- /[companyId]/vehicles/[vehicleId]/edit/page.tsx
-- /[companyId]/vehicles/[vehicleId]/edit/EditFormWrapper.tsx
-- /[companyId]/vehicles/new/page.tsx
-- /[companyId]/layout.tsx
+- /[familyId]/vehicles/page.tsx
+- /[familyId]/vehicles/[vehicleId]/page.tsx
+- /[familyId]/vehicles/[vehicleId]/edit/page.tsx
+- /[familyId]/vehicles/[vehicleId]/edit/EditFormWrapper.tsx
+- /[familyId]/vehicles/new/page.tsx
+- /[familyId]/layout.tsx
 - CompanyProvider.tsx
 
 Files Updated: 7
-- /[companyId]/dashboard/page.tsx (links)
+- /[familyId]/dashboard/page.tsx (links)
 - components/vehicle/VehicleList.tsx (routes + store init)
-- components/Forms/Vehicle/VehicleForm.tsx (companyId support)
+- components/Forms/Vehicle/VehicleForm.tsx (familyId support)
 
 API Routes Verified: 10
 - All secure ✅

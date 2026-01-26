@@ -135,12 +135,12 @@ child.currentBalance += netPayout  // Atomic MongoDB update
 ### Child Auto-Redirection
 
 **Logic**:
-1. Child logs in and navigates to `/protected/[companyId]/daily-records`
-2. System checks `GET /api/user-role?familyId=[companyId]`
+1. Child logs in and navigates to `/protected/[familyId]/daily-records`
+2. System checks `GET /api/user-role?familyId=[familyId]`
 3. If child, redirects to their own daily record automatically
 4. Prevents cross-sibling record access via Auth0 roles and database checks
 
-**Implementation**: [childAccess.ts](src/lib/access-control/childAccess.ts), [daily-records/page.tsx](src/app/protectedPages/[companyId]/daily-records/page.tsx)
+**Implementation**: [childAccess.ts](src/lib/access-control/childAccess.ts), [daily-records/page.tsx](src/app/protectedPages/[familyId]/daily-records/page.tsx)
 
 ### Enforcement Points
 
@@ -270,7 +270,7 @@ These indexes ensure fast queries for:
 ```typescript
 // Vehicle → Child
 new Child({
-  familyId: vehicle.companyId,
+  familyId: vehicle.familyId,
   name: vehicle.nickName,
   age: 0, // Manual entry required
   currentBalance: 0,
@@ -279,7 +279,7 @@ new Child({
 
 // WorkOrder → Chore
 new Chore({
-  familyId: workOrder.companyId,
+  familyId: workOrder.familyId,
   taskName: workOrder.serviceType,
   rewardAmount: 0, // Manual entry required
   isRecurring: workOrder.isRecurring,

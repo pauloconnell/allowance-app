@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const sanitized = sanitizeCreate<Partial<IWorkOrder>>(WorkOrder, { ...body, companyId: familyId });
+      const sanitized = sanitizeCreate<Partial<IWorkOrder>>(WorkOrder, { ...body, familyId: familyId });
 
       // Create work order
       const wo = await WorkOrder.create(sanitized);
@@ -68,14 +68,14 @@ export async function PUT(req: NextRequest) {
       await assertPermission(session.userId, familyId, 'workOrder', 'update');
 
       // Query with familyId for security
-      const existing = await WorkOrder.findOne({ _id: id, companyId: familyId }).lean();
+      const existing = await WorkOrder.findOne({ _id: id, familyId: familyId }).lean();
       if (!existing) {
          return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
       }
 
       const sanitized = sanitizeUpdate(WorkOrder, body);
       const updated = await WorkOrder.findOneAndUpdate(
-         { _id: id, companyId: familyId },
+         { _id: id, familyId: familyId },
          sanitized,
          { new: true }
       ).lean();
@@ -115,7 +115,7 @@ export async function GET(req: NextRequest) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const baseQuery: any = { status: 'open', companyId: familyId }; // only get 'open' + verify family
+      const baseQuery: any = { status: 'open', familyId: familyId }; // only get 'open' + verify family
       const query = vehicleId ? { ...baseQuery, vehicleId } : baseQuery;
 
       const workOrders = await WorkOrder.find(query).lean();
@@ -157,7 +157,7 @@ export async function DELETE(req: NextRequest) {
       // Query with familyId for security
       const deleted = await WorkOrder.findOneAndDelete({
          $or: [{ _id: workOrderId }, { workOrderId }],
-         companyId: familyId,
+         familyId: familyId,
       }).lean();
 
       if (!deleted) {

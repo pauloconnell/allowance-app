@@ -11,7 +11,7 @@ import { DailyRecordHistory } from '@/components/DailyRecord/DailyRecordHistory'
 import LoadingSpinner from '@/components/UI/LoadingSpinner';
 
 interface PageProps {
-   params: { companyId: string };
+   params: { familyId: string };
    searchParams: { childId?: string };
 }
 
@@ -28,7 +28,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
 
-   const companyId = params.companyId;
+   const familyId = params.familyId;
 
    // Determine user role and permissions
    useEffect(() => {
@@ -38,7 +38,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
       // This should be checked against auth0 roles or UserCompany collection
       const checkIfParent = async () => {
          try {
-            const response = await fetch(`/api/user-role?familyId=${companyId}`);
+            const response = await fetch(`/api/user-role?familyId=${familyId}`);
             const data = await response.json();
             setIsParent(data.isParent);
 
@@ -48,7 +48,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
             } else {
                // Child - redirect to own record
                const childIdResponse = await fetch(
-                  `/api/get-child-id?familyId=${companyId}`
+                  `/api/get-child-id?familyId=${familyId}`
                );
                const childData = await childIdResponse.json();
                setSelectedChildId(childData.childId);
@@ -59,12 +59,12 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
       };
 
       checkIfParent();
-   }, [session, companyId]);
+   }, [session, familyId]);
 
    const fetchChildren = async () => {
       try {
          const response = await fetch(
-            `/api/children?familyId=${companyId}`
+            `/api/children?familyId=${familyId}`
          );
          if (!response.ok) throw new Error('Failed to fetch children');
          const data = await response.json();
@@ -76,7 +76,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
 
    // Fetch daily record for selected child
    useEffect(() => {
-      if (!selectedChildId || !companyId) return;
+      if (!selectedChildId || !familyId) return;
 
       const fetchData = async () => {
          try {
@@ -89,7 +89,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify({
                   childId: selectedChildId,
-                  familyId: companyId,
+                  familyId: familyId,
                }),
             });
 
@@ -115,7 +115,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
       };
 
       fetchData();
-   }, [selectedChildId, companyId]);
+   }, [selectedChildId, familyId]);
 
    const handleChoreUpdate = async (
       choreIndex: number,
@@ -217,7 +217,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
                   onChange={(e) => {
                      setSelectedChildId(e.target.value);
                      router.push(
-                        `/protected/${companyId}/daily-records?childId=${e.target.value}`
+                        `/protected/${familyId}/daily-records?childId=${e.target.value}`
                      );
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
@@ -272,7 +272,7 @@ export default function DailyRecordsPage({ params, searchParams }: PageProps) {
          {/* History */}
          <div className="mt-8">
             <DailyRecordHistory
-               familyId={companyId}
+               familyId={familyId}
                childId={selectedChildId || undefined}
             />
          </div>

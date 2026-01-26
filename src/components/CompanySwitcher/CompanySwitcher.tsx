@@ -7,37 +7,37 @@ import { useFamilyStore } from '@/store/useCompanyStore';
 
 interface CompanySwitcherProps {
    companies: (IFamily & { role: string })[];
-   activeCompanyId: string;
+   activefamilyId: string;
 }
 
 export default function CompanySwitcher({
    companies,
-   activeCompanyId,
+   activefamilyId,
 }: CompanySwitcherProps) {
    const router = useRouter();
    //const searchParams = useSearchParams();
    const { setActiveFamilyId } = useFamilyStore();
    const [isOpen, setIsOpen] = useState(false);
 
-   // Sync the URL-provided activeCompanyId into the Zustand store on mount or change
+   // Sync the URL-provided activefamilyId into the Zustand store on mount or change
    useEffect(() => {
-      if (activeCompanyId) {
-         setActiveFamilyId(activeCompanyId);
+      if (activefamilyId) {
+         setActiveFamilyId(activefamilyId);
       }
-   }, [activeCompanyId, setActiveFamilyId]);
+   }, [activefamilyId, setActiveFamilyId]);
 
    // if (companies.length <= 1) {
    //    return null; // Don't show switcher if only one company
    // }
 
-   const activeCompany = companies.find((c) => c._id === activeCompanyId);
+   const activeCompany = companies.find((c) => c._id === activefamilyId);
 
-   function handleSwitch(companyId: string) {
+   function handleSwitch(familyId: string) {
       // 1. Update the global state
-      setActiveFamilyId(companyId);
+      setActiveFamilyId(familyId);
 
       // 2. Navigate to the dynamic route
-      router.push(`/protectedPages/${companyId}/dashboard`);
+      router.push(`/protectedPages/${familyId}/dashboard`);
 
       setIsOpen(false);
    }
@@ -58,7 +58,7 @@ export default function CompanySwitcher({
                      key={company._id}
                      onClick={() => handleSwitch(company._id)}
                      className={`w-full text-left px-6 py-3 hover:bg-gray-200 transition-colors ${
-                        company._id === activeCompanyId
+                        company._id === activefamilyId
                            ? 'bg-gray-100 text-blue-600 font-bold'
                            : 'text-black font-medium'
                      }`}

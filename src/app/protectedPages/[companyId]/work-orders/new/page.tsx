@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: 'Create Work Order',
 };
 
-export default async function NewWorkOrderPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { companyId: familyId } = await params;
+export default async function NewWorkOrderPage({ params }: { params: Promise<{ familyId: string }> }) {
+  const { familyId: familyId } = await params;
 
   const children = await getAllChildren(familyId);
 

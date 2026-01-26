@@ -9,17 +9,17 @@ export const metadata: Metadata = {
 export default async function WorkOrderDetailPage({
   params,
 }: {
-  params: Promise<{ companyId: string; workOrderId: string }>;
+  params: Promise<{ familyId: string; workOrderId: string }>;
 }) {
-  const { companyId, workOrderId } = await params;
+  const { familyId, workOrderId } = await params;
 
-  const vehicles = await getAllChildren(companyId);
+  const vehicles = await getAllChildren(familyId);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-semibold mb-8">Work Order Details</h1>
-        <WorkOrderEditFormWrapper companyId={companyId} workOrderId={workOrderId} vehicles={vehicles} />
+        <WorkOrderEditFormWrapper familyId={familyId} workOrderId={workOrderId} vehicles={vehicles} />
       </div>
     </div>
   );

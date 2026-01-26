@@ -19,7 +19,7 @@ export default function ServiceRecordForm({ familyId, childId }: { familyId: str
 
       // Form state
    const [form, setForm] = useState<IFormServiceRecord>({
-      companyId: familyId,
+      familyId: familyId,
       vehicleId: childId || '',
       serviceType: '',
       serviceDate: new Date().toISOString().split('T')[0],
@@ -101,7 +101,7 @@ export default function ServiceRecordForm({ familyId, childId }: { familyId: str
       });
 
       if (res.ok) {
-         router.push(`/protectedPages/${companyId}/vehicles/${form.vehicleId}`);
+         router.push(`/protectedPages/${familyId}/vehicles/${form.vehicleId}`);
       } else {
          alert('Failed to save record');
       }

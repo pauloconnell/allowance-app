@@ -13,7 +13,7 @@ import { getSession } from '@auth0/nextjs-auth0';
  */
 export async function createCompany(name: string) {
 
-    let newCompanyId: string | null = null; // Store ID for redirect
+    let newfamilyId: string | null = null; // Store ID for redirect
     
     try {
         if (!name || name.trim().length === 0) {
@@ -38,17 +38,17 @@ export async function createCompany(name: string) {
             isActive: true,
         });
 
-        // 2. Create UserCompany record linking user to company as owner (Security Badge. It tells the system, "This person (UserID) is allowed to enter this building (CompanyID) with these permissions (Role))
+        // 2. Create UserCompany record linking user to company as owner (Security Badge. It tells the system, "This person (UserID) is allowed to enter this building (familyId) with these permissions (Role))
         await UserCompany.create({
             userId: session.user.sub,
-            companyId: company._id,
+            familyId: company._id,
             role: 'owner',
             email: session.user.email,
             firstName: session.user.given_name || '',
             lastName: session.user.family_name || '',
             isActive: true,
         });
-        newCompanyId = company._id.toString();
+        newfamilyId = company._id.toString();
 
     } catch (error: any) {
         // Handle MongoDB Duplicate Key Error specifically
@@ -61,7 +61,7 @@ export async function createCompany(name: string) {
 
     // 3. Redirect to dashboard with company context
 
-    if (newCompanyId) {
-        redirect(`/dashboard?companyId=${newCompanyId}`);
+    if (newfamilyId) {
+        redirect(`/dashboard?familyId=${newfamilyId}`);
     }
 }
