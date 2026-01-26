@@ -1,5 +1,5 @@
 import { getSession } from '@auth0/nextjs-auth0';
-import CompanySwitcher from '@/components/CompanySwitcher/CompanySwitcher';
+import FamilySwitcher from '@/components/CompanySwitcher/FamilySwitcher';
 import { getUserCompanies } from '@/lib/companyContext';
 import '@/models/Company';
 import type { ICompany } from '@/types/ICompany';
@@ -104,9 +104,9 @@ export default async function Home() {
                      </a>
                      {isLoggedIn && (companies.length > 0) && (
                         <div className="w-full sm:w-auto">
-                           <CompanySwitcher
+                           <FamilySwitcher
                               companies={companies}
-                              activeCompanyId={activeCompanyId}
+                              activeChild={activeCompanyId}
                            />
                         </div>
                      )}

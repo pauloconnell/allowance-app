@@ -1,44 +1,80 @@
 import { connectDB } from './mongodb';
 import UserCompany from '@/models/UserCompany';
+import Child from '@/models/Child';
 
 /**
  * Resource types that can be protected by RBAC
  */
-export type ResourceType = 'vehicle' | 'workOrder' | 'serviceRecord';
+export type ResourceType =
+   | 'vehicle'
+   | 'workOrder'
+   | 'serviceRecord'
+   | 'child'
+   | 'chore'
+   | 'daily-record';
 
 /**
  * Actions that can be performed on resources
  */
-export type Action = 'create' | 'read' | 'update' | 'delete' | 'complete';
+export type Action =
+   | 'create'
+   | 'read'
+   | 'update'
+   | 'write'
+   | 'delete'
+   | 'complete'
+   | 'approve';
 
 /**
  * User roles in a company
  */
-export type UserRole = 'owner' | 'admin' | 'manager' | 'user';
+export type UserRole = 'owner' | 'admin' | 'manager' | 'user' | 'child' | 'parent';
 
 /**
  * Permission matrix defining what each role can do
  */
-const PERMISSIONS: Record<UserRole, Record<ResourceType, Action[]>> = {
-   owner: { 
-      vehicle: ['create', 'read', 'update', 'delete'],
+const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
+   owner: {
+      vehicle: ['create', 'read', 'update', 'delete'] ,
       workOrder: ['create', 'read', 'update', 'delete'],
       serviceRecord: ['create', 'read', 'update', 'delete'],
+      child: ['create', 'read', 'update', 'delete'],
+      chore: ['create', 'read', 'update', 'delete'],
+      'daily-record': ['read', 'write', 'approve', 'create', 'delete'],
    },
-    admin: {
+   admin: {
       vehicle: ['create', 'read', 'update', 'delete'],
       workOrder: ['create', 'read', 'update', 'delete'],
       serviceRecord: ['create', 'read', 'update', 'delete'],
+      child: ['create', 'read', 'update'],
+      chore: ['create', 'read', 'update', 'delete'],
+      'daily-record': ['read', 'write', 'approve', 'create'],
    },
    manager: {
       vehicle: ['read', 'create', 'update'],
       workOrder: ['create', 'read', 'update', 'complete'],
       serviceRecord: ['create', 'read', 'update'],
+      child: ['read'],
+      chore: ['read', 'create', 'update'],
+      'daily-record': ['read', 'write', 'create'],
    },
    user: {
       vehicle: ['read'],
       workOrder: ['read', 'complete'],
       serviceRecord: ['read', 'create'],
+      child: ['read'],
+      chore: ['read'],
+      'daily-record': ['read'],
+   },
+   parent: {
+      child: ['read', 'create', 'update'],
+      chore: ['read', 'create', 'update', 'delete'],
+      'daily-record': ['read', 'write', 'approve', 'create'],
+   },
+   child: {
+      child: ['read'],
+      chore: ['read'],
+      'daily-record': ['read', 'write', 'create'],
    },
 };
 
@@ -84,23 +120,29 @@ export async function hasPermission(
    resource: ResourceType,
    action: Action
 ): Promise<boolean> {
+   // First, try to get role from UserCompany (parents/admins/managers)
    const role = await getUserRoleInCompany(userId, companyId);
 
-   if (!role) return false;
-
-   //  Check if the role found in DB exists in our PERMISSIONS config
-   const rolePermissions = PERMISSIONS[role as UserRole];
-   if (!rolePermissions) {
-      console.error(`RBAC Error: Role '${role}' found in DB but not defined in PERMISSIONS object.`);
-      return false;
+   if (role) {
+      const rolePermissions = PERMISSIONS[role as UserRole] || {};
+      const allowedActions = rolePermissions[resource] || [];
+      return allowedActions.includes(action);
    }
 
-   const allowedActions = rolePermissions[resource];
-   if (!allowedActions) {
-      console.error(`RBAC Error: Resource '${resource}' not defined for role '${role}'.`);
-      return false;
+   // If user is not in UserCompany, they may be a child (stored in Child collection)
+   try {
+      await connectDB();
+      const child = await Child.findOne({ familyId: companyId, auth0UserId: userId }).lean();
+      if (child) {
+         const childPerms = PERMISSIONS['child'] || {};
+         const allowedActions = childPerms[resource] || [];
+         return allowedActions.includes(action);
+      }
+   } catch (err) {
+      console.error('RBAC child lookup error:', err);
    }
-   return allowedActions.includes(action);
+
+   return false;
 }
 
 /**
