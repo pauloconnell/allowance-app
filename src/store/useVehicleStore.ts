@@ -1,54 +1,57 @@
 import { create } from 'zustand';
 import type { IVehicle } from '@/types/IVehicle';
 
-interface VehicleState {
-  // Single vehicle (detail view)
-  selectedVehicle: IVehicle | null;
-  setSelectedVehicle: (vehicle: IVehicle) => void;
-  clearSelectedVehicle: () => void;
-  fetchVehicle: (id: string) => Promise<void>;
+interface ChildState {
+  // Single child (detail view)
+  selectedChild: IVehicle | null;
+  setSelectedChild: (child: IVehicle) => void;
+  clearSelectedChild: () => void;
+  fetchChild: (id: string) => Promise<void>;
 
-  // All vehicles (dashboard, dropdowns, forms)
-  allVehicles: IVehicle[];
-  setAllVehicles: (vehicles: IVehicle[]) => void;
-  fetchAllVehicles: (companyId: string) => Promise<void>;
+  // All children (dashboard, dropdowns, forms)
+  allChildren: IVehicle[];
+  setAllChildren: (children: IVehicle[]) => void;
+  fetchAllChildren: (familyId: string) => Promise<void>;
 }
 
-export const useVehicleStore = create<VehicleState>((set) => ({
-  // --- Selected Vehicle ---
-  selectedVehicle: null,
+export const useChildStore = create<ChildState>((set) => ({
+  // --- Selected Child ---
+  selectedChild: null,
 
-  setSelectedVehicle: (vehicle) => set({ selectedVehicle: vehicle }),
+  setSelectedChild: (child) => set({ selectedChild: child }),
 
-  clearSelectedVehicle: () => set({ selectedVehicle: null }),
+  clearSelectedChild: () => set({ selectedChild: null }),
 
-fetchVehicle: async (id) => {
+fetchChild: async (id) => {
   try {
-    const res = await fetch(`/api/vehicles/${id}`);
-    if (!res.ok) throw new Error(`Failed to fetch vehicle: ${res.status}`);
+    const res = await fetch(`/api/children/${id}`);
+    if (!res.ok) throw new Error(`Failed to fetch child: ${res.status}`);
     const data = await res.json();
-    set({ selectedVehicle: data });
+    set({ selectedChild: data });
   } catch (error) {
-    console.error('Error fetching vehicle:', error);
-    set({ selectedVehicle: null });
+    console.error('Error fetching child:', error);
+    set({ selectedChild: null });
   }
 },
 
 
-  // --- All Vehicles ---
-  allVehicles: [],
+  // --- All Children ---
+  allChildren: [],
 
-  setAllVehicles: (vehicles) => set({ allVehicles: vehicles }),
+  setAllChildren: (children) => set({ allChildren: children }),
 
-  fetchAllVehicles: async (companyId) => {
+  fetchAllChildren: async (familyId) => {
     try {
-    const res = await fetch(`/api/vehicles?companyId=${companyId}`);
-     if (!res.ok) throw new Error(`Failed to fetch vehicles: ${res.status}`);
+    const res = await fetch(`/api/children?familyId=${familyId}`);
+     if (!res.ok) throw new Error(`Failed to fetch children: ${res.status}`);
     const data = await res.json();
-    set({ allVehicles: data });
+    set({ allChildren: data });
   } catch (error) {
-      console.error('Error fetching vehicles:', error);
-    set({ allVehicles: [] });
+      console.error('Error fetching children:', error);
+    set({ allChildren: [] });
   }
   },
-}))
+}));
+
+// Backward compatibility aliases
+export const useVehicleStore = useChildStore;

@@ -3,49 +3,49 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IWorkOrder } from '@/types/IWorkOrder';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
-import { useVehicleStore } from '@/store/useVehicleStore';
+import { useChildStore } from '@/store/useVehicleStore';
 import { LoadingSpinner} from '@/components/UI/LoadingSpinner';
 import { CardWorkOrder } from '@/components/UI/CardWorkOrder';
 
 
 interface ServiceDueProps {
-   vehicleId?: string;
-   companyId: string;
+   childId?: string;
+   familyId: string;
 }
 
-export default function ServiceDue({ vehicleId, companyId }: ServiceDueProps) {
+export default function ServiceDue({ childId, familyId }: ServiceDueProps) {
    const fetchAllWorkOrders = useWorkOrderStore((s) => s.fetchAllWorkOrders);
    const setSelectedWorkOrder = useWorkOrderStore((s) => s.setSelectedWorkOrder);
    const getUpcomingWorkOrders = useWorkOrderStore((s) => s.getUpcomingWorkOrders);
    const [loading, setLoading] = useState(true);
-   const { selectedVehicle, fetchVehicle } = useVehicleStore();
+   const { selectedChild, fetchChild } = useChildStore();
    
 
    useEffect(() => {
-      if (!companyId || companyId === 'undefined') return;
+      if (!familyId || familyId === 'undefined') return;
       
       setLoading(true);
-      fetchAllWorkOrders(companyId)
+      fetchAllWorkOrders(familyId)
       .catch(console.error)
       .finally(() => setLoading(false));
-   }, [companyId, fetchAllWorkOrders]);
+   }, [familyId, fetchAllWorkOrders]);
 
-   // If a vehicleId is passed, filter upcoming WOs for that vehicle
+   // If a childId is passed, filter upcoming WOs for that child
    const upcoming = getUpcomingWorkOrders();
    //console.log({ upcoming });
-   const workOrders = vehicleId
-      ? upcoming.filter((wo) => wo.vehicleId === vehicleId)
+   const workOrders = childId
+      ? upcoming.filter((wo) => wo.vehicleId === childId)
       : upcoming; // else show all
 
-   // if passed vehicleId in URL, then populate store with vehicle details
+   // if passed childId in URL, then populate store with child details
    useEffect(() => {
        setLoading(true);
-      if (vehicleId && !selectedVehicle) {
-         fetchVehicle(vehicleId)
+      if (childId && !selectedChild) {
+         fetchChild(childId)
             .catch(console.error)
             .finally(() => setLoading(false));
       }
-   }, [vehicleId, selectedVehicle]);
+   }, [childId, selectedChild]);
 
     if (loading) return <div><LoadingSpinner /> Loading…</div>;
 

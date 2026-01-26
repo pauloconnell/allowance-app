@@ -1,12 +1,12 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { createCompany } from '@/lib/actions/company';
+import { createFamily } from '@/lib/actions/family';
 import { useRouter } from 'next/navigation';
 import { sanitizeInput } from '@/lib/sanitizeInput';
 
-export default function SetupCompanyPage() {
-   const [companyName, setCompanyName] = useState('');
+export default function SetupFamilyPage() {
+   const [familyName, setFamilyName] = useState('');
    const [error, setError] = useState('');
    const [loading, setLoading] = useState(false);
    const router = useRouter();
@@ -15,21 +15,21 @@ export default function SetupCompanyPage() {
       e.preventDefault();
       setError('');
       setLoading(true);
-      let sanitizedCompanyName = "";
+      let sanitizedFamilyName = "";
       try{
-        sanitizedCompanyName = sanitizeInput(companyName);
+        sanitizedFamilyName = sanitizeInput(familyName);
       }catch(e){
-        setError('Replacing Invalid characters in company name failed.');
+        setError('Replacing Invalid characters in family name failed.');
       }
 
       try {
-         const result = await createCompany(sanitizedCompanyName);
+         const result = await createFamily(sanitizedFamilyName);
          if (result?.error) {
             setError(result.error);
          }
-         // If successful, createCompany redirects automatically
+         // If successful, createFamily redirects automatically
       } catch (err) {
-         setError('Failed to create company. Please try again.');
+         setError('Failed to create family. Please try again.');
          console.error(err);
       } finally {
          setLoading(false);
@@ -42,24 +42,24 @@ export default function SetupCompanyPage() {
             <div className="mb-8">
                <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome!</h1>
                <p className="text-gray-600">
-                  Let's get you set up. Create a company to get started.
+                  Let's get you set up. Create a family to get started.
                </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                <div>
                   <label
-                     htmlFor="companyName"
+                     htmlFor="familyName"
                      className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                     Company Name
+                     Family Name
                   </label>
                   <input
-                     id="companyName"
+                     id="familyName"
                      type="text"
-                     value={companyName}
-                     onChange={(e) => setCompanyName(e.target.value)}
-                     placeholder="Enter your company name"
+                     value={familyName}
+                     onChange={(e) => setFamilyName(e.target.value)}
+                     placeholder="Enter your family name"
                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                      required
                      disabled={loading}
@@ -74,15 +74,15 @@ export default function SetupCompanyPage() {
 
                <button
                   type="submit"
-                  disabled={loading || !companyName.trim()}
+                  disabled={loading || !familyName.trim()}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
                >
-                  {loading ? 'Creating...' : 'Create Company'}
+                  {loading ? 'Creating...' : 'Create Family'}
                </button>
             </form>
 
             <p className="text-xs text-gray-500 text-center mt-6">
-               You'll be set as the owner of this company and can invite team members later.
+               You'll be set as the owner of this family and can invite family members later.
             </p>
          </div>
       </div>

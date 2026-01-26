@@ -3,24 +3,24 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
-import { useVehicleStore } from '@/store/useVehicleStore';
+import { useChildStore } from '@/store/useVehicleStore';
 import { sanitizeInput } from '@/lib/sanitizeInput';
 import type { IFormServiceRecord } from '@/types/IFormServiceRecord';
 
-export default function ServiceRecordForm({ companyId, vehicleId }: { companyId: string; vehicleId?: string }) {
+export default function ServiceRecordForm({ familyId, childId }: { familyId: string; childId?: string }) {
    const router = useRouter();
 
    // Zustand
-   const vehicles = useVehicleStore((s) => s.allVehicles);
-   const fetchAllVehicles = useVehicleStore((s) => s.fetchAllVehicles);
-   const selectedVehicle = useVehicleStore((s) => s.selectedVehicle);
-   const fetchVehicle = useVehicleStore((s) => s.fetchVehicle); // Fetch all vehicles if not loaded (dashboard mode)
+   const children = useChildStore((s) => s.allChildren);
+   const fetchAllChildren = useChildStore((s) => s.fetchAllChildren);
+   const selectedChild = useChildStore((s) => s.selectedChild);
+   const fetchChild = useChildStore((s) => s.fetchChild); // Fetch all children if not loaded (dashboard mode)
 
 
       // Form state
    const [form, setForm] = useState<IFormServiceRecord>({
-      companyId,
-      vehicleId: vehicleId || '',
+      companyId: familyId,
+      vehicleId: childId || '',
       serviceType: '',
       serviceDate: new Date().toISOString().split('T')[0],
       mileage: '',
@@ -33,53 +33,53 @@ export default function ServiceRecordForm({ companyId, vehicleId }: { companyId:
    });
 
 
-   // Load all vehicles (dashboard mode)
+   // Load all children (dashboard mode)
 
-   // if no vehicleId, get all vehicles into store
+   // if no childId, get all children into store
    useEffect(() => {
-      if (!vehicles.length) {
-         fetchAllVehicles(companyId);
+      if (!children.length) {
+         fetchAllChildren(familyId);
       }
-   }, [vehicles, fetchAllVehicles]);
+   }, [children, fetchAllChildren]);
 
 
-   //  Load selected vehicle (detail mode)
+   //  Load selected child (detail mode)
 
-   // Fetch selected vehicle if vehicleId provided
+   // Fetch selected child if childId provided
    useEffect(() => {
-      // Guard against undefined/null vehicleId
-      if (!vehicleId) return;
-      // If no selectedVehicle OR wrong selectedVehicle, fetch it
-      if (!selectedVehicle || selectedVehicle._id !== vehicleId) {
-         fetchVehicle(vehicleId);   // this sets selectedVehicle in store
+      // Guard against undefined/null childId
+      if (!childId) return;
+      // If no selectedChild OR wrong selectedChild, fetch it
+      if (!selectedChild || selectedChild._id !== childId) {
+         fetchChild(childId);   // this sets selectedChild in store
       }
-   }, [vehicleId, selectedVehicle, fetchVehicle]);
+   }, [childId, selectedChild, fetchChild]);
 
    
-   // Hydrate form when selectedVehicle loads
+   // Hydrate form when selectedChild loads
    useEffect(() => {
-      if (!selectedVehicle) return;
+      if (!selectedChild) return;
       setForm((prev) => ({
          ...prev,
-         vehicleId: prev.vehicleId || selectedVehicle._id,
-         nickName: selectedVehicle.nickName,
-         mileage: String(selectedVehicle.mileage ?? ''),
+         vehicleId: prev.vehicleId || selectedChild._id,
+         nickName: selectedChild.nickName,
+         mileage: String(selectedChild.mileage ?? ''),
       }));
-   }, [selectedVehicle]);
+   }, [selectedChild]);
 
 
 
    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
       const { name, value } = e.target;
 
-      // Special case: vehicle selection
+      // Special case: child selection
       if (name === 'vehicleId') {
-         const v = vehicles.find((veh) => veh._id === value);
+         const c = children.find((child) => child._id === value);
          setForm((prev) => ({
             ...prev,
             vehicleId: value,
-            nickName: v?.nickName ?? prev.nickName, //|| '', // REQUIRED by WorkOrder schema
-            mileage: String(v?.mileage ?? prev.mileage), // set mileage to last known
+            nickName: c?.nickName ?? prev.nickName, //|| '', // REQUIRED by WorkOrder schema
+            mileage: String(c?.mileage ?? prev.mileage), // set mileage to last known
          }));
          return;
       }

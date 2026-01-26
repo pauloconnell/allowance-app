@@ -16,20 +16,20 @@ export async function POST(req: NextRequest) {
 
       await connectDB();
 
-      const body: Partial<IWorkOrder> & { companyId?: string } = await req.json();
-      const companyId = body.companyId;
+      const body: Partial<IWorkOrder> & { familyId?: string } = await req.json();
+      const familyId = body.familyId;
 
-      if (!companyId) {
-         return validationErrorResponse('companyId is required');
+      if (!familyId) {
+         return validationErrorResponse('familyId is required');
       }
 
       // RBAC: Check create permission
-      const canCreate = await hasPermission(session.userId, companyId, 'workOrder', 'create');
+      const canCreate = await hasPermission(session.userId, familyId, 'workOrder', 'create');
       if (!canCreate) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const sanitized = sanitizeCreate<Partial<IWorkOrder>>(WorkOrder, { ...body, companyId });
+      const sanitized = sanitizeCreate<Partial<IWorkOrder>>(WorkOrder, { ...body, companyId: familyId });
 
       // Create work order
       const wo = await WorkOrder.create(sanitized);
@@ -49,14 +49,14 @@ export async function PUT(req: NextRequest) {
       await connectDB();
       const body = await req.json();
       const id = body.id || body.workOrderId;
-      const companyId = body.companyId;
+      const familyId = body.familyId;
 
       if (!id) {
          return validationErrorResponse('ID is required');
       }
 
-      if (!companyId) {
-         return validationErrorResponse('companyId is required');
+      if (!familyId) {
+         return validationErrorResponse('familyId is required');
       }
 
       // Verify ID format
@@ -65,17 +65,17 @@ export async function PUT(req: NextRequest) {
       }
 
       // RBAC: Check update permission
-      await assertPermission(session.userId, companyId, 'workOrder', 'update');
+      await assertPermission(session.userId, familyId, 'workOrder', 'update');
 
-      // Query with companyId for security
-      const existing = await WorkOrder.findOne({ _id: id, companyId }).lean();
+      // Query with familyId for security
+      const existing = await WorkOrder.findOne({ _id: id, companyId: familyId }).lean();
       if (!existing) {
          return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
       }
 
       const sanitized = sanitizeUpdate(WorkOrder, body);
       const updated = await WorkOrder.findOneAndUpdate(
-         { _id: id, companyId },
+         { _id: id, companyId: familyId },
          sanitized,
          { new: true }
       ).lean();
@@ -102,20 +102,20 @@ export async function GET(req: NextRequest) {
       await connectDB();
       const { searchParams } = new URL(req.url);
       const vehicleId = searchParams.get('vehicleId');
-      const companyId = searchParams.get('companyId');
+      const familyId = searchParams.get('familyId');
 
-      if (!companyId) {
-         return validationErrorResponse('companyId is required');
+      if (!familyId) {
+         return validationErrorResponse('familyId is required');
       }
 
       // RBAC: Check read permission
-      const canRead = await hasPermission(session.userId, companyId, 'workOrder', 'read');
+      const canRead = await hasPermission(session.userId, familyId, 'workOrder', 'read');
       console.log("GET /api/work-orders - canRead:", canRead);
       if (!canRead) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const baseQuery: any = { status: 'open', companyId }; // only get 'open' + verify company
+      const baseQuery: any = { status: 'open', companyId: familyId }; // only get 'open' + verify family
       const query = vehicleId ? { ...baseQuery, vehicleId } : baseQuery;
 
       const workOrders = await WorkOrder.find(query).lean();
@@ -141,23 +141,23 @@ export async function DELETE(req: NextRequest) {
 
       const { searchParams } = new URL(req.url);
       const workOrderId = searchParams.get('workOrderId');
-      const companyId = searchParams.get('companyId');
+      const familyId = searchParams.get('familyId');
 
       if (!workOrderId) {
          return validationErrorResponse('Missing work order ID');
       }
 
-      if (!companyId) {
-         return validationErrorResponse('companyId is required');
+      if (!familyId) {
+         return validationErrorResponse('familyId is required');
       }
 
       // RBAC: Check delete permission
-      await assertPermission(session.userId, companyId, 'workOrder', 'delete');
+      await assertPermission(session.userId, familyId, 'workOrder', 'delete');
 
-      // Query with companyId for security
+      // Query with familyId for security
       const deleted = await WorkOrder.findOneAndDelete({
          $or: [{ _id: workOrderId }, { workOrderId }],
-         companyId,
+         companyId: familyId,
       }).lean();
 
       if (!deleted) {

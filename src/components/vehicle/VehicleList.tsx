@@ -1,39 +1,39 @@
 'use client';
 import Link from 'next/link';
-import { useVehicleStore } from '@/store/useVehicleStore';
-import { useCompanyStore } from '@/store/useCompanyStore';
+import { useChildStore } from '@/store/useVehicleStore';
+import { useFamilyStore } from '@/store/useCompanyStore';
 import { IVehicle } from '@/types/IVehicle';
 import { useEffect } from 'react';
 
-interface VehicleListProps {
-   vehicles: IVehicle[];
-   companyId: string;
+interface ChildListProps {
+   children: IVehicle[];
+   familyId: string;
 }
 
-export default function VehicleList({ vehicles, companyId }: VehicleListProps) {
-   const setSelectedVehicle = useVehicleStore((s) => s.setSelectedVehicle);
-   // Get the current companyId from the store
+export default function ChildList({ children, familyId }: ChildListProps) {
+   const setSelectedChild = useChildStore((s) => s.setSelectedChild);
+   // Get the current familyId from the store
    
-const setActiveCompanyId = useCompanyStore((s) => s.setActiveCompanyId);
+const setActiveFamilyId = useFamilyStore((s) => s.setActiveFamilyId);
    useEffect(() => {
-      if (companyId) setActiveCompanyId(companyId);
-   }, [companyId, setActiveCompanyId]);
+      if (familyId) setActiveFamilyId(familyId);
+   }, [familyId, setActiveFamilyId]);
 
-   if (!vehicles || vehicles.length === 0) {
-      return <p className="text-gray-500">No vehicles yet.</p>;
+   if (!children || children.length === 0) {
+      return <p className="text-gray-500">No children yet.</p>;
    }
 
    return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-         {vehicles.map((v) => (
+         {children.map((c) => (
             <Link
-               key={v._id}
-               href={`/protectedPages/${companyId}/vehicles/${v._id}`}
-               onClick={() => setSelectedVehicle(v)}
+               key={c._id}
+               href={`/protectedPages/${familyId}/children/${c._id}`}
+               onClick={() => setSelectedChild(c)}
                className="p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition"
             >
                <div className="font-medium">
-                  {v.year} {v.make} {v.model}, Name: {v.nickName}
+                  {c.year} {c.make} {c.model}, Name: {c.nickName}
                </div>
             </Link>
          ))}

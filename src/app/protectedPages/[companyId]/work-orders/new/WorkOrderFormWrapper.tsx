@@ -4,10 +4,10 @@ import WorkOrderForm from '@/components/Forms/WorkOrderForm';
 import { IVehicle } from '@/types/IVehicle';
 
 interface WorkOrderFormWrapperProps {
-  companyId: string;
-  vehicles: IVehicle[];
+  familyId: string;
+  children: IVehicle[];
 }
 
-export default function WorkOrderFormWrapper({ companyId, vehicles }: WorkOrderFormWrapperProps) {
-  return <WorkOrderForm companyId={companyId} vehicles={vehicles} />;
+export default function WorkOrderFormWrapper({ familyId, children }: WorkOrderFormWrapperProps) {
+  return <WorkOrderForm familyId={familyId} children={children} />;
 }

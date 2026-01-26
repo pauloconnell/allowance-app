@@ -1,26 +1,29 @@
 import { create } from 'zustand';
 
-interface CompanySummary {
+interface FamilySummary {
   _id: string;
   name: string;
   slug?: string;
 }
 
-interface useCompanyState {
-  activeCompanyId: string | null;
-  companies: CompanySummary[];
-  setCompanies: (companies: CompanySummary[]) => void;
-  setActiveCompanyId: (id: string | null) => void;
-  clearCompany: () => void;
+interface useFamilyState {
+  activeFamilyId: string | null;
+  families: FamilySummary[];
+  setFamilies: (families: FamilySummary[]) => void;
+  setActiveFamilyId: (id: string | null) => void;
+  clearFamily: () => void;
 }
 
-export const useCompanyStore = create<useCompanyState>((set) => ({
-  activeCompanyId: null,
-  companies: [],
+export const useFamilyStore = create<useFamilyState>((set) => ({
+  activeFamilyId: null,
+  families: [],
 
-  setCompanies: (companies: CompanySummary[]) => set({ companies }),
+  setFamilies: (families: FamilySummary[]) => set({ families }),
 
-  setActiveCompanyId: (id: string | null) => set({ activeCompanyId: id }),
+  setActiveFamilyId: (id: string | null) => set({ activeFamilyId: id }),
 
-  clearCompany: () => set({ activeCompanyId: null }),
+  clearFamily: () => set({ activeFamilyId: null }),
 }));
+
+// Backward compatibility alias
+export const useCompanyStore = useFamilyStore;

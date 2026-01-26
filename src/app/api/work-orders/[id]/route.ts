@@ -23,28 +23,28 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
    }
 
    const body = await req.json();
-   const companyId = body.companyId;
+   const familyId = body.familyId;
 
-   if (!companyId) {
-      return validationErrorResponse('companyId is required');
+   if (!familyId) {
+      return validationErrorResponse('familyId is required');
    }
 
    // RBAC: Check update permission
    try {
-      await assertPermission(session.userId, companyId, 'workOrder', 'update');
+      await assertPermission(session.userId, familyId, 'workOrder', 'update');
    } catch (err) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
    }
 
-   // Query with companyId for security - never query by _id alone
-   const existing = await WorkOrder.findOne({ _id: id, companyId }).lean();
+   // Query with familyId for security - never query by _id alone
+   const existing = await WorkOrder.findOne({ _id: id, companyId: familyId }).lean();
    if (!existing) {
       return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
    }
 
    let sanitized = sanitizeUpdate(WorkOrder, body);
 
-   const updated = await WorkOrder.findOneAndUpdate({ _id: id, companyId }, sanitized, { new: true }).lean();
+   const updated = await WorkOrder.findOneAndUpdate({ _id: id, companyId: familyId }, sanitized, { new: true }).lean();
    if (!updated) {
       return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
    }
@@ -68,9 +68,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return validationErrorResponse('Invalid ID format');
    }
 
-   const companyId = new URL(req.url).searchParams.get('companyId');
+   const companyId = new URL(req.url).searchParams.get('familyId');
    if (!companyId) {
-      return validationErrorResponse('companyId is required');
+      return validationErrorResponse('familyId is required');
    }
 
    // RBAC: Check read permission
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
    }
 
    try {
-      // Query with companyId for security - never query by _id alone
+      // Query with familyId for security - never query by _id alone
       const wo = await WorkOrder.findOne({ _id: id, companyId }).lean();
       if (!wo) {
          return NextResponse.json({ error: 'Work order not found' }, { status: 404 });

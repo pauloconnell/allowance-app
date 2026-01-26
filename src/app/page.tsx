@@ -1,5 +1,5 @@
 import { getSession } from '@auth0/nextjs-auth0';
-import FamilySwitcher from '@/components/CompanySwitcher/FamilySwitcher';
+import FamilySwitcher from '@/components/FamilySwitcher/FamilySwitcher';
 import { getUserCompanies } from '@/lib/companyContext';
 import '@/models/Company';
 import type { ICompany } from '@/types/ICompany';
@@ -29,7 +29,7 @@ export default async function Home() {
             const firstCompanyId = companies[0]._id;
             href = `/protectedPages/${firstCompanyId}/dashboard`;
          } else {
-            href = '/setup-company';
+            href = '/setup-family';
          }
       } catch (error) {
          console.error('Failed to fetch companies:', error);
@@ -85,14 +85,14 @@ export default async function Home() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                <div className="text-center mb-12 sm:mb-16">
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-boldt text-white tracking-tight mb-6">
-                     Track Your Vehicle Maintenance
+                     Manage Your Family's Chores & Allowance
                      <span className="block text-primary-400 mt-2">
-                        Never Miss a Service Again
+                        Track Tasks and Rewards Effortlessly
                      </span>
                   </h1>
 
                   <p className="text-lg sm:text-xl text-secondary-300 max-w-3xl mx-auto mb-8 leading-relaxed">
-                     mainTracker helps you stay ahead of repairs, plan maintenance, and keep your fleet running smoothly. Smart reminders, complete service history, and an intuitive dashboard built for fleet managers.
+                     allowanceApp helps you organize family chores, track daily records, and manage allowances. Smart reminders, complete activity history, and an intuitive dashboard built for families.
                   </p>
 
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -105,17 +105,17 @@ export default async function Home() {
                      {isLoggedIn && (companies.length > 0) && (
                         <div className="w-full sm:w-auto">
                            <FamilySwitcher
-                              companies={companies}
-                              activeChild={activeCompanyId}
+                              families={companies}
+                              activeFamilyId={activeCompanyId}
                            />
                         </div>
                      )}
                      {isLoggedIn && (
                         <a
-                           href="/setup-company"
+                           href="/setup-family"
                            className="flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg shadow-lg transition duration-150"
                         >
-                           Create New Fleet
+                           Create New Family
                         </a>
                      )}
                   </div>
@@ -125,7 +125,7 @@ export default async function Home() {
                <div className="mt-12 sm:mt-16 rounded-2xl overflow-hidden shadow-2xl">
                   <img
                      src="/images/CarAndBoat.png"
-                     alt="Fleet Management"
+                     alt="Family Management"
                      className="w-full h-auto object-cover"
                   />
                </div>
@@ -137,10 +137,10 @@ export default async function Home() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                <div className="text-center mb-16">
                   <h2 className="text-3xl sm:text-4xl font-bold text-secondary-900 mb-4">
-                     Why Choose mainTracker?
+                     Why Choose allowanceApp?
                   </h2>
                   <p className="text-lg text-secondary-600">
-                     Everything you need to manage your fleet efficiently
+                     Everything you need to manage your family efficiently
                   </p>
                </div>
 
@@ -152,7 +152,7 @@ export default async function Home() {
                      </div>
                      <h3 className="text-xl font-bold text-secondary-900 mb-3">Smart Reminders</h3>
                      <p className="text-secondary-600">
-                        Automatic notifications for oil changes, tire rotations, inspections, and routine maintenance.
+                        Automatic notifications for chores, tasks, and important family events.
                      </p>
                   </div>
 
@@ -161,20 +161,20 @@ export default async function Home() {
                      <div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-6">
                         <span className="text-2xl">📋</span>
                      </div>
-                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Complete Service History</h3>
+                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Complete Activity History</h3>
                      <p className="text-secondary-600">
-                        Keep a searchable log of every repair, upgrade, and maintenance event for your entire fleet.
+                        Keep a searchable log of every chore, task, and daily record for your entire family.
                      </p>
                   </div>
 
                   {/* Feature 3 */}
                   <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-8 border border-secondary-100">
                      <div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-6">
-                        <span className="text-2xl">🚗</span>
+                        <span className="text-2xl">�‍👩‍👧‍👦</span>
                      </div>
-                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Multi-Vehicle Support</h3>
+                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Multi-Child Support</h3>
                      <p className="text-secondary-600">
-                        Manage all your vehicles in one place — cars, trucks, motorcycles, and equipment.
+                        Manage all your children in one place — track their chores, allowances, and daily tasks.
                      </p>
                   </div>
                </div>
@@ -207,10 +207,10 @@ export default async function Home() {
          <section className="bg-gradient-to-r from-primary-600 to-primary-700 py-20 sm:py-32">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-                  Ready to streamline your maintenance?
+                  Ready to organize your family?
                </h2>
                <p className="text-lg text-primary-100 mb-8">
-                  Join thousands of fleet managers who trust mainTracker to keep their vehicles in top condition.
+                  Join families who trust allowanceApp to manage chores, track daily records, and rewards.
                </p>
                <a
                   href={href}
@@ -226,11 +226,11 @@ export default async function Home() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <div className="mb-6 sm:mb-0">
-                     <span className="text-2xl font-bold text-white">mainTracker</span>
-                     <p className="text-sm mt-2 text-secondary-400">Fleet maintenance made simple</p>
+                     <span className="text-2xl font-bold text-white">allowanceApp</span>
+                     <p className="text-sm mt-2 text-secondary-400">Family chores made simple</p>
                   </div>
                   <div className="text-sm text-secondary-400">
-                     © 2025 mainTracker. All rights reserved.
+                     © 2025 allowanceApp. All rights reserved.
                   </div>
                </div>
             </div>

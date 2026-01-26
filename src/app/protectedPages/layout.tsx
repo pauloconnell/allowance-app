@@ -19,7 +19,7 @@ export default async function ProtectedLayout({ children, }: { children: ReactNo
   
   // 4. If user has no company, redirect to onboarding
   if (!hasCompany) {
-    redirect("/setup-company");
+    redirect("/setup-family");
   }
 
   return <>{children}</>;

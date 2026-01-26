@@ -3,10 +3,10 @@ import { IVehicle } from "@/types/IVehicle";
 
 export default function EditFormWrapper({ 
    vehicle,
-   companyId 
+   familyId 
 }: {
    vehicle: IVehicle;
-   companyId: string;
+   familyId: string;
 }) {
-   return <VehicleForm vehicle={vehicle} companyId={companyId} />;
+   return <VehicleForm vehicle={vehicle} familyId={familyId} />;
 }

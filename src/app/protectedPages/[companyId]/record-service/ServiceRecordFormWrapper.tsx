@@ -3,10 +3,10 @@
 import ServiceRecordForm from '@/components/Forms/ServiceRecordForm';
 
 interface ServiceRecordFormWrapperProps {
-  companyId: string;
-  vehicleId?: string;
+  familyId: string;
+  childId?: string;
 }
 
-export default function ServiceRecordFormWrapper({ companyId, vehicleId }: ServiceRecordFormWrapperProps) {
-  return <ServiceRecordForm companyId={companyId} vehicleId={vehicleId} />;
+export default function ServiceRecordFormWrapper({ familyId, childId }: ServiceRecordFormWrapperProps) {
+  return <ServiceRecordForm familyId={familyId} childId={childId} />;
 }

@@ -7,15 +7,15 @@ export const metadata: Metadata = {
 };
 
 export default async function NewWorkOrderPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { companyId } = await params;
+  const { companyId: familyId } = await params;
 
-  const vehicles = await getAllVehicles(companyId);
+  const children = await getAllVehicles(familyId);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-semibold mb-8">Create Work Order</h1>
-        <WorkOrderFormWrapper companyId={companyId} vehicles={vehicles} />
+        <WorkOrderFormWrapper familyId={familyId} children={children} />
       </div>
     </div>
   );

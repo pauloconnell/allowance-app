@@ -1,6 +1,6 @@
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
 import { getAllVehicles } from '@/lib/vehicles';
-import VehicleList from '@/components/vehicle/VehicleList';
+import ChildList from '@/components/vehicle/VehicleList';
 import Link from 'next/link';
 
 interface PageProps {
@@ -8,17 +8,17 @@ interface PageProps {
 }
 
 export default async function DashboardPage({ params }: PageProps) {
-   const { companyId } = await params;
-   let vehicles = [];
+   const { companyId: familyId } = await params;
+   let children = [];
    try {
-      vehicles = await getAllVehicles(companyId);
+      children = await getAllVehicles(familyId);
    } catch (err) {
-      console.error('Failed to load vehicles:', err);
+      console.error('Failed to load children:', err);
       return (
          <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
             <div className="bg-white rounded-xl shadow-lg p-8 text-center max-w-md">
                <p className="text-danger-600 font-semibold text-lg">
-                  Error loading vehicles
+                  Error loading children
                </p>
                <p className="text-secondary-600 mt-2">Please try refreshing the page.</p>
             </div>
@@ -36,7 +36,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      Dashboard
                   </h1>
                   <p className="text-secondary-600 mt-2">
-                     Manage your fleet and service records
+                     Manage your family, children, and chores
                   </p>
                </div>
 
@@ -45,25 +45,25 @@ export default async function DashboardPage({ params }: PageProps) {
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
                >
                   <span className="text-lg"></span>
-                  <span className="hover:text-black ml-2">Change Fleet</span>
+                  <span className="hover:text-black ml-2">Change Family</span>
                </Link>
             </div>
 
             {/* Grid Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-               {/* Service Due Card - Spans 2 columns on large screens */}
+               {/* Chores/Daily Records Card - Spans 2 columns on large screens */}
                <div className="lg:col-span-2">
                   <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 sm:p-8">
                      <div className="flex items-center justify-between mb-6">
                         <h2 className="text-2xl font-bold text-secondary-900">
-                           Service Due
+                           Chores & Daily Records
                         </h2>
                         <div className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-lg">
-                           <span className="text-primary-600 font-semibold">⚙️</span>
+                           <span className="text-primary-600 font-semibold">📋</span>
                         </div>
                      </div>
                      <div className="min-h-[200px] sm:min-h-[300px]">
-                        <ServiceDue companyId={companyId} />
+                        <p className="text-secondary-600">View and manage chores and daily records for your family.</p>
                      </div>
                   </div>
                </div>
@@ -75,62 +75,46 @@ export default async function DashboardPage({ params }: PageProps) {
                   </h3>
                   <div className="flex flex-col gap-4">
                      <Link
-                        href={`/protectedPages/${companyId}/record-service`}
+                        href={`/protectedPages/${familyId}/daily-records`}
                         className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
                      >
-                        <span className="text-lg">+</span>
-                        <span className="hover:text-black ml-2">Record Inspection </span>
+                        <span className="text-lg">📝</span>
+                        <span className="hover:text-black ml-2">View Daily Records</span>
                      </Link>
 
                      <Link
-                        href={`/protectedPages/${companyId}/record-service`}
+                        href={`/protectedPages/${familyId}/chores`}
                         className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
                      >
-                        <span className="text-lg">+</span>
-                        <span className="hover:text-black ml-2">Record Service</span>
+                        <span className="text-lg">✅</span>
+                        <span className="hover:text-black ml-2">Manage Chores</span>
                      </Link>
 
                      <Link
-                        href={`/protectedPages/${companyId}/vehicles/new`}
+                        href={`/protectedPages/${familyId}/children/new`}
                         className="flex items-center justify-center px-4 py-3 bg-primary-50 text-primary-700 font-semibold rounded-lg hover:bg-primary-100 transition-colors duration-200 border border-primary-200"
                      >
-                        <span className="hover:text-black">+ Add Vehicle</span>
-                     </Link>
-
-                  
-
-                     <Link
-                        href={`/protectedPages/${companyId}/work-orders`}
-                        className="flex items-center justify-center px-4 py-3 bg-secondary-50 text-secondary-700 font-semibold rounded-lg hover:bg-secondary-100 transition-colors duration-200 border border-secondary-200"
-                     >
-                        <span className="hover:text-black">📋All Work Orders</span>
-                     </Link>
-
-                     <Link
-                        href={`/protectedPages/${companyId}/work-orders`}
-                        className="flex items-center justify-center px-4 py-3 bg-secondary-50 text-secondary-700 font-semibold rounded-lg hover:bg-secondary-100 transition-colors duration-200 border border-secondary-200"
-                     >
-                        <span className="hover:text-black">📋 All Service Records</span>
+                        <span className="hover:text-black">+ Add Child</span>
                      </Link>
                   </div>
                </div>
             </div>
 
-            {/* Vehicles Section */}
+            {/* Children Section */}
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 sm:p-8">
                <div className="flex items-center justify-between mb-6">
                   <div>
-                     <h2 className="text-2xl font-bold text-secondary-900">Vehicles</h2>
+                     <h2 className="text-2xl font-bold text-secondary-900">Children</h2>
                      <p className="text-secondary-600 text-sm mt-1">
-                        {vehicles.length} vehicle{vehicles.length !== 1 ? 's' : ''} in
-                        fleet
+                        {children.length} child{children.length !== 1 ? 'ren' : ''} in
+                        family
                      </p>
                   </div>
                   <div className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-lg">
-                     <span className="text-primary-600 font-semibold">🚗</span>
+                     <span className="text-primary-600 font-semibold">👨‍👩‍👧</span>
                   </div>
                </div>
-               <VehicleList vehicles={vehicles} companyId={companyId} />
+               <ChildList children={children} familyId={familyId} />
             </div>
          </div>
       </div>

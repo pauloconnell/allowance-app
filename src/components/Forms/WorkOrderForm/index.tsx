@@ -6,24 +6,24 @@ import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
 import DeleteWorkOrderButton from '@/components/Buttons/DeleteWorkOrderButton';
 import { toast } from 'react-hot-toast';
 import { useWorkOrderStore } from '@/store/useWorkOrderStore';
-import { useVehicleStore } from '@/store/useVehicleStore';
+import { useChildStore } from '@/store/useVehicleStore';
 import { IVehicle } from '@/types/IVehicle';
 import { IFormWorkOrder } from '@/types/IFormWorkOrder';
 import { sanitizeInput } from '@/lib/sanitizeInput';
 
 
 interface WorkOrderFormProps {
-   companyId: string;
+   familyId: string;
    workOrderId?: string;
-   vehicleId?: string;
-   vehicles: IVehicle[];
+   childId?: string;
+   children: IVehicle[];
 }
 
 export default function WorkOrderForm({
-   companyId,
+   familyId,
    workOrderId,
-   vehicleId,
-   vehicles,
+   childId,
+   children,
 }: WorkOrderFormProps) {
    const router = useRouter();
 
@@ -31,9 +31,9 @@ export default function WorkOrderForm({
    const storeWO = useWorkOrderStore((s) => s.selectedWorkOrder);
    const fetchWorkOrder = useWorkOrderStore((s) => s.fetchWorkOrder);
 
-   const selectedVehicle = useVehicleStore((state) => state.selectedVehicle);
-   const fetchVehicle = useVehicleStore((state) => state.fetchVehicle);
-   const setSelectedVehicle = useVehicleStore((s) => s.setSelectedVehicle);
+   const selectedChild = useChildStore((state) => state.selectedChild);
+   const fetchChild = useChildStore((state) => state.fetchChild);
+   const setSelectedChild = useChildStore((s) => s.setSelectedChild);
    const fetchAllWorkOrders = useWorkOrderStore((s) => s.fetchAllWorkOrders);
 
    //console.log('vehicleId issue?', storeWO);
@@ -53,28 +53,28 @@ export default function WorkOrderForm({
 
    // BLOCK URL: if No IDs → redirect
    useEffect(() => {
-      if (!workOrderId && !vehicleId) {
-         router.push(`/protectedPages/${companyId}/vehicles`);
+      if (!workOrderId && !childId) {
+         router.push(`/protectedPages/${familyId}/children`);
       }
-   }, [workOrderId, vehicleId, companyId, router]);
+   }, [workOrderId, childId, familyId, router]);
 
    // 2) derive id
-   const derivedVehicleId =
-      (isEditing ? storeWO?.vehicleId : vehicleId || selectedVehicle?._id) ?? '';
+   const derivedChildId =
+      (isEditing ? storeWO?.vehicleId : childId || selectedChild?._id) ?? '';
 
-   // 4) Fetch vehicle (new WO only)
+   // 4) Fetch child (new WO only)
    useEffect(() => {
-      if (!isEditing && derivedVehicleId && !selectedVehicle) {
-         fetchVehicle(derivedVehicleId);
+      if (!isEditing && derivedChildId && !selectedChild) {
+         fetchChild(derivedChildId);
       }
-   }, [isEditing, derivedVehicleId, selectedVehicle, fetchVehicle]);
+   }, [isEditing, derivedChildId, selectedChild, fetchChild]);
 
    // 2) Form State
 
    const [form, setForm] = useState<IFormWorkOrder>(() => {
       if (isEditing && storeWO) {
          return {
-            companyId,
+            companyId: familyId,
             workOrderId: storeWO._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
@@ -95,9 +95,9 @@ export default function WorkOrderForm({
          };
       } // New Work Order
       return {
-         companyId,
+         companyId: familyId,
          workOrderId: '',
-         vehicleId: derivedVehicleId || '',
+         vehicleId: derivedChildId || '',
          serviceType: '',
          serviceDueDate: '',
          serviceDueKM: '',
@@ -116,7 +116,7 @@ export default function WorkOrderForm({
    useEffect(() => {
       if (isEditing && storeWO) {
          setForm({
-            companyId,
+            companyId: familyId,
             workOrderId: storeWO?._id,
             vehicleId: storeWO.vehicleId ?? '',
             serviceType: storeWO.serviceType ?? '',
@@ -134,7 +134,7 @@ export default function WorkOrderForm({
             serviceFrequencyWeeks: String(storeWO.serviceFrequencyWeeks ?? ''),
          });
       }
-   }, [isEditing, storeWO, companyId]);
+   }, [isEditing, storeWO, familyId]);
 
    // 4. Block rendering ONLY when editing and store isn't loaded
 
@@ -149,12 +149,12 @@ export default function WorkOrderForm({
    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
       const { name, value, type } = e.target;
 
-      // If the user changed the vehicle dropdown, update the store
+      // If the user changed the child dropdown, update the store
       if (name === 'vehicleId') {
-         const v = vehicles.find((veh) => veh._id === value);
-         console.log('changed vehicle ', v);
-         if (v) {
-            setSelectedVehicle(v);
+         const c = children.find((child) => child._id === value);
+         console.log('changed child ', c);
+         if (c) {
+            setSelectedChild(c);
          }
       }
 
