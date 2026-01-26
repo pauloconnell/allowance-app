@@ -1,7 +1,7 @@
 import { connectDB } from '@/lib/mongodb';
-import UserCompany from '@/models/UserCompany';
-import Company from '@/models/Family';
-import type { IUserCompany } from '@/types/IUserCompany';
+import UserFamily from '@/models/UserFamily';
+import Family from '@/models/Family';
+import type { IUserFamily } from '@/types/IUserFamily';
 import type { IFamily } from '@/types/IFamily';
 
 /**
@@ -13,7 +13,7 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
    try {
       await connectDB();
 
-      const userCompanies = await UserCompany.find({
+      const userCompanies = await UserFamily.find({
          userId,
          isActive: true,
       })
@@ -53,7 +53,7 @@ export async function userHasFamily(userId: string): Promise<boolean> {
    try {
       await connectDB();
 
-      const count = await UserCompany.countDocuments({
+      const count = await UserFamily.countDocuments({
          userId,
          isActive: true,
       });
@@ -74,7 +74,7 @@ export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & {
    try {
       await connectDB();
 
-      const userCompany = await UserCompany.findOne({
+      const userFamily = await UserFamily.findOne({
          userId,
          isActive: true,
       })
@@ -82,25 +82,25 @@ export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & {
          .populate('companyId')
          .lean();
 
-      if (!userCompany) return null;
+      if (!userFamily) return null;
 
       return {
-         _id: userCompany.companyId._id.toString(),
-         name: userCompany.companyId.name,
-         slug: userCompany.companyId.slug,
-         description: userCompany.companyId.description,
-         email: userCompany.companyId.email,
-         phone: userCompany.companyId.phone,
-         address: userCompany.companyId.address,
-         city: userCompany.companyId.city,
-         state: userCompany.companyId.state,
-         zipCode: userCompany.companyId.zipCode,
-         country: userCompany.companyId.country,
-         logo: userCompany.companyId.logo,
-         isActive: userCompany.companyId.isActive,
-         createdAt: userCompany.companyId.createdAt?.toISOString?.() ?? '',
-         updatedAt: userCompany.companyId.updatedAt?.toISOString?.() ?? '',
-         role: userCompany.role,
+         _id: userFamily.companyId._id.toString(),
+         name: userFamily.companyId.name,
+         slug: userFamily.companyId.slug,
+         description: userFamily.companyId.description,
+         email: userFamily.companyId.email,
+         phone: userFamily.companyId.phone,
+         address: userFamily.companyId.address,
+         city: userFamily.companyId.city,
+         state: userFamily.companyId.state,
+         zipCode: userFamily.companyId.zipCode,
+         country: userFamily.companyId.country,
+         logo: userFamily.companyId.logo,
+         isActive: userFamily.companyId.isActive,
+         createdAt: userFamily.companyId.createdAt?.toISOString?.() ?? '',
+         updatedAt: userFamily.companyId.updatedAt?.toISOString?.() ?? '',
+         role: userFamily.role,
       };
    } catch (error) {
       console.error('Failed to fetch user primary family:', error);

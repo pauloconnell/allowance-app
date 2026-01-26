@@ -2,8 +2,8 @@
 
 import { redirect } from 'next/navigation';
 import { connectDB } from '@/lib/mongodb';
-import Company from '@/models/Family';
-import UserCompany from '@/models/UserCompany';
+import Family from '@/models/Family';
+import UserFamily from '@/models/UserFamily';
 import Invite from '@/models/Invite';
 import { getSession } from '@auth0/nextjs-auth0';
 import crypto from 'crypto';
@@ -12,7 +12,7 @@ import crypto from 'crypto';
  * Server Action: Create a new family (company) and link the user as owner
  */
 export async function createFamily(name: string) {
-  let newCompanyId: string | null = null;
+  let newFamilyId: string | null = null;
 
   try {
     if (!name || name.trim().length === 0) {
@@ -26,7 +26,8 @@ export async function createFamily(name: string) {
 
     await connectDB();
 
-    const company = await Company.create({
+    const company = await Family.create({
+          userId: session.user.sub,
       name: name.trim(),
       slug: name
         .trim()
@@ -36,7 +37,7 @@ export async function createFamily(name: string) {
       isActive: true,
     });
 
-    await UserCompany.create({
+    await UserFamily.create({
       userId: session.user.sub,
       companyId: company._id,
       role: 'owner',
@@ -46,7 +47,7 @@ export async function createFamily(name: string) {
       isActive: true,
     });
 
-    newCompanyId = company._id.toString();
+    newFamilyId = company._id.toString();
   } catch (error: any) {
     if (error.code === 11000) {
       return { error: 'A family with this name already exists. Please try a different name.' };
@@ -55,8 +56,8 @@ export async function createFamily(name: string) {
     return { error: 'Failed to create family' };
   }
 
-  if (newCompanyId) {
-    redirect(`/dashboard?companyId=${newCompanyId}`);
+  if (newFamilyId) {
+    redirect(`/dashboard?familyId=${newFamilyId}`);
   }
 }
 

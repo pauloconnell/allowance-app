@@ -1,5 +1,5 @@
 import { connectDB } from './mongodb';
-import UserCompany from '@/models/UserCompany';
+import UserCompany from '@/models/UserFamily';
 import Child from '@/models/Child';
 
 /**

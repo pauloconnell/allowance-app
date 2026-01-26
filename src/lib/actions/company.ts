@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { connectDB } from '@/lib/mongodb';
 import Company from '@/models/Family';
-import UserCompany from '@/models/UserCompany';
+import UserCompany from '@/models/UserFamily';
 import { getSession } from '@auth0/nextjs-auth0';
 
 /**

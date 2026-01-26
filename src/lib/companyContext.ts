@@ -1,5 +1,5 @@
 import { connectDB } from '@/lib/mongodb';
-import UserCompany from '@/models/UserCompany';
+import UserCompany from '@/models/UserFamily';
 import Company from '@/models/Family';
 import type { IUserCompany } from '@/types/IUserCompany';
 import type { IFamily } from '@/types/IFamily';

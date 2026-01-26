@@ -1,6 +1,6 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
-import UserCompany from '@/models/UserCompany';
+import UserCompany from '@/models/UserFamily';
 import Child from '@/models/Child';
 
 /**
