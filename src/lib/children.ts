@@ -71,7 +71,4 @@ export async function createChild(data: Partial<IChild>): Promise<Partial<IChild
   };
 }
 
-// Backward compatibility aliases
-export const getVehicleById = getChildById;
-export const getAllVehicles = getAllChildren;
-export const createVehicle = createChild;
+

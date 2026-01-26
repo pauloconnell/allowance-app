@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { getServiceHistory } from '@/lib/serviceRecords';
-import { getVehicleById } from '@/lib/vehicles';
+import { getDailyHistory } from '@/lib/serviceRecords';
+import { getChildById } from '@/lib/children';
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
 
 interface Props {
@@ -10,9 +10,9 @@ interface Props {
 export default async function VehiclePage({ params }: Props) {
    const { companyId, vehicleId } = await params;
 
-   // Fetch vehicle + service history from MongoDB
-   const vehicle = await getVehicleById(vehicleId, companyId);
-   const history = await getServiceHistory(vehicleId, companyId);
+   // Fetch child + daily record history from MongoDB
+   const vehicle = await getChildById(vehicleId, companyId);
+   const history = await getDailyHistory(vehicleId, companyId);
 
    if (!vehicle) {
       return (

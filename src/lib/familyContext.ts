@@ -98,12 +98,7 @@ export async function getUserPrimaryFamily(userId: string): Promise<(ICompany & 
          country: userCompany.companyId.country,
          logo: userCompany.companyId.logo,
          isActive: userCompany.companyId.isActive,
-         createdAt: userCompany.companyId.createdAt,
-      };
-      
-   }catch (err) {
-          console.error(`Failed to get user family membership: ${error}`);
-         return null;?.toISOString?.() ?? '',
+         createdAt: userCompany.companyId.createdAt?.toISOString?.() ?? '',
          updatedAt: userCompany.companyId.updatedAt?.toISOString?.() ?? '',
          role: userCompany.role,
       };

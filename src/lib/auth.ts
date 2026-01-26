@@ -55,11 +55,6 @@ export async function requireAuthAndFamily(familyId: string) {
 }
 
 /**
- * Backward compatibility alias
- */
-export const requireAuthAndCompany = requireAuthAndFamily;
-
-/**
  * Create error response for authorization failures
  */
 export function unauthorizedResponse(message = 'Unauthorized') {

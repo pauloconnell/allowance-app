@@ -42,6 +42,3 @@ export async function createNextChore(nextChore: Partial<IChore>) {
       });
    }
 }
-
-// Backward compatibility alias
-export const createNextWorkOrder = createNextChore;

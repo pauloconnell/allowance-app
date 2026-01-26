@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import ServiceRecord from '@/models/ServiceRecord';
-import { createNextWorkOrder } from '@/lib/createNextWorkOrder';
+import { createNextChore } from '@/lib/chores';
 import { IWorkOrder } from '@/types/IWorkOrder';
 import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth';
 import { hasPermission } from '@/lib/rbac';
@@ -41,8 +41,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Work order missing company context' }, { status: 400 });
    }
 
-   // 2. RBAC: Verify user belongs to company
-   const canComplete = await hasPermission(session.userId, companyId, 'workOrder', 'complete');
+   // 2. RBAC: Verify user belongs to family
+   const canComplete = await hasPermission(session.userId, companyId, 'chore', 'complete');
    if (!canComplete) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
    }

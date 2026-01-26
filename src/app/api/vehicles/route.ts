@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getAllVehicles, createVehicle } from '@/lib/vehicles';
+import { getAllChildren, createChild } from '@/lib/children';
 import { sanitizeCreate } from '@/lib/sanitizeCreate';
 import { normalizeRecord } from '@/lib/normalizeRecord';
 import Vehicle from '@/models/Vehicle';
@@ -20,12 +20,12 @@ export async function GET(req: NextRequest) {
       }
 
       // RBAC: Check read permission
-      const canRead = await hasPermission(session.userId, companyId, 'vehicle', 'read');
+      const canRead = await hasPermission(session.userId, companyId, 'child', 'read');
       if (!canRead) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const vehicles = await getAllVehicles(companyId);
+      const vehicles = await getAllChildren(companyId);
       const normalized = vehicles.map((v) => {
          const n = normalizeRecord(v);
          n.vehicleId = n._id; // model-specific ID field
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       }
 
       // RBAC: Check create permission
-      const canCreate = await hasPermission(session.userId, companyId, 'vehicle', 'create');
+      const canCreate = await hasPermission(session.userId, companyId, 'child', 'create');
       if (!canCreate) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
@@ -61,14 +61,14 @@ export async function POST(req: NextRequest) {
          body.mileage = body.mileage.toString().replace(/,/g, '');
       }
 
-      // Sanitize input based on Vehicle schema
+      // Sanitize input based on Child schema
       const sanitized = sanitizeCreate(Vehicle, { ...body, companyId });
 
-      const vehicle = await createVehicle(sanitized);
+      const vehicle = await createChild(sanitized);
 
       return NextResponse.json({ success: true }, { status: 201 });
    } catch (err) {
-      console.error('Error creating vehicle:', err);
-      return NextResponse.json({ error: 'Failed to create vehicle' }, { status: 500 });
+      console.error('Error creating child:', err);
+      return NextResponse.json({ error: 'Failed to create child' }, { status: 500 });
    }
 }

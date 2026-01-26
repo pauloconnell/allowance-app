@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { createServiceRecord } from "@/lib/serviceRecords";
+import { createDailyRecord } from "@/lib/serviceRecords";
 import ServiceRecord from "@/models/ServiceRecord"; 
 import { sanitizeCreate } from "@/lib/sanitizeCreate";
 import { IServiceRecord } from "@/types/IServiceRecord"
@@ -21,17 +21,17 @@ export async function POST(req: NextRequest) {
     }
 
     // RBAC: Check create permission
-    const canCreate = await hasPermission(session.userId, companyId, 'serviceRecord', 'create');
+    const canCreate = await hasPermission(session.userId, companyId, 'daily-record', 'create');
     if (!canCreate) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const sanitized = sanitizeCreate<Partial<IServiceRecord>>(ServiceRecord, { ...body, companyId });
 
-    const record = await createServiceRecord(sanitized);
+    const record = await createDailyRecord(sanitized);
     return NextResponse.json("Success", { status: 201 });
   } catch (err) {
-    console.error("Error creating service record:", err);
-    return NextResponse.json({ error: "Failed to create record" }, { status: 500 });
+    console.error("Error creating daily record:", err);
+    return NextResponse.json({ error: "Failed to create daily record" }, { status: 500 });
   }
 }

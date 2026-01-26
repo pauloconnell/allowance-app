@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import WorkOrderEditFormWrapper from './edit/WorkOrderEditFormWrapper';
-import { getAllVehicles } from '@/lib/vehicles';
+import { getAllChildren } from '@/lib/children';
 
 export const metadata: Metadata = {
   title: 'Work Order Details',
@@ -13,7 +13,7 @@ export default async function WorkOrderDetailPage({
 }) {
   const { companyId, workOrderId } = await params;
 
-  const vehicles = await getAllVehicles(companyId);
+  const vehicles = await getAllChildren(companyId);
 
   return (
     <div className="min-h-screen bg-gray-50">

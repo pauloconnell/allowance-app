@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllWorkOrders } from '@/lib/workOrders';
+import { getAllChores } from '@/lib/chores';
 import { CardWorkOrder } from '@/components/UI/CardWorkOrder';
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function WorkOrdersPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { companyId } = await params;
 
-  const workOrders = await getAllWorkOrders(companyId);
+  const workOrders = await getAllChores(companyId);
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import WorkOrderFormWrapper from './WorkOrderFormWrapper';
-import { getAllVehicles } from '@/lib/vehicles';
+import { getAllChildren } from '@/lib/children';
 
 export const metadata: Metadata = {
   title: 'Create Work Order',
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default async function NewWorkOrderPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { companyId: familyId } = await params;
 
-  const children = await getAllVehicles(familyId);
+  const children = await getAllChildren(familyId);
 
   return (
     <div className="min-h-screen bg-gray-50">

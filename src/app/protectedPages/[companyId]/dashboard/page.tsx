@@ -1,5 +1,5 @@
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
-import { getAllVehicles } from '@/lib/vehicles';
+import { getAllChildren } from '@/lib/children';
 import ChildList from '@/components/vehicle/VehicleList';
 import Link from 'next/link';
 
@@ -11,7 +11,7 @@ export default async function DashboardPage({ params }: PageProps) {
    const { companyId: familyId } = await params;
    let children = [];
    try {
-      children = await getAllVehicles(familyId);
+      children = await getAllChildren(familyId);
    } catch (err) {
       console.error('Failed to load children:', err);
       return (

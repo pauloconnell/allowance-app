@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getVehicleById } from "@/lib/vehicles";
+import { getChildById } from "@/lib/children";
 import EditFormWrapper from "./EditFormWrapper";
 import mongoose from "mongoose";
 
@@ -13,21 +13,21 @@ export default async function EditVehiclePage({ params }: Props) {
    if (!mongoose.isValidObjectId(vehicleId)) {
       return (
          <div className="text-red-600 p-6">
-            Invalid vehicle ID format
+            Invalid child ID format
          </div>
       );
    }
 
    let vehicle = null;
    try {
-      // Fetch vehicle from DB with company scope
-      const doc = await getVehicleById(vehicleId, companyId);
+      // Fetch child from DB with family scope
+      const doc = await getChildById(vehicleId, companyId);
       vehicle = JSON.parse(JSON.stringify(doc));
    } catch (err) {
-      console.error('Failed to load vehicle:', err);
+      console.error('Failed to load child:', err);
       return (
          <div className="text-red-600 p-6">
-            Failed to load vehicle. Please try again.
+            Failed to load child. Please try again.
          </div>
       );
    }

@@ -1,6 +1,6 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import FamilySwitcher from '@/components/FamilySwitcher/FamilySwitcher';
-import { getUserCompanies } from '@/lib/companyContext';
+import { getUserFamilies } from '@/lib/familyContext';
 import '@/models/Company';
 import type { ICompany } from '@/types/ICompany';
 

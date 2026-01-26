@@ -1,11 +1,8 @@
 import { connectDB } from './mongodb';
 import DailyRecord from '@/models/DailyRecord';
 import type { IDailyRecord } from '@/types/IDailyRecord';
-import type { IChild } from '@/types/IChild';
 
-// Re-exported from dailyRecords.ts - this file kept for backward compatibility
-
-// helper to normalize Daily Records
+// Helper to normalize Daily Records
 export function normalizeDailyRecord(record: IDailyRecord): IDailyRecord {
    return {
       ...record,
@@ -46,9 +43,3 @@ export async function getAllDailyRecords(familyId?: string): Promise<IDailyRecor
 
    return records.map(normalizeDailyRecord);
 }
-
-// Backward compatibility aliases - legacy function names
-export const normalizeServiceRecord = normalizeDailyRecord;
-export const createServiceRecord = createDailyRecord;
-export const getServiceHistory = getDailyHistory;
-export const getAllServiceRecords = getAllDailyRecords;

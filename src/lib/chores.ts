@@ -1,5 +1,7 @@
 import { connectDB } from "./mongodb";
 import Chore from "@/models/Chore";
+import Child from "@/models/Child";
+import mongoose from "mongoose";
 import { IChore } from "@/types/IChore";
 
 
@@ -69,8 +71,40 @@ export async function deleteChore(id: string, familyId?: string) {
     : null;
 }
 
-// Backward compatibility aliases
-export const createWorkOrder = createChore;
-export const getAllWorkOrders = getAllChores;
-export const getWorkOrdersForVehicle = getChoresForChild;
-export const deleteWorkOrder = deleteChore;
+export async function createNextChore(nextChore: Partial<IChore>) {
+  if (!mongoose.isValidObjectId(nextChore.childId)) {
+    return null;
+  }
+  
+  const child = await Child.findById(nextChore.childId);
+  if (!child) return null;
+
+  // If all required fields are provided, use them directly
+  if (
+    nextChore.familyId &&
+    nextChore.taskName &&
+    nextChore.rewardAmount !== undefined
+  ) {
+    // Create the new chore with provided values
+    await Chore.create({
+      familyId: nextChore.familyId,
+      childId: nextChore.childId,
+      taskName: nextChore.taskName,
+      rewardAmount: nextChore.rewardAmount,
+      notes: nextChore.notes ?? "",
+      isActive: true,
+      isRecurring: nextChore.isRecurring ?? false,
+    });
+  } else {
+    // Fallback: Create with minimal data
+    await Chore.create({
+      familyId: nextChore.familyId,
+      childId: nextChore.childId,
+      taskName: nextChore.taskName,
+      rewardAmount: nextChore.rewardAmount,
+      notes: nextChore.notes ?? "",
+      isActive: true,
+      isRecurring: false,
+    });
+  }
+}

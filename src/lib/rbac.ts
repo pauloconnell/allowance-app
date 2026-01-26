@@ -8,10 +8,7 @@ import Child from '@/models/Child';
 export type ResourceType =
    | 'child'
    | 'chore'
-   | 'daily-record'
-   | 'vehicle'
-   | 'workOrder'
-   | 'serviceRecord';
+   | 'daily-record';
 
 /**
  * Actions that can be performed on resources
@@ -38,37 +35,21 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
       child: ['create', 'read', 'update', 'delete'],
       chore: ['create', 'read', 'update', 'delete'],
       'daily-record': ['read', 'write', 'approve', 'create', 'delete'],
-      // Legacy aliases
-      vehicle: ['create', 'read', 'update', 'delete'],
-      workOrder: ['create', 'read', 'update', 'delete'],
-      serviceRecord: ['create', 'read', 'update', 'delete'],
    },
    admin: {
       child: ['create', 'read', 'update'],
       chore: ['create', 'read', 'update', 'delete'],
       'daily-record': ['read', 'write', 'approve', 'create'],
-      // Legacy aliases
-      vehicle: ['create', 'read', 'update', 'delete'],
-      workOrder: ['create', 'read', 'update', 'delete'],
-      serviceRecord: ['create', 'read', 'update', 'delete'],
    },
    manager: {
       child: ['read'],
       chore: ['read', 'create', 'update'],
       'daily-record': ['read', 'write', 'create'],
-      // Legacy aliases
-      vehicle: ['read', 'create', 'update'],
-      workOrder: ['create', 'read', 'update', 'complete'],
-      serviceRecord: ['create', 'read', 'update'],
    },
    user: {
       child: ['read'],
       chore: ['read'],
       'daily-record': ['read'],
-      // Legacy aliases
-      vehicle: ['read'],
-      workOrder: ['read', 'complete'],
-      serviceRecord: ['read', 'create'],
    },
    parent: {
       child: ['read', 'create', 'update'],
@@ -78,6 +59,9 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
    child: {
       child: ['read'],
       chore: ['read'],
+      'daily-record': ['read', 'write', 'create'],
+   },
+};
       'daily-record': ['read', 'write', 'create'],
    },family
  * @param userId - Auth0 or session user ID
@@ -167,7 +151,7 @@ export async function assertPermission(
 
    if (!allowed) {
       throw new Error(
-         `Unauthorized: User does not have '${action}' permission on '${resource}' in this company`
+         `Unauthorized: User does not have '${action}' permission on '${resource}' in this family`
       );
    }
 }
@@ -224,22 +208,12 @@ export async function getUserFamilyInfo(userId: string, familyId: string) {
 }
 
 /**
- * Backward compatibility aliasfamily (basic membership check)
+ * Validate that a user belongs to a family (basic membership check)
  * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param familyId - MongoDB ObjectId of the family as string
  * @returns true if user is an active member of the family
  */
 export async function isFamilyMember(userId: string, familyId: string): Promise<boolean> {
    const role = await getUserRoleInFamily(userId, familyId);
-   return role !== null;
-}
-
-/**
- * Backward compatibility alias
- */
-export const isCompanyMember = isFamilyMember;* @returns true if user is an active member of the company
- */
-export async function isCompanyMember(userId: string, companyId: string): Promise<boolean> {
-   const role = await getUserRoleInCompany(userId, companyId);
    return role !== null;
 }
