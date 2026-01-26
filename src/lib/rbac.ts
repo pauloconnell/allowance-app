@@ -6,12 +6,12 @@ import Child from '@/models/Child';
  * Resource types that can be protected by RBAC
  */
 export type ResourceType =
-   | 'vehicle'
-   | 'workOrder'
-   | 'serviceRecord'
    | 'child'
    | 'chore'
-   | 'daily-record';
+   | 'daily-record'
+   | 'vehicle'
+   | 'workOrder'
+   | 'serviceRecord';
 
 /**
  * Actions that can be performed on resources
@@ -26,7 +26,7 @@ export type Action =
    | 'approve';
 
 /**
- * User roles in a company
+ * User roles in a family (formerly company)
  */
 export type UserRole = 'owner' | 'admin' | 'manager' | 'user' | 'child' | 'parent';
 
@@ -35,36 +35,40 @@ export type UserRole = 'owner' | 'admin' | 'manager' | 'user' | 'child' | 'paren
  */
 const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
    owner: {
-      vehicle: ['create', 'read', 'update', 'delete'] ,
-      workOrder: ['create', 'read', 'update', 'delete'],
-      serviceRecord: ['create', 'read', 'update', 'delete'],
       child: ['create', 'read', 'update', 'delete'],
       chore: ['create', 'read', 'update', 'delete'],
       'daily-record': ['read', 'write', 'approve', 'create', 'delete'],
-   },
-   admin: {
+      // Legacy aliases
       vehicle: ['create', 'read', 'update', 'delete'],
       workOrder: ['create', 'read', 'update', 'delete'],
       serviceRecord: ['create', 'read', 'update', 'delete'],
+   },
+   admin: {
       child: ['create', 'read', 'update'],
       chore: ['create', 'read', 'update', 'delete'],
       'daily-record': ['read', 'write', 'approve', 'create'],
+      // Legacy aliases
+      vehicle: ['create', 'read', 'update', 'delete'],
+      workOrder: ['create', 'read', 'update', 'delete'],
+      serviceRecord: ['create', 'read', 'update', 'delete'],
    },
    manager: {
-      vehicle: ['read', 'create', 'update'],
-      workOrder: ['create', 'read', 'update', 'complete'],
-      serviceRecord: ['create', 'read', 'update'],
       child: ['read'],
       chore: ['read', 'create', 'update'],
       'daily-record': ['read', 'write', 'create'],
+      // Legacy aliases
+      vehicle: ['read', 'create', 'update'],
+      workOrder: ['create', 'read', 'update', 'complete'],
+      serviceRecord: ['create', 'read', 'update'],
    },
    user: {
-      vehicle: ['read'],
-      workOrder: ['read', 'complete'],
-      serviceRecord: ['read', 'create'],
       child: ['read'],
       chore: ['read'],
       'daily-record': ['read'],
+      // Legacy aliases
+      vehicle: ['read'],
+      workOrder: ['read', 'complete'],
+      serviceRecord: ['read', 'create'],
    },
    parent: {
       child: ['read', 'create', 'update'],
@@ -75,14 +79,14 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
       child: ['read'],
       chore: ['read'],
       'daily-record': ['read', 'write', 'create'],
-   },
-};
-
-/**
- * Get user's role in a specific company
+   },family
  * @param userId - Auth0 or session user ID
- * @param companyId - MongoDB ObjectId of the company as string
+ * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
  * @returns User's role or null if not a member
+ */
+export async function getUserRoleInFamily(
+   userId: string,
+   familns User's role or null if not a member
  */
 export async function getUserRoleInCompany(
    userId: string,
@@ -93,7 +97,7 @@ export async function getUserRoleInCompany(
 
       const userCompany = await UserCompany.findOne({
          userId,
-         companyId,
+         companyId: familyId,
          isActive: true,
       }).lean();
 
@@ -107,21 +111,21 @@ export async function getUserRoleInCompany(
 }
 
 /**
- * Check if a user can perform an action on a resource in a company
+ * Check if a user can perform an action on a resource in a family
  * @param userId - Auth0 or session user ID
- * @param companyId - MongoDB ObjectId of the company as string
- * @param resource - Type of resource (vehicle, workOrder, serviceRecord)
- * @param action - Action to perform (create, read, update, delete, complete)
+ * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @param resource - Type of resource (child, chore, daily-record)
+ * @param action - Action to perform (create, read, update, delete, complete, approve)
  * @returns true if user has permission, false otherwise
  */
 export async function hasPermission(
    userId: string,
-   companyId: string,
+   familyId: string,
    resource: ResourceType,
    action: Action
 ): Promise<boolean> {
    // First, try to get role from UserCompany (parents/admins/managers)
-   const role = await getUserRoleInCompany(userId, companyId);
+   const role = await getUserRoleInFamily(userId, familyId);
 
    if (role) {
       const rolePermissions = PERMISSIONS[role as UserRole] || {};
@@ -132,7 +136,7 @@ export async function hasPermission(
    // If user is not in UserCompany, they may be a child (stored in Child collection)
    try {
       await connectDB();
-      const child = await Child.findOne({ familyId: companyId, auth0UserId: userId }).lean();
+      const child = await Child.findOne({ familyId: familyId, auth0UserId: userId }).lean();
       if (child) {
          const childPerms = PERMISSIONS['child'] || {};
          const allowedActions = childPerms[resource] || [];
@@ -148,18 +152,18 @@ export async function hasPermission(
 /**
  * Assert that a user has permission for an action (throws if not authorized)
  * @param userId - Auth0 or session user ID
- * @param companyId - MongoDB ObjectId of the company as string
+ * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
  * @param resource - Type of resource
  * @param action - Action to perform
  * @throws Error if user lacks permission
  */
 export async function assertPermission(
    userId: string,
-   companyId: string,
+   familyId: string,
    resource: ResourceType,
    action: Action
 ): Promise<void> {
-   const allowed = await hasPermission(userId, companyId, resource, action);
+   const allowed = await hasPermission(userId, familyId, resource, action);
 
    if (!allowed) {
       throw new Error(
@@ -169,17 +173,17 @@ export async function assertPermission(
 }
 
 /**
- * Get all permissions for a user in a company
+ * Get all permissions for a user in a family
  * Useful for frontend conditional rendering
  * @param userId - Auth0 or session user ID
- * @param companyId - MongoDB ObjectId of the company as string
+ * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
  * @returns Object mapping resources to their allowed actions, or null if not a member
  */
 export async function getUserPermissions(
    userId: string,
-   companyId: string
+   familyId: string
 ): Promise<Record<ResourceType, Action[]> | null> {
-   const role = await getUserRoleInCompany(userId, companyId);
+   const role = await getUserRoleInFamily(userId, familyId);
 
    if (!role) return null;
 
@@ -187,19 +191,19 @@ export async function getUserPermissions(
 }
 
 /**
- * Get the user's role information for a company
+ * Get the user's role information for a family
  * Useful for UI/logging purposes
  * @param userId - Auth0 or session user ID
- * @param companyId - MongoDB ObjectId of the company as string
- * @returns User's company role info or null
+ * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @returns User's family role info or null
  */
-export async function getUserCompanyInfo(userId: string, companyId: string) {
+export async function getUserFamilyInfo(userId: string, familyId: string) {
    try {
       await connectDB();
 
       const userCompany = await UserCompany.findOne({
          userId,
-         companyId,
+         companyId: familyId,
       }).lean();
 
       if (!userCompany) return null;
@@ -214,16 +218,26 @@ export async function getUserCompanyInfo(userId: string, companyId: string) {
          createdAt: userCompany.createdAt?.toISOString?.() ?? null,
       };
    } catch (error) {
-      console.error('Error fetching user company info:', error);
+      console.error('Error fetching user family info:', error);
       return null;
    }
 }
 
 /**
- * Validate that a user belongs to a company (basic membership check)
+ * Backward compatibility aliasfamily (basic membership check)
  * @param userId - Auth0 or session user ID
- * @param companyId - MongoDB ObjectId of the company as string
- * @returns true if user is an active member of the company
+ * @param familyId - MongoDB ObjectId of the family (formerly companyId) as string
+ * @returns true if user is an active member of the family
+ */
+export async function isFamilyMember(userId: string, familyId: string): Promise<boolean> {
+   const role = await getUserRoleInFamily(userId, familyId);
+   return role !== null;
+}
+
+/**
+ * Backward compatibility alias
+ */
+export const isCompanyMember = isFamilyMember;* @returns true if user is an active member of the company
  */
 export async function isCompanyMember(userId: string, companyId: string): Promise<boolean> {
    const role = await getUserRoleInCompany(userId, companyId);

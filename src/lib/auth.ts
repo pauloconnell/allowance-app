@@ -10,11 +10,11 @@ export interface SessionContext {
 }
 
 /**
- * Auth + Company context for API routes
+ * Auth + Family context for API routes
  */
 export interface AuthContext {
    session: SessionContext;
-   companyId: string;
+   familyId: string;
 }
 
 /**
@@ -37,22 +37,27 @@ export async function getAuthSession(req?: NextRequest): Promise<SessionContext 
 }
 
 /**
- * Verify Auth0 session and company membership
+ * Verify Auth0 session and family membership
  * Throws error or returns null response if not authorized
  */
-export async function requireAuthAndCompany(companyId: string) {
+export async function requireAuthAndFamily(familyId: string) {
    const session = await getAuthSession();
 
    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
    }
 
-   if (!companyId) {
-      return NextResponse.json({ error: 'Missing company context' }, { status: 400 });
+   if (!familyId) {
+      return NextResponse.json({ error: 'Missing family context' }, { status: 400 });
    }
 
    return null; // Success - caller should proceed
 }
+
+/**
+ * Backward compatibility alias
+ */
+export const requireAuthAndCompany = requireAuthAndFamily;
 
 /**
  * Create error response for authorization failures

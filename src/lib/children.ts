@@ -3,11 +3,9 @@ import Child from "@/models/Child";
 import type { IChild } from "@/types/IChild";
 import mongoose from "mongoose";
 
-// Re-export from new children module for backward compatibility
-export { getChildById as getVehicleById, getAllChildren as getAllVehicles, createChild as createVehicle } from "./children";
 
-// Legacy functions kept for backward compatibility - use children.ts instead
-export async function getVehicleById_LEGACY(childId: string, familyId?: string) {
+
+export async function getChildById(childId: string, familyId?: string) {
   await connectDB();
 
   // Security: ensure validId sent
@@ -37,7 +35,7 @@ export async function getVehicleById_LEGACY(childId: string, familyId?: string) 
   };
 }
 
-export async function getAllVehicles_LEGACY(familyId?: string) {
+export async function getAllChildren(familyId?: string) {
   await connectDB();
 
   const query = familyId ? { familyId } : {};
@@ -53,7 +51,7 @@ export async function getAllVehicles_LEGACY(familyId?: string) {
   }));
 }
 
-export async function createVehicle_LEGACY(data: Partial<IChild>): Promise<Partial<IChild>> {
+export async function createChild(data: Partial<IChild>): Promise<Partial<IChild>> {
   await connectDB();
 
   const c = await Child.create(data);
@@ -72,3 +70,8 @@ export async function createVehicle_LEGACY(data: Partial<IChild>): Promise<Parti
     updatedAt: c.updatedAt?.toISOString?.() ?? null,
   };
 }
+
+// Backward compatibility aliases
+export const getVehicleById = getChildById;
+export const getAllVehicles = getAllChildren;
+export const createVehicle = createChild;

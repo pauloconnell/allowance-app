@@ -2,11 +2,8 @@ import { connectDB } from "./mongodb";
 import Chore from "@/models/Chore";
 import { IChore } from "@/types/IChore";
 
-// Re-export from new chores module for backward compatibility
-export { createChore as createWorkOrder, getAllChores as getAllWorkOrders, getChoresForChild as getWorkOrdersForVehicle, deleteChore as deleteWorkOrder } from "./chores";
 
-// Legacy functions kept for backward compatibility - use chores.ts instead
-export async function createWorkOrder_LEGACY(data: Partial<IChore>): Promise<IChore> {
+export async function createChore(data: Partial<IChore>): Promise<IChore> {
   await connectDB();
   const chore = await Chore.create(data);
   return {
@@ -18,7 +15,7 @@ export async function createWorkOrder_LEGACY(data: Partial<IChore>): Promise<ICh
   };
 }
 
-export async function getAllWorkOrders_LEGACY(familyId: string): Promise<IChore[]> {
+export async function getAllChores(familyId: string): Promise<IChore[]> {
   await connectDB();
   const chores = await Chore.find({ familyId }).sort({ createdAt: -1 }).lean();
   return chores.map((chore) => ({
@@ -31,7 +28,7 @@ export async function getAllWorkOrders_LEGACY(familyId: string): Promise<IChore[
   }));
 }
 
-export async function getWorkOrdersForVehicle_LEGACY(childId: string, familyId?: string): Promise<IChore[]> {
+export async function getChoresForChild(childId: string, familyId?: string): Promise<IChore[]> {
   await connectDB();
   const query: any = { childId, isActive: true };
   if (familyId) {
@@ -48,7 +45,8 @@ export async function getWorkOrdersForVehicle_LEGACY(childId: string, familyId?:
   }));
 }
 
-export async function deleteWorkOrder_LEGACY(id: string, familyId?: string) {
+
+export async function deleteChore(id: string, familyId?: string) {
   await connectDB();
 
   const query: any = {
@@ -70,3 +68,9 @@ export async function deleteWorkOrder_LEGACY(id: string, familyId?: string) {
       }
     : null;
 }
+
+// Backward compatibility aliases
+export const createWorkOrder = createChore;
+export const getAllWorkOrders = getAllChores;
+export const getWorkOrdersForVehicle = getChoresForChild;
+export const deleteWorkOrder = deleteChore;

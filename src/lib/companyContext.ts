@@ -5,11 +5,11 @@ import type { IUserCompany } from '@/types/IUserCompany';
 import type { ICompany } from '@/types/ICompany';
 
 /**
- * Fetch all companies a user belongs to
+ * Fetch all families a user belongs to
  * @param userId - Auth0 sub
- * @returns Array of companies with user's role in each
+ * @returns Array of families with user's role in each
  */
-export async function getUserCompanies(userId: string): Promise<(ICompany & { role: string })[]> {
+export async function getUserFamilies(userId: string): Promise<(ICompany & { role: string })[]> {
    try {
       await connectDB();
 
@@ -39,17 +39,22 @@ export async function getUserCompanies(userId: string): Promise<(ICompany & { ro
          role: uc.role,
       }));
    } catch (error) {
-      console.error('Failed to fetch user companies:', error);
+      console.error('Failed to fetch user families:', error);
       return [];
    }
 }
 
 /**
- * Check if user belongs to any company
- * @param userId - Auth0 sub
- * @returns true if user has at least one company
+ * Backward compatibility alias
  */
-export async function userHasCompany(userId: string): Promise<boolean> {
+export const getUserCompanies = getUserFamilies;
+
+/**
+ * Check if user belongs to any family
+ * @param userId - Auth0 sub
+ * @returns true if user has at least one family
+ */
+export async function userHasFamily(userId: string): Promise<boolean> {
    try {
       await connectDB();
 
@@ -60,17 +65,22 @@ export async function userHasCompany(userId: string): Promise<boolean> {
 
       return count > 0;
    } catch (error) {
-      console.error('Failed to check user company membership:', error);
+      console.error('Failed to check user family membership:', error);
       return false;
    }
 }
 
 /**
- * Get user's primary (oldest/first) company - useful for fallback selection
- * @param userId - Auth0 sub
- * @returns First company user belongs to or null
+ * Backward compatibility alias
  */
-export async function getUserPrimaryCompany(userId: string): Promise<(ICompany & { role: string }) | null> {
+export const userHasCompany = userHasFamily;
+
+/**
+ * Get user's primary (oldest/first) family - useful for fallback selection
+ * @param userId - Auth0 sub
+ * @returns First family user belongs to or null
+ */
+export async function getUserPrimaryFamily(userId: string): Promise<(ICompany & { role: string }) | null> {
    try {
       await connectDB();
 
@@ -98,10 +108,15 @@ export async function getUserPrimaryCompany(userId: string): Promise<(ICompany &
          country: userCompany.companyId.country,
          logo: userCompany.companyId.logo,
          isActive: userCompany.companyId.isActive,
-         createdAt: userCompany.companyId.createdAt?.toISOString?.() ?? '',
-         updatedAt: userCompany.companyId.updatedAt?.toISOString?.() ?? '',
-         role: userCompany.role,
-      };
+         createdAt: userCompany.companyId.createdAfamily:', error);
+      return null;
+   }
+}
+
+/**
+ * Backward compatibility alias
+ */
+export const getUserPrimaryCompany = getUserPrimaryFamily;     };
    } catch (error) {
       console.error('Failed to fetch user primary company:', error);
       return null;

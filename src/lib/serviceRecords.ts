@@ -1,47 +1,54 @@
 import { connectDB } from './mongodb';
-import ServiceRecord from '@/models/ServiceRecord';
-import type { IWorkOrder } from '@/types/IWorkOrder';
-import type { IVehicle } from '@/types/IVehicle';
-import { IServiceRecord } from '@/types/IServiceRecord';
+import DailyRecord from '@/models/DailyRecord';
+import type { IDailyRecord } from '@/types/IDailyRecord';
+import type { IChild } from '@/types/IChild';
 
-// helper to normalize Records
-export function normalizeServiceRecord(record: IServiceRecord): IServiceRecord {
+// Re-exported from dailyRecords.ts - this file kept for backward compatibility
+
+// helper to normalize Daily Records
+export function normalizeDailyRecord(record: IDailyRecord): IDailyRecord {
    return {
       ...record,
       _id: record._id.toString(),
-      vehicleId: record.vehicleId.toString(),
-      serviceDate: record.serviceDate ? new Date(record.serviceDate).toISOString().split('T')[0] : '',
-      serviceDueDate: record.serviceDueDate  ? new Date(record.serviceDueDate).toISOString().split('T')[0] : '',
+      childId: record.childId.toString(),
+      familyId: record.familyId.toString(),
+      date: record.date ? new Date(record.date).toISOString().split('T')[0] : '',
       createdAt: new Date(record.createdAt).toISOString(),
       updatedAt: new Date(record.updatedAt).toISOString(),
    };
 }
 
-export async function createServiceRecord(data: Partial<IServiceRecord>) {
+export async function createDailyRecord(data: Partial<IDailyRecord>) {
    await connectDB();
-   const record = await ServiceRecord.create(data);
+   const record = await DailyRecord.create(data);
 
-   return normalizeServiceRecord(record.toObject());
+   return normalizeDailyRecord(record.toObject());
 }
 
-export async function getServiceHistory(
-   vehicleId: string,
-   companyId?: string
-): Promise<IServiceRecord[]> {
+export async function getDailyHistory(
+   childId: string,
+   familyId?: string
+): Promise<IDailyRecord[]> {
    await connectDB();
-   const query: any = { vehicleId };
-   if (companyId) {
-      query.companyId = companyId;
+   const query: any = { childId };
+   if (familyId) {
+      query.familyId = familyId;
    }
-   const records = await ServiceRecord.find(query).sort({ serviceDate: -1 }).lean();
+   const records = await DailyRecord.find(query).sort({ date: -1 }).lean();
 
-   return records.map(normalizeServiceRecord);
+   return records.map(normalizeDailyRecord);
 }
 
-export async function getAllServiceRecords(companyId?: string): Promise<IServiceRecord[]> {
+export async function getAllDailyRecords(familyId?: string): Promise<IDailyRecord[]> {
    await connectDB();
-   const query = companyId ? { companyId } : {};
-   const records = await ServiceRecord.find(query).lean();
+   const query = familyId ? { familyId } : {};
+   const records = await DailyRecord.find(query).lean();
 
-   return records.map(normalizeServiceRecord);
+   return records.map(normalizeDailyRecord);
 }
+
+// Backward compatibility aliases - legacy function names
+export const normalizeServiceRecord = normalizeDailyRecord;
+export const createServiceRecord = createDailyRecord;
+export const getServiceHistory = getDailyHistory;
+export const getAllServiceRecords = getAllDailyRecords;
