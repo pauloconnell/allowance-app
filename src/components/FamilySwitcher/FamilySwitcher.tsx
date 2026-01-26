@@ -1,12 +1,12 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ICompany } from '@/types/ICompany';
+import { IFamily } from '@/types/IFamily';
 import { useState, useEffect } from 'react';
 import { useFamilyStore } from '@/store/useCompanyStore';
 
 interface FamilySwitcherProps {
-   families: (ICompany & { role: string })[];
+   families: (IFamily & { role: string })[];
    activeFamilyId: string;
 }
 

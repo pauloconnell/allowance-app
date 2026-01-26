@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-const CompanySchema = new Schema(
+const FamilySchema = new Schema(
    {
       name: { type: String, required: true },
       slug: { type: String, required: true, unique: true, index: true },
@@ -18,4 +18,4 @@ const CompanySchema = new Schema(
    { timestamps: true }
 );
 
-export default mongoose.models.Company || mongoose.model('Company', CompanySchema);
+export default mongoose.models.Family || mongoose.model('Family', FamilySchema);

@@ -1,8 +1,8 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import FamilySwitcher from '@/components/FamilySwitcher/FamilySwitcher';
 import { getUserFamilies } from '@/lib/familyContext';
-import '@/models/Company';
-import type { ICompany } from '@/types/ICompany';
+import '@/models/Family';
+import type { IFamily } from '@/types/IFamily';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,21 +18,21 @@ export default async function Home() {
    let href = session
       ? '/protectedPages/dashboard'
       : '/api/auth/login?screen_hint=signup';
-   let companies: (ICompany & { role: string })[] = [];
+   let families: (IFamily & { role: string })[] = [];
    let activeCompanyId = '';
 
    if (isLoggedIn && session?.user) {
       try {
-         console.log('FETCHING COMPANIES FOR USER ID:', session.user.sub);
-         companies = await getUserCompanies(session.user.sub);
-         if (companies.length > 0) {
-            const firstCompanyId = companies[0]._id;
+         console.log('FETCHING families FOR USER ID:', session.user.sub);
+         families = await getUserFamilies(session.user.sub);
+         if (families.length > 0) {
+            const firstCompanyId = families[0]._id;
             href = `/protectedPages/${firstCompanyId}/dashboard`;
          } else {
             href = '/setup-family';
          }
       } catch (error) {
-         console.error('Failed to fetch companies:', error);
+         console.error('Failed to fetch families:', error);
       }
    }
 
@@ -102,10 +102,10 @@ export default async function Home() {
                      >
                         {isLoggedIn ? 'Go to Dashboard' : 'Get Started Free'}
                      </a>
-                     {isLoggedIn && (companies.length > 0) && (
+                     {isLoggedIn && (families.length > 0) && (
                         <div className="w-full sm:w-auto">
                            <FamilySwitcher
-                              families={companies}
+                              families={families}
                               activeFamilyId={activeCompanyId}
                            />
                         </div>

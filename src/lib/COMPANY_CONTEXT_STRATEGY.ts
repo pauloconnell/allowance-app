@@ -109,7 +109,7 @@
  * - getUserCompanies() helps user choose company
  */
 
-import { ICompany } from '@/types/ICompany';
+import { IFamily } from '@/types/IFamily';
 
 /**
  * Helper: Get active company from request context
@@ -144,7 +144,7 @@ export async function setActiveCompanyId(companyId: string): Promise<void> {
  * Shows all user's companies and allows switching
  */
 export interface CompanySwitcherProps {
-   companies: (ICompany & { role: string })[];
+   companies: (IFamily & { role: string })[];
    activeCompanyId: string;
    onSwitch: (companyId: string) => void;
 }

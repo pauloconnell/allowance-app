@@ -1,15 +1,15 @@
 import { connectDB } from '@/lib/mongodb';
 import UserCompany from '@/models/UserCompany';
-import Company from '@/models/Company';
+import Company from '@/models/Family';
 import type { IUserCompany } from '@/types/IUserCompany';
-import type { ICompany } from '@/types/ICompany';
+import type { IFamily } from '@/types/IFamily';
 
 /**
  * Fetch all families a user belongs to
  * @param userId - Auth0 sub
  * @returns Array of families with user's role in each
  */
-export async function getUserFamilies(userId: string): Promise<(ICompany & { role: string })[]> {
+export async function getUserFamilies(userId: string): Promise<(IFamily & { role: string })[]> {
    try {
       await connectDB();
 
@@ -70,7 +70,7 @@ export async function userHasFamily(userId: string): Promise<boolean> {
  * @param userId - Auth0 sub
  * @returns First family user belongs to or null
  */
-export async function getUserPrimaryFamily(userId: string): Promise<(ICompany & { role: string }) | null> {
+export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & { role: string }) | null> {
    try {
       await connectDB();
 

@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { connectDB } from '@/lib/mongodb';
-import Company from '@/models/Company';
+import Company from '@/models/Family';
 import UserCompany from '@/models/UserCompany';
 import Invite from '@/models/Invite';
 import { getSession } from '@auth0/nextjs-auth0';
