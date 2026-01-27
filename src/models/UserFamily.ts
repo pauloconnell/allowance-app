@@ -2,8 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 
 const UserFamilySchema = new Schema(
    {
-      userId: { type: String, required: true, index: true },
-      familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true },
+      userId: { type: String, required: true, index: true },   // auth0 string
+      familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true }, // keep all mongodb ids ObjectId to allow .populate
       role: { type: String, enum: ['parent', 'child'], default: 'parent' },
       email: { type: String, required: true },
       firstName: { type: String },

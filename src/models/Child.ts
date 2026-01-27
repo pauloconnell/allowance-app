@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const ChildSchema = new Schema(
    {
       familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true, index: true },
-      auth0UserId: { type: String, default: null, index: true }, // Auth0 user ID for the child
+      userId: { type: String, default: null, index: true }, // Auth0 user ID for the child
       name: { type: String, required: true },
       age: { type: Number, required: true },
       currentBalance: { type: Number, default: 0, required: true },

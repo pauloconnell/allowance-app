@@ -3,6 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const ChoreSchema = new Schema(
    {
       familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true, index: true },
+      childId: { type: Schema.Types.ObjectId, ref: 'Child', required: true, index: true },
       taskName: { type: String, required: true },
       rewardAmount: { type: Number, required: true, min: 0 },
       isRecurring: { type: Boolean, default: false },

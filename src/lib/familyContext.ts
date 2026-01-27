@@ -23,7 +23,7 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
          console.log("lib/actions got: userFamilies:", userFamilies);
 
       return userFamilies.map((uc: any) => ({
-         _id: uc.familyId._id.stoString(),
+         _id: uc.familyId._id.toString(),
          name: uc.familyId.name,
          slug: uc.familyId.slug,
          description: uc.familyId.description,

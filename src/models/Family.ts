@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const FamilySchema = new Schema(
    {
       name: { type: String, required: true },
-      userId: { type: String, required: true, index: true },
+      userId: { type: String, required: true, index: true },   // string from auth0
       slug: { type: String, required: true, unique: true, index: true },
       description: { type: String, default: '' },
       email: { type: String },
