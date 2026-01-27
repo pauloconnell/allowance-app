@@ -14,5 +14,5 @@ export default async function HeaderServer() {
         }
       : null;
 
-   return <HeaderClient session={safeSession} />;
+   return <HeaderClient  />;
 }

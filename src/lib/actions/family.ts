@@ -41,11 +41,11 @@ export async function createFamily(name: string) {
     const family = await Family.create({
           userId: userId,
       name: name.trim(),
-      slug: name
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, ''),
+     // slug: name
+     //   .trim()
+    //    .toLowerCase()
+    //    .replace(/[^a-z0-9]+/g, '-')
+     //   .replace(/^-|-$/g, ''),
       isActive: true,
     });
     console.log("4Family created :) ")

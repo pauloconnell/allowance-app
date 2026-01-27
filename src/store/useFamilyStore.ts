@@ -3,7 +3,7 @@ import { create } from 'zustand';
 interface FamilySummary {
   _id: string;
   name: string;
-  slug?: string;
+ // slug?: string;
 }
 
 interface FamilyState {

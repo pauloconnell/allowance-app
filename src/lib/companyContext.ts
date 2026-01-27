@@ -23,7 +23,7 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
       return userCompanies.map((uc: any) => ({
          _id: uc.familyId._id.toString(),
          name: uc.familyId.name,
-         slug: uc.familyId.slug,
+         //slug: uc.familyId.slug,
          description: uc.familyId.description,
          email: uc.familyId.email,
          phone: uc.familyId.phone,
@@ -87,7 +87,7 @@ export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & {
       return {
          _id: userCompany.familyId._id.toString(),
          name: userCompany.familyId.name,
-         slug: userCompany.familyId.slug,
+         //slug: userCompany.familyId.slug,
          description: userCompany.familyId.description,
          email: userCompany.familyId.email,
          phone: userCompany.familyId.phone,

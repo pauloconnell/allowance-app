@@ -1,6 +1,8 @@
 export interface IFamily { 
-    _id: string; name: string; // e.g., "The Johnson Family" 
-    slug: string; // URL-friendly identifier 
+    //_id: string; 
+    name: string; // e.g., "The Johnson Family" 
+    //slug: string; // URL-friendly identifier 
+    email?: string; // contact email
     description?: string; // optional notes about the family 
     primaryEmail?: string; // contact email 
     primaryPhone?: string; // contact phone 

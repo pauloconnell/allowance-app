@@ -1,12 +1,18 @@
+export const dynamic = "force-dynamic";
+
 import { getSession } from '@auth0/nextjs-auth0';
 import FamilySwitcher from '@/components/FamilySwitcher/FamilySwitcher';
 import { getUserFamilies } from '@/lib/familyContext';
 import '@/models/Family';
 import type { IFamily } from '@/types/IFamily';
+import { cookies } from 'next/headers';
 
-export const dynamic = 'force-dynamic';
+
 
 export default async function Home() {
+   // Await cookies to satisfy Next.js 15 requirements
+   await cookies();
+   
    let session = null;
    try {
       session = await getSession();
