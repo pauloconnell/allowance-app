@@ -14,7 +14,7 @@ export default withMiddlewareAuthRequired(async function middleware(req: NextReq
    // 2. Allow specific internal paths that are NOT caught by the matcher
    // (Like /setup-company or /public assets)
    const allowedPaths = [
-      '/setup-company',
+      '/setup-family',
       '/public',
    ];
 

@@ -13,15 +13,17 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
    try {
       await connectDB();
 
-      const userCompanies = await UserFamily.find({
+      const userFamilies = await UserFamily.find({
          userId,
          isActive: true,
       })
          .populate('familyId')
          .lean();
 
-      return userCompanies.map((uc: any) => ({
-         _id: uc.familyId._id.toString(),
+         console.log("lib/actions got: userFamilies:", userFamilies);
+
+      return userFamilies.map((uc: any) => ({
+         _id: uc.familyId._id.stoString(),
          name: uc.familyId.name,
          slug: uc.familyId.slug,
          description: uc.familyId.description,

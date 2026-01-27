@@ -1,5 +1,5 @@
 import { connectDB } from './mongodb';
-import UserCompany from '@/models/UserFamily';
+import UserFamily from '@/models/UserFamily';
 import Child from '@/models/Child';
 
 /**
@@ -25,32 +25,13 @@ export type Action =
 /**
  * User roles in a family (formerly company)
  */
-export type UserRole = 'owner' | 'admin' | 'manager' | 'user' | 'child' | 'parent';
+export type UserRole = 'parent' | 'child' ;
 
 /**
  * Permission matrix defining what each role can do
  */
 const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
-   owner: {
-      child: ['create', 'read', 'update', 'delete'],
-      chore: ['create', 'read', 'update', 'delete'],
-      'daily-record': ['read', 'write', 'approve', 'create', 'delete'],
-   },
-   admin: {
-      child: ['create', 'read', 'update'],
-      chore: ['create', 'read', 'update', 'delete'],
-      'daily-record': ['read', 'write', 'approve', 'create'],
-   },
-   manager: {
-      child: ['read'],
-      chore: ['read', 'create', 'update'],
-      'daily-record': ['read', 'write', 'create'],
-   },
-   user: {
-      child: ['read'],
-      chore: ['read'],
-      'daily-record': ['read'],
-   },
+  
    parent: {
       child: ['read', 'create', 'update'],
       chore: ['read', 'create', 'update', 'delete'],
@@ -59,7 +40,7 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
    child: {
       child: ['read'],
       chore: ['read'],
-      'daily-record': ['read', 'write', 'create'],
+      'daily-record': ['read', 'write'],
    },
 };
       'daily-record': ['read', 'write', 'create'],
@@ -79,15 +60,15 @@ export async function getUserRoleInCompany(
    try {
       await connectDB();
 
-      const userCompany = await UserCompany.findOne({
+      const userFamily = await UserCompany.findOne({
          userId,
          familyId: familyId,
          isActive: true,
       }).lean();
 
-      if (!userCompany) return null;
+      if (!userFamily) return null;
 
-      return userCompany.role as UserRole;
+      return userFamily.role as UserRole;
    } catch (error) {
       console.error('Error fetching user role:', error);
       return null;
@@ -185,21 +166,21 @@ export async function getUserFamilyInfo(userId: string, familyId: string) {
    try {
       await connectDB();
 
-      const userCompany = await UserCompany.findOne({
+      const userFamily = await UserFamily.findOne({
          userId,
          familyId: familyId,
       }).lean();
 
-      if (!userCompany) return null;
+      if (!userFamily) return null;
 
       return {
-         _id: userCompany._id.toString(),
-         role: userCompany.role,
-         email: userCompany.email,
-         firstName: userCompany.firstName,
-         lastName: userCompany.lastName,
-         isActive: userCompany.isActive,
-         createdAt: userCompany.createdAt?.toISOString?.() ?? null,
+         _id: userFamily._id.toString(),
+         role: userFamily.role,
+         email: userFamily.email,
+         firstName: userFamily.firstName,
+         lastName: userFamily.lastName,
+         isActive: userFamily.isActive,
+         createdAt: userFamily.createdAt?.toISOString?.() ?? null,
       };
    } catch (error) {
       console.error('Error fetching user family info:', error);

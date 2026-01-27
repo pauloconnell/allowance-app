@@ -20,10 +20,10 @@ export async function createFamily(name: string) {
       return { error: 'Family name is required' };
     }
 
-    // FORCE Next.js to treat this as a dynamic, awaited context
-    // before calling the Auth0 SDK
-    await cookies(); 
-    await headers();
+    // // FORCE Next.js to treat this as a dynamic, awaited context
+    // // before calling the Auth0 SDK
+    // await cookies(); 
+    // await headers();
   console.log("2Family name is ", name)
     const session = await getSession();
       console.log("3made it? ", name)
@@ -48,18 +48,19 @@ export async function createFamily(name: string) {
         .replace(/^-|-$/g, ''),
       isActive: true,
     });
+    console.log("4Family created :) ")
 console.log("family created", family.name)
-console.log("Data check:", { userId, email, familyId: family._id });
+console.log("Data check:", { userId, email, family });
 await UserFamily.create({
       userId: userId,
-      familyId: family._id.toString(),
+      familyId: family._id,
       role: 'parent',
       email: email,
       firstName: firstName,
       lastName: lastName,
       isActive: true,
     });
- 
+  console.log("userFamily created? should be...")
     newFamilyId = family._id.toString();
     console.log("userFamily created? 1")
     
