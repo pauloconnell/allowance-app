@@ -2,9 +2,9 @@ import mongoose, { Schema } from 'mongoose';
 
 const InviteSchema = new Schema(
    {
-      familyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+      familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true, index: true },
       email: { type: String, required: true, lowercase: true, trim: true },
-      role: { type: String, enum: ['admin', 'manager', 'user'], default: 'user' },
+      role: { type: String, enum: ['parent', 'child'], default: 'child' },
       token: { type: String, required: true, unique: true, index: true },
       invitedBy: { type: String, required: true },
       status: { type: String, enum: ['pending', 'accepted', 'expired'], default: 'pending' },

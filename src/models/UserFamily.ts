@@ -4,7 +4,7 @@ const UserFamilySchema = new Schema(
    {
       userId: { type: String, required: true, index: true },
       familyId: { type: String, required: true, index: true },
-      role: { type: String, enum: ['parent', 'child'], default: 'child' },
+      role: { type: String, enum: ['parent', 'child'], default: 'parent' },
       email: { type: String, required: true },
       firstName: { type: String },
       lastName: { type: String },

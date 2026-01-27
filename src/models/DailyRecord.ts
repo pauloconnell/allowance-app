@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const DailyRecordSchema = new Schema(
    {
-      familyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+      familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true, index: true },
       childId: { type: Schema.Types.ObjectId, ref: 'Child', required: true, index: true },
       date: { type: Date, required: true, index: true },
       choresList: [

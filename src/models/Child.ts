@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const ChildSchema = new Schema(
    {
-      familyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+      familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true, index: true },
       auth0UserId: { type: String, default: null, index: true }, // Auth0 user ID for the child
       name: { type: String, required: true },
       age: { type: Number, required: true },
