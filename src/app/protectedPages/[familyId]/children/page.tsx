@@ -1,5 +1,6 @@
 import { getAllChildren } from '@/lib/data/childService';
 import Link from 'next/link';
+import ChildrenList from '@/components/Children/ChildrenList';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -7,7 +8,7 @@ interface PageProps {
 
 export default async function ChildrenPage({ params }: PageProps) {
    const { familyId } = await params;
-   
+
    let children = [];
    try {
       children = await getAllChildren(familyId);
@@ -18,6 +19,15 @@ export default async function ChildrenPage({ params }: PageProps) {
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div>
+               <Link
+                  href={`/protectedPages/${familyId}/dashboard`}
+                  className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
+               >
+                  ← Back to Dashboard
+               </Link>
+            </div>
+
             <div className="flex justify-between items-center mb-8">
                <h1 className="text-3xl font-bold text-secondary-900">Children</h1>
                <Link
@@ -27,22 +37,7 @@ export default async function ChildrenPage({ params }: PageProps) {
                   Add Child
                </Link>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {children.map((child: any) => (
-                  <div key={child.id} className="bg-white rounded-lg shadow-md p-6">
-                     <h3 className="text-xl font-semibold mb-2">{child.name}</h3>
-                     <p className="text-gray-600 mb-2">Age: {child.age}</p>
-                     <p className="text-gray-600 mb-4">Balance: ${child.currentBalance}</p>
-                     <Link
-                        href={`/protectedPages/${familyId}/children/${child.id}`}
-                        className="text-primary-600 hover:text-primary-700"
-                     >
-                        View Details →
-                     </Link>
-                  </div>
-               ))}
-            </div>
+            <ChildrenList children={children} familyId={familyId} />
 
             {children.length === 0 && (
                <div className="text-center py-12">

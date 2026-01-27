@@ -1,6 +1,7 @@
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
 import { getAllChildren } from '@/lib/data/childService';
-import ChildList from '@/components/vehicle/VehicleList';
+import ChildrenList from '@/components/Children/ChildrenList';
+
 import Link from 'next/link';
 
 interface PageProps {
@@ -116,7 +117,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      <span className="text-primary-600 font-semibold">👨‍👩‍👧</span>
                   </div>
                </div>
-               <ChildList children={children} familyId={familyId} />
+               <ChildrenList children={children} familyId={familyId} />
             </div>
          </div>
       </div>

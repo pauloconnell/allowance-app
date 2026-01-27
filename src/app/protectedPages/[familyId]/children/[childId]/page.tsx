@@ -8,10 +8,10 @@ interface PageProps {
 export default async function ChildDetailPage({ params }: PageProps) {
    const { familyId, childId } = await params;
 
-
+ //  console.log( "Get data for this child ", childId, familyId);
    // get child data from API or DB direct
-   let child =getChildById(childId, familyId);
-
+   let child =await getChildById(childId, familyId);
+  // console.log(child)
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
