@@ -23,15 +23,14 @@ export type Action =
    | 'approve';
 
 /**
- * User roles in a family (formerly company)
+ * User roles in a family
  */
-export type UserRole = 'parent' | 'child' ;
+export type UserRole = 'parent' | 'child';
 
 /**
  * Permission matrix defining what each role can do
  */
 const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
-  
    parent: {
       child: ['read', 'create', 'update'],
       chore: ['read', 'create', 'update', 'delete'],
@@ -43,26 +42,20 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
       'daily-record': ['read', 'write'],
    },
 };
-      'daily-record': ['read', 'write', 'create'],
-   },family
- * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
- * @returns User's role or null if not a member
+
+/**
+ * Get a user's role in a family
  */
 export async function getUserRoleInFamily(
-   userId: string,
-   familns User's role or null if not a member
- */
-export async function getUserRoleInCompany(
    userId: string,
    familyId: string
 ): Promise<UserRole | null> {
    try {
       await connectDB();
 
-      const userFamily = await UserCompany.findOne({
+      const userFamily = await UserFamily.findOne({
          userId,
-         familyId: familyId,
+         familyId,
          isActive: true,
       }).lean();
 
@@ -77,11 +70,6 @@ export async function getUserRoleInCompany(
 
 /**
  * Check if a user can perform an action on a resource in a family
- * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
- * @param resource - Type of resource (child, chore, daily-record)
- * @param action - Action to perform (create, read, update, delete, complete, approve)
- * @returns true if user has permission, false otherwise
  */
 export async function hasPermission(
    userId: string,
@@ -89,23 +77,26 @@ export async function hasPermission(
    resource: ResourceType,
    action: Action
 ): Promise<boolean> {
-   // First, try to get role from UserCompany (parents/admins/managers)
+   // First: check UserFamily (parents)
    const role = await getUserRoleInFamily(userId, familyId);
 
    if (role) {
-      const rolePermissions = PERMISSIONS[role as UserRole] || {};
-      const allowedActions = rolePermissions[resource] || [];
-      return allowedActions.includes(action);
+      const allowed = PERMISSIONS[role]?.[resource] ?? [];
+      return allowed.includes(action);
    }
 
-   // If user is not in UserCompany, they may be a child (stored in Child collection)
+   // Second: check if user is a child (Child collection)
    try {
       await connectDB();
-      const child = await Child.findOne({ familyId: familyId, auth0UserId: userId }).lean();
+
+      const child = await Child.findOne({
+         familyId,
+         auth0UserId: userId,
+      }).lean();
+
       if (child) {
-         const childPerms = PERMISSIONS['child'] || {};
-         const allowedActions = childPerms[resource] || [];
-         return allowedActions.includes(action);
+         const allowed = PERMISSIONS['child']?.[resource] ?? [];
+         return allowed.includes(action);
       }
    } catch (err) {
       console.error('RBAC child lookup error:', err);
@@ -115,12 +106,7 @@ export async function hasPermission(
 }
 
 /**
- * Assert that a user has permission for an action (throws if not authorized)
- * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
- * @param resource - Type of resource
- * @param action - Action to perform
- * @throws Error if user lacks permission
+ * Assert that a user has permission (throws if not authorized)
  */
 export async function assertPermission(
    userId: string,
@@ -139,36 +125,30 @@ export async function assertPermission(
 
 /**
  * Get all permissions for a user in a family
- * Useful for frontend conditional rendering
- * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
- * @returns Object mapping resources to their allowed actions, or null if not a member
  */
 export async function getUserPermissions(
    userId: string,
    familyId: string
 ): Promise<Record<ResourceType, Action[]> | null> {
    const role = await getUserRoleInFamily(userId, familyId);
-
    if (!role) return null;
 
    return PERMISSIONS[role];
 }
 
 /**
- * Get the user's role information for a family
- * Useful for UI/logging purposes
- * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family (formerly familyId) as string
- * @returns User's family role info or null
+ * Get user-family relationship info
  */
-export async function getUserFamilyInfo(userId: string, familyId: string) {
+export async function getUserFamilyInfo(
+   userId: string,
+   familyId: string
+) {
    try {
       await connectDB();
 
       const userFamily = await UserFamily.findOne({
          userId,
-         familyId: familyId,
+         familyId,
       }).lean();
 
       if (!userFamily) return null;
@@ -189,12 +169,12 @@ export async function getUserFamilyInfo(userId: string, familyId: string) {
 }
 
 /**
- * Validate that a user belongs to a family (basic membership check)
- * @param userId - Auth0 or session user ID
- * @param familyId - MongoDB ObjectId of the family as string
- * @returns true if user is an active member of the family
+ * Validate that a user belongs to a family
  */
-export async function isFamilyMember(userId: string, familyId: string): Promise<boolean> {
+export async function isFamilyMember(
+   userId: string,
+   familyId: string
+): Promise<boolean> {
    const role = await getUserRoleInFamily(userId, familyId);
    return role !== null;
 }

@@ -16,7 +16,7 @@ import Child from '@/models/Child';
  */
 export async function GET(
    req: NextRequest,
-   { params }: { params: { id: string } }
+   { params }: { params: Promise<{ id: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -24,7 +24,8 @@ export async function GET(
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const dailyRecord = await DailyRecord.findById(params.id);
+      const { id } = await params;
+      const dailyRecord = await DailyRecord.findById(id);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
       }
@@ -58,7 +59,7 @@ export async function GET(
  */
 export async function PUT(
    req: NextRequest,
-   { params }: { params: { id: string } }
+   { params }: { params: Promise<{ id: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -68,8 +69,9 @@ export async function PUT(
 
       const body = await req.json();
       const { action } = body;
+      const { id } = await params;
 
-      const dailyRecord = await DailyRecord.findById(params.id);
+      const dailyRecord = await DailyRecord.findById(id);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
       }
@@ -90,12 +92,12 @@ export async function PUT(
       if (action === 'updateChore') {
          const { choreIndex, completionStatus } = body;
          updatedRecord = await updateChoreCompletion(
-            params.id,
+            id,
             choreIndex,
             completionStatus
          );
       } else if (action === 'submit') {
-         updatedRecord = await submitDailyRecord(params.id);
+         updatedRecord = await submitDailyRecord(id);
       } else {
          return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
       }

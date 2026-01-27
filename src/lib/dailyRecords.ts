@@ -350,3 +350,68 @@ export async function getFamilyDailyRecords(
 
    return records.map((r) => r.toObject() as IDailyRecord);
 }
+
+/**
+ * Upsert penalty: Add penalty to existing record or create new record with penalty
+ * If record exists: append to penalties array
+ * If no record exists: create new record with status 'approved' and penalty
+ */
+export async function upsertPenalty(
+   childId: string,
+   familyId: string,
+   date: Date,
+   penalty: { amount: number; reason: string },
+   parentUserId: string
+): Promise<IDailyRecord> {
+   const startOfDay = getStartOfDay(date);
+   const endOfDay = getEndOfDay(date);
+
+   // Check if record exists for this date
+   let dailyRecord = await DailyRecord.findOne({
+      childId,
+      familyId,
+      date: {
+         $gte: startOfDay,
+         $lte: endOfDay,
+      },
+   });
+
+   const penaltyWithMetadata = {
+      ...penalty,
+      appliedBy: parentUserId,
+      appliedAt: new Date(),
+   };
+
+   if (dailyRecord) {
+      // Record exists: append penalty
+      dailyRecord.penalties.push(penaltyWithMetadata);
+      await dailyRecord.save();
+   } else {
+      // No record exists: create new record with penalty
+      dailyRecord = new DailyRecord({
+         childId,
+         familyId,
+         date: startOfDay,
+         choresList: [],
+         isSubmitted: true,
+         isApproved: true,
+         submittedAt: new Date(),
+         approvedAt: new Date(),
+         approvedBy: parentUserId,
+         penalties: [penaltyWithMetadata],
+         status: 'approved',
+         totalReward: -penalty.amount,
+         notes: 'Standalone penalty record',
+      });
+      await dailyRecord.save();
+
+      // Update child balance immediately for standalone penalty
+      await Child.findByIdAndUpdate(
+         childId,
+         { $inc: { currentBalance: -penalty.amount } },
+         { new: true }
+      );
+   }
+
+   return dailyRecord.toObject() as IDailyRecord;
+}

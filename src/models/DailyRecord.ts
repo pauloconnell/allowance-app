@@ -2,12 +2,12 @@ import mongoose, { Schema } from 'mongoose';
 
 const DailyRecordSchema = new Schema(
    {
-      familyId: { type: Schema.Types.ObjectId, ref: 'Family', required: true, index: true },
-      childId: { type: Schema.Types.ObjectId, ref: 'Child', required: true, index: true },
+      familyId: { type: String, required: true, index: true },
+      childId: { type: String, required: true, index: true },
       date: { type: Date, required: true, index: true },
       choresList: [
          {
-            choreId: { type: Schema.Types.ObjectId, ref: 'Chore', required: true },
+            choreId: { type: String, required: true },
             taskName: { type: String, required: true },
             rewardAmount: { type: Number, required: true, min: 0 },
             completionStatus: {

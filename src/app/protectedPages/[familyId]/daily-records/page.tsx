@@ -1,280 +1,170 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import { useSession } from '@auth0/nextjs-auth0/client';
-import { useParams, useRouter } from 'next/navigation';
-import { IDailyRecord } from '@/types/IDailyRecord';
-import { IChild } from '@/types/IChild';
-import { DailyRecordView } from '@/components/DailyRecord/DailyRecordView';
-import { ParentReview } from '@/components/DailyRecord/ParentReview';
-import { DailyRecordHistory } from '@/components/DailyRecord/DailyRecordHistory';
-import LoadingSpinner from '@/components/UI/LoadingSpinner';
+import Link from 'next/link';
+import { getAllChildren } from '@/lib/children';
+import { getChildDailyRecords, getStartOfDay, getEndOfDay } from '@/lib/dailyRecords';
 
 interface PageProps {
-   params: { familyId: string };
-   searchParams: { childId?: string };
+   params: Promise<{ familyId: string }>;
+   searchParams: Promise<{ childId?: string; date?: string }>;
 }
 
-export default function DailyRecordsPage({ params, searchParams }: PageProps) {
-   const { session, isLoading: sessionLoading } = useSession();
-   const router = useRouter();
-   const [dailyRecord, setDailyRecord] = useState<IDailyRecord | null>(null);
-   const [child, setChild] = useState<IChild | null>(null);
-   const [children, setChildren] = useState<IChild[]>([]);
-   const [selectedChildId, setSelectedChildId] = useState<string | null>(
-      searchParams.childId || null
-   );
-   const [isParent, setIsParent] = useState(false);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string | null>(null);
-
-   const familyId = params.familyId;
-
-   // Determine user role and permissions
-   useEffect(() => {
-      if (!session) return;
-
-      // Check if user is a parent (can view all children)
-      // This should be checked against auth0 roles or UserCompany collection
-      const checkIfParent = async () => {
-         try {
-            const response = await fetch(`/api/user-role?familyId=${familyId}`);
-            const data = await response.json();
-            setIsParent(data.isParent);
-
-            if (data.isParent) {
-               // Parent can access all children
-               await fetchChildren();
-            } else {
-               // Child - redirect to own record
-               const childIdResponse = await fetch(
-                  `/api/get-child-id?familyId=${familyId}`
-               );
-               const childData = await childIdResponse.json();
-               setSelectedChildId(childData.childId);
-            }
-         } catch (err) {
-            console.error('Failed to check user role:', err);
-         }
-      };
-
-      checkIfParent();
-   }, [session, familyId]);
-
-   const fetchChildren = async () => {
-      try {
-         const response = await fetch(
-            `/api/children?familyId=${familyId}`
-         );
-         if (!response.ok) throw new Error('Failed to fetch children');
-         const data = await response.json();
-         setChildren(data);
-      } catch (err: any) {
-         setError(err.message);
+export default async function DailyRecordsPage({ params, searchParams }: PageProps) {
+   const { familyId } = await params;
+   const { childId, date } = await searchParams;
+   
+   let children = [];
+   let records = [];
+   let selectedChild = null;
+   
+   try {
+      children = await getAllChildren(familyId);
+      
+      if (childId) {
+         selectedChild = children.find((c: any) => c.id === childId);
+         const targetDate = date ? new Date(date) : new Date();
+         const endDate = new Date(targetDate);
+         endDate.setDate(endDate.getDate() + 1);
+         
+         records = await getChildDailyRecords(childId, familyId, targetDate, endDate);
       }
-   };
-
-   // Fetch daily record for selected child
-   useEffect(() => {
-      if (!selectedChildId || !familyId) return;
-
-      const fetchData = async () => {
-         try {
-            setLoading(true);
-            setError(null);
-
-            // Get or create today's daily record
-            const recordResponse = await fetch('/api/daily-records', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                  childId: selectedChildId,
-                  familyId: familyId,
-               }),
-            });
-
-            if (!recordResponse.ok) {
-               throw new Error('Failed to fetch daily record');
-            }
-
-            const recordData = await recordResponse.json();
-            setDailyRecord(recordData);
-
-            // Get child details
-            const childResponse = await fetch(
-               `/api/children/${selectedChildId}`
-            );
-            if (!childResponse.ok) throw new Error('Failed to fetch child');
-            const childData = await childResponse.json();
-            setChild(childData);
-         } catch (err: any) {
-            setError(err.message);
-         } finally {
-            setLoading(false);
-         }
-      };
-
-      fetchData();
-   }, [selectedChildId, familyId]);
-
-   const handleChoreUpdate = async (
-      choreIndex: number,
-      completionStatus: 0 | 0.5 | 1
-   ) => {
-      if (!dailyRecord) return;
-
-      try {
-         const response = await fetch(`/api/daily-records/${dailyRecord._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-               action: 'updateChore',
-               choreIndex,
-               completionStatus,
-            }),
-         });
-
-         if (!response.ok) throw new Error('Failed to update chore');
-         const updatedRecord = await response.json();
-         setDailyRecord(updatedRecord);
-      } catch (err: any) {
-         setError(err.message);
-      }
-   };
-
-   const handleSubmit = async () => {
-      if (!dailyRecord) return;
-
-      try {
-         const response = await fetch(`/api/daily-records/${dailyRecord._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'submit' }),
-         });
-
-         if (!response.ok) throw new Error('Failed to submit record');
-         const updatedRecord = await response.json();
-         setDailyRecord(updatedRecord);
-      } catch (err: any) {
-         setError(err.message);
-      }
-   };
-
-   const handleApprove = async (
-      choreAdjustments: any[],
-      penalties: any[]
-   ) => {
-      if (!dailyRecord) return;
-
-      try {
-         const response = await fetch(
-            `/api/daily-records/${dailyRecord._id}/approve`,
-            {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                  choreAdjustments,
-                  penalties,
-               }),
-            }
-         );
-
-         if (!response.ok) throw new Error('Failed to approve record');
-         const data = await response.json();
-         setDailyRecord(data.record);
-      } catch (err: any) {
-         setError(err.message);
-      }
-   };
-
-   if (sessionLoading || loading) {
-      return <LoadingSpinner />;
+   } catch (err) {
+      console.error('Failed to load data:', err);
    }
 
-   if (!session) {
-      router.push('/api/auth/login');
-      return null;
-   }
+   const today = new Date();
+   const isToday = !date || getStartOfDay(new Date(date)).getTime() === getStartOfDay(today).getTime();
+   const todayRecord = records.find((r: any) => {
+      const recordDate = new Date(r.date);
+      return getStartOfDay(recordDate).getTime() === getStartOfDay(today).getTime();
+   });
 
    return (
-      <div className="container mx-auto px-4 py-8">
-         <h1 className="text-3xl font-bold mb-6">Daily Records</h1>
-
-         {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-               <p className="text-red-700 font-semibold">{error}</p>
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mb-8">
+               <h1 className="text-3xl font-bold text-secondary-900">Daily Records</h1>
+               <p className="text-secondary-600 mt-2">
+                  Track and review daily chore completion
+               </p>
             </div>
-         )}
 
-         {/* Child Selector (Parent View) */}
-         {isParent && children.length > 0 && (
-            <div className="mb-6 bg-white rounded-lg shadow-md p-4">
-               <label className="block text-sm font-semibold mb-2">
-                  Select Child
-               </label>
-               <select
-                  value={selectedChildId || ''}
-                  onChange={(e) => {
-                     setSelectedChildId(e.target.value);
-                     router.push(
-                        `/protected/${familyId}/daily-records?childId=${e.target.value}`
-                     );
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-               >
-                  <option value="">-- Select a child --</option>
-                  {children.map((c) => (
-                     <option key={c._id} value={c._id}>
-                        {c.name} (Age {c.age})
-                     </option>
+            {/* Child Selector */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+               <h2 className="text-xl font-semibold mb-4">Select Child</h2>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {children.map((child: any) => (
+                     <Link
+                        key={child.id}
+                        href={`/protectedPages/${familyId}/daily-records?childId=${child.id}`}
+                        className={`p-4 border rounded-lg hover:bg-gray-50 ${
+                           childId === child.id ? 'border-primary-500 bg-primary-50' : 'border-gray-200'
+                        }`}
+                     >
+                        <h3 className="font-semibold">{child.name}</h3>
+                        <p className="text-sm text-gray-600">Age {child.age}</p>
+                        <p className="text-sm text-gray-600">Balance: ${child.currentBalance}</p>
+                     </Link>
                   ))}
-               </select>
+               </div>
             </div>
-         )}
 
-         {selectedChildId && dailyRecord && child && (
-            <>
-               {/* Child View */}
-               {!isParent && (
-                  <DailyRecordView
-                     dailyRecord={dailyRecord}
-                     child={child}
-                     isReadOnly={dailyRecord.isSubmitted}
-                     onChoreUpdate={handleChoreUpdate}
-                     onSubmit={handleSubmit}
-                     isLoading={loading}
-                  />
-               )}
+            {selectedChild && (
+               <div className="space-y-8">
+                  {/* Live Record Section */}
+                  {isToday && (
+                     <div className="bg-white rounded-lg shadow-md p-6">
+                        <div className="flex justify-between items-center mb-4">
+                           <h2 className="text-xl font-semibold text-green-700">📅 Today's Record (Live)</h2>
+                           {!todayRecord && (
+                              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                 Start Today's Record
+                              </button>
+                           )}
+                        </div>
+                        
+                        {todayRecord ? (
+                           <div className="space-y-4">
+                              <p className="text-sm text-gray-600">
+                                 Status: {todayRecord.status} | 
+                                 Submitted: {todayRecord.isSubmitted ? 'Yes' : 'No'} |
+                                 Approved: {todayRecord.isApproved ? 'Yes' : 'No'}
+                              </p>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 {todayRecord.choresList?.map((chore: any, index: number) => (
+                                    <div key={index} className="border rounded-lg p-4">
+                                       <h4 className="font-medium">{chore.taskName}</h4>
+                                       <p className="text-sm text-gray-600">Reward: ${chore.rewardAmount}</p>
+                                       <p className="text-sm">
+                                          Completion: {chore.completionStatus * 100}%
+                                       </p>
+                                       {chore.isOverridden && (
+                                          <p className="text-sm text-orange-600">Parent Override Applied</p>
+                                       )}
+                                    </div>
+                                 ))}
+                              </div>
+                           </div>
+                        ) : (
+                           <p className="text-gray-500">No record started for today</p>
+                        )}
+                     </div>
+                  )}
 
-               {/* Parent View */}
-               {isParent && dailyRecord.isSubmitted && !dailyRecord.isApproved && (
-                  <ParentReview
-                     dailyRecord={dailyRecord}
-                     child={child}
-                     onApprove={handleApprove}
-                     isLoading={loading}
-                  />
-               )}
+                  {/* Historical Records */}
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                     <h2 className="text-xl font-semibold mb-4">Record History</h2>
+                     
+                     {records.length > 0 ? (
+                        <div className="space-y-4">
+                           {records.map((record: any) => {
+                              const recordDate = new Date(record.date);
+                              const isLive = getStartOfDay(recordDate).getTime() === getStartOfDay(today).getTime();
+                              
+                              return (
+                                 <div key={record.id} className={`border rounded-lg p-4 ${
+                                    isLive ? 'border-green-500 bg-green-50' : 'border-gray-200'
+                                 }`}>
+                                    <div className="flex justify-between items-start">
+                                       <div>
+                                          <h3 className="font-medium">
+                                             {recordDate.toLocaleDateString()}
+                                             {isLive && <span className="ml-2 text-green-600">(Live)</span>}
+                                          </h3>
+                                          <p className="text-sm text-gray-600">
+                                             Status: {record.status} | 
+                                             Chores: {record.choresList?.length || 0} |
+                                             Total: ${record.totalReward || 0}
+                                          </p>
+                                       </div>
+                                       <Link
+                                          href={`/protectedPages/${familyId}/daily-records/${record.id}`}
+                                          className="text-primary-600 hover:text-primary-700 text-sm"
+                                       >
+                                          View Details →
+                                       </Link>
+                                    </div>
+                                 </div>
+                              );
+                           })}
+                        </div>
+                     ) : (
+                        <p className="text-gray-500">No records found for this child</p>
+                     )}
+                  </div>
+               </div>
+            )}
 
-               {/* Parent View - Record Summary */}
-               {isParent && (
-                  <DailyRecordView
-                     dailyRecord={dailyRecord}
-                     child={child}
-                     isReadOnly={true}
-                     onChoreUpdate={handleChoreUpdate}
-                     onSubmit={handleSubmit}
-                  />
-               )}
-            </>
-         )}
-
-         {/* History */}
-         <div className="mt-8">
-            <DailyRecordHistory
-               familyId={familyId}
-               childId={selectedChildId || undefined}
-            />
+            {!selectedChild && children.length === 0 && (
+               <div className="text-center py-12">
+                  <p className="text-gray-500 mb-4">No children added yet</p>
+                  <Link
+                     href={`/protectedPages/${familyId}/children/new`}
+                     className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                     Add Your First Child
+                  </Link>
+               </div>
+            )}
          </div>
       </div>
    );

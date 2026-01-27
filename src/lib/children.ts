@@ -43,9 +43,9 @@ export async function getAllChildren(familyId?: string) {
 
   return children.map((c) => ({
     ...c,
+    id: c._id.toString(),
     _id: c._id.toString(),
-    familyId: c.familyId?.toString?.() ?? '',
-    childId: c.childId?.toString() ?? c._id.toString(),
+    familyId: c.familyId?.toString?.() ?? c.familyId ?? '',
     createdAt: c.createdAt?.toISOString() ?? null,
     updatedAt: c.updatedAt?.toISOString() ?? null,
   }));

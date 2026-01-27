@@ -4,6 +4,7 @@ import {
    getChildDailyRecords,
    updateChoreCompletion,
    submitDailyRecord,
+   upsertPenalty,
 } from '@/lib/dailyRecords';
 import { getAuthSession } from '@/lib/auth';
 import { hasPermission } from '@/lib/rbac';
@@ -58,8 +59,8 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/daily-records
- * Creates or retrieves today's daily record for a child
- * Body: { childId, familyId }
+ * Creates or retrieves daily record for a child, or creates standalone penalty
+ * Body: { childId, familyId, date?, penalty? }
  */
 export async function POST(req: NextRequest) {
    try {
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
       }
 
       const body = await req.json();
-      const { childId, familyId } = body;
+      const { childId, familyId, date, penalty } = body;
 
       if (!childId || !familyId) {
          return NextResponse.json(
@@ -78,13 +79,24 @@ export async function POST(req: NextRequest) {
          );
       }
 
-      // RBAC: Check read permission on family
-      const canRead = await hasPermission(session.userId, familyId, 'daily-record', 'read');
-      if (!canRead) {
+      // RBAC: Check appropriate permission
+      const permission = penalty ? 'approve' : 'read';
+      const canPerform = await hasPermission(session.userId, familyId, 'daily-record', permission);
+      if (!canPerform) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const dailyRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
+      // Handle penalty upsert
+      if (penalty) {
+         const targetDate = date ? new Date(date) : new Date();
+         const dailyRecord = await upsertPenalty(childId, familyId, targetDate, penalty, session.userId);
+         const normalized = normalizeRecord(dailyRecord);
+         return NextResponse.json(normalized, { status: 200 });
+      }
+
+      // Handle regular daily record creation/retrieval
+      const targetDate = date ? new Date(date) : new Date();
+      const dailyRecord = await getOrCreateTodaysDailyRecord(childId, familyId, targetDate);
       const normalized = normalizeRecord(dailyRecord);
 
       return NextResponse.json(normalized, { status: 200 });

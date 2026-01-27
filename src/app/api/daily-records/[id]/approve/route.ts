@@ -15,7 +15,7 @@ import DailyRecord from '@/models/DailyRecord';
  */
 export async function POST(
    req: NextRequest,
-   { params }: { params: { id: string } }
+   { params }: { params: Promise<{ id: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -25,8 +25,9 @@ export async function POST(
 
       const body = await req.json();
       const { choreAdjustments = [], penalties = [] } = body;
+      const { id } = await params;
 
-      const dailyRecord = await DailyRecord.findById(params.id);
+      const dailyRecord = await DailyRecord.findById(id);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
       }
@@ -43,13 +44,13 @@ export async function POST(
       }
 
       const payoutResult = await approveDailyRecord(
-         params.id,
+         id,
          session.userId,
          choreAdjustments,
          penalties
       );
 
-      const updatedRecord = await DailyRecord.findById(params.id);
+      const updatedRecord = await DailyRecord.findById(id);
       const normalized = normalizeRecord(updatedRecord.toObject());
 
       return NextResponse.json({
