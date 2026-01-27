@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getAuthSession } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth/auth';
 import { getChildIdIfMember } from '@/lib/access-control/childAccess';
 
 /**

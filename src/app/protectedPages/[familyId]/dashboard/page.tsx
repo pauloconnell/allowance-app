@@ -1,5 +1,5 @@
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
-import { getAllChildren } from '@/lib/children';
+import { getAllChildren } from '@/lib/data/childService';
 import ChildList from '@/components/vehicle/VehicleList';
 import Link from 'next/link';
 

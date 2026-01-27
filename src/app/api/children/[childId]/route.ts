@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
 import Child from '@/models/Child';
-import { getAuthSession } from '@/lib/auth';
-import { hasPermission } from '@/lib/rbac';
-import { normalizeRecord } from '@/lib/normalizeRecord';
+import { getAuthSession } from '@/lib/auth/auth';
+import { hasPermission } from '@/lib/auth/rbac';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import type { IChildFormData } from '@/types/IChild';
 
 /**

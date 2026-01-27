@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import Vehicle from '@/models/Vehicle';
-import { sanitizeCreate } from '../../lib/sanitizeCreate';
+import { sanitizeCreate } from '../../lib/utils/sanitizeCreate';
 
 describe('sanitizeCreate (Vehicle schema)', () => {
   it('keeps only fields defined in Vehicle schema', () => {

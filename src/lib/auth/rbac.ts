@@ -1,4 +1,4 @@
-import { connectDB } from './mongodb';
+import { connectDB } from '../mongodb';
 import UserFamily from '@/models/UserFamily';
 import Child from '@/models/Child';
 

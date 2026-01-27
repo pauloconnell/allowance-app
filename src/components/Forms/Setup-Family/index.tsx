@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { createFamily } from '@/lib/actions/family';
-import { sanitizeInput } from '@/lib/sanitizeInput';
+import { sanitizeInput } from '@/lib/utils/sanitizeInput';
 
 export default function SetupFamilyForm() {
   const [familyName, setFamilyName] = useState('');

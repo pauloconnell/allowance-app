@@ -1,10 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createDailyRecord } from "@/lib/serviceRecords";
 import ServiceRecord from "@/models/ServiceRecord"; 
-import { sanitizeCreate } from "@/lib/sanitizeCreate";
+import { sanitizeCreate } from "@/lib/utils/sanitizeCreate";
 import { IServiceRecord } from "@/types/IServiceRecord"
-import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth';
-import { hasPermission } from '@/lib/rbac';
+import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth/auth';
+import { hasPermission } from '@/lib/auth/rbac';
 
 //POST /api/service-records
 

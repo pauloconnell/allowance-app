@@ -1,4 +1,4 @@
-import { connectDB } from "./mongodb";
+import { connectDB } from "../mongodb";
 import Child from "@/models/Child";
 import type { IChild } from "@/types/IChild";
 import mongoose from "mongoose";

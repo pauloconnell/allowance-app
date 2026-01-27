@@ -9,7 +9,7 @@ import { useWorkOrderStore } from '@/store/useWorkOrderStore';
 import { useChildStore } from '@/store/useVehicleStore';
 import { IVehicle } from '@/types/IVehicle';
 import { IFormWorkOrder } from '@/types/IFormWorkOrder';
-import { sanitizeInput } from '@/lib/sanitizeInput';
+import { sanitizeInput } from '@/lib/utils/sanitizeInput';
 
 
 interface WorkOrderFormProps {

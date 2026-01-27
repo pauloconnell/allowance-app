@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import ServiceRecord from '@/models/ServiceRecord';
-import { sanitizeCreate } from '../../lib/sanitizeCreate';
+import { sanitizeCreate } from '../../lib/utils/sanitizeCreate';
 
 describe('sanitizeCreate (ServiceRecord schema)', () => {
   it('keeps only fields defined in ServiceRecord schema', () => {

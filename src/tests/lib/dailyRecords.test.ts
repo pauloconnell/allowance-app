@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computePayoutTotals } from '@/lib/dailyRecords';
+import { computePayoutTotals } from '@/lib/data/dailyRecordService';
 
 describe('computePayoutTotals', () => {
    it('calculates totals with no overrides or penalties', () => {

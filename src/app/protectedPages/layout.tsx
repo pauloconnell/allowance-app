@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/requireAuth";
+import { requireAuth } from "@/lib/auth/requireAuth";
 import { userHasFamily } from "@/lib/familyContext";
 import { redirect } from "next/navigation";
 import { getSession } from "@auth0/nextjs-auth0";

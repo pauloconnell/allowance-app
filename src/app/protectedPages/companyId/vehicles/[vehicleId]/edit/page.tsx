@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getChildById } from "@/lib/children";
+import { getChildById } from "@/lib/data/childService";
 import EditFormWrapper from "./EditFormWrapper";
 import mongoose from "mongoose";
 

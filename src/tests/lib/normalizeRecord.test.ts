@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import mongoose from 'mongoose';
 
-import { normalizeRecord } from '../../lib/normalizeRecord';
+import { normalizeRecord } from '../../lib/utils/normalizeRecord';
 
 // Import your real models
 import Vehicle from '@/models/Vehicle';

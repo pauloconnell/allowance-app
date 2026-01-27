@@ -1,4 +1,4 @@
-import { getAllChildren } from '@/lib/children';
+import { getAllChildren } from '@/lib/data/childService';
 import Link from 'next/link';
 
 interface PageProps {

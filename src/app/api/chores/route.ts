@@ -1,9 +1,9 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { sanitizeCreate } from '@/lib/sanitizeCreate';
-import { normalizeRecord } from '@/lib/normalizeRecord';
+import { sanitizeCreate } from '@/lib/utils/sanitizeCreate';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import Chore from '@/models/Chore';
-import { getAuthSession } from '@/lib/auth';
-import { hasPermission } from '@/lib/rbac';
+import { getAuthSession } from '@/lib/auth/auth';
+import { hasPermission } from '@/lib/auth/rbac';
 import type { IChoreFormData } from '@/types/IChore';
 
 /**

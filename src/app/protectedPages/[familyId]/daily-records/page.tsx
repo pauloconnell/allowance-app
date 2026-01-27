@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { getAllChildren } from '@/lib/children';
-import { getChildDailyRecords, getStartOfDay, getEndOfDay } from '@/lib/dailyRecords';
+import { getAllChildren } from '@/lib/data/childService';
+import { getChildDailyRecords, getStartOfDay, getEndOfDay } from '@/lib/data/dailyRecordService';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;

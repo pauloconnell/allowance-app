@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllChores } from '@/lib/chores';
+import { getAllChores } from '@/lib/data/choreService';
 import { CardWorkOrder } from '@/components/UI/CardWorkOrder';
 
 export const metadata: Metadata = {

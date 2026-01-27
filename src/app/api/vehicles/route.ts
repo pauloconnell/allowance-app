@@ -1,11 +1,11 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getAllChildren, createChild } from '@/lib/children';
-import { sanitizeCreate } from '@/lib/sanitizeCreate';
-import { normalizeRecord } from '@/lib/normalizeRecord';
+import { getAllChildren, createChild } from '@/lib/data/childService';
+import { sanitizeCreate } from '@/lib/utils/sanitizeCreate';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import Vehicle from '@/models/Vehicle';
 import type { IFormVehicle } from "@/types/IFormVehicle";
-import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth';
-import { hasPermission } from '@/lib/rbac';
+import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth/auth';
+import { hasPermission } from '@/lib/auth/rbac';
 
 export async function GET(req: NextRequest) {
    try {

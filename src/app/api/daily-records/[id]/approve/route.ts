@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { approveDailyRecord } from '@/lib/dailyRecords';
-import { getAuthSession } from '@/lib/auth';
-import { hasPermission } from '@/lib/rbac';
-import { normalizeRecord } from '@/lib/normalizeRecord';
+import { approveDailyRecord } from '@/lib/data/dailyRecordService';
+import { getAuthSession } from '@/lib/auth/auth';
+import { hasPermission } from '@/lib/auth/rbac';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import DailyRecord from '@/models/DailyRecord';
 
 /**

@@ -2,11 +2,11 @@ import { NextResponse, NextRequest } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import { IWorkOrder } from '@/types/IWorkOrder';
-import { sanitizeCreate } from '@/lib/sanitizeCreate';
-import { sanitizeUpdate } from '@/lib/sanitizeUpdate';
-import { normalizeRecord } from '@/lib/normalizeRecord';
-import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth';
-import { hasPermission, assertPermission } from '@/lib/rbac';
+import { sanitizeCreate } from '@/lib/utils/sanitizeCreate';
+import { sanitizeUpdate } from '@/lib/utils/sanitizeUpdate';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
+import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth/auth';
+import { hasPermission, assertPermission } from '@/lib/auth/rbac';
 import mongoose from 'mongoose';
 
 export async function POST(req: NextRequest) {

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import WorkOrderFormWrapper from './WorkOrderFormWrapper';
-import { getAllChildren } from '@/lib/children';
+import { getAllChildren } from '@/lib/data/childService';
 
 export const metadata: Metadata = {
   title: 'Create Work Order',

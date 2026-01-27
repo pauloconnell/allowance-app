@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SharedServiceFormFields from '../Shared/SharedServiceFormFields';
 import { useChildStore } from '@/store/useVehicleStore';
-import { sanitizeInput } from '@/lib/sanitizeInput';
+import { sanitizeInput } from '@/lib/utils/sanitizeInput';
 import type { IFormServiceRecord } from '@/types/IFormServiceRecord';
 
 export default function ServiceRecordForm({ familyId, childId }: { familyId: string; childId?: string }) {

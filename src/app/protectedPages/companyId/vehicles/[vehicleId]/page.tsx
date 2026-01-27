@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getDailyHistory } from '@/lib/serviceRecords';
-import { getChildById } from '@/lib/children';
+import { getChildById } from '@/lib/data/childService';
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
 
 interface Props {

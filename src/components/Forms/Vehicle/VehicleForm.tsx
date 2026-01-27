@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { sanitizeInput } from '@/lib/sanitizeInput';
+import { sanitizeInput } from '@/lib/utils/sanitizeInput';
 import type { IVehicle } from '@/types/IVehicle';
 import type { IFormVehicle } from '@/types/IFormVehicle';
 

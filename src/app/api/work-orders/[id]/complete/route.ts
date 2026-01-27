@@ -2,10 +2,10 @@ import { NextResponse, NextRequest } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import WorkOrder from '@/models/WorkOrder';
 import ServiceRecord from '@/models/ServiceRecord';
-import { createNextChore } from '@/lib/chores';
+import { createNextChore } from '@/lib/data/choreService';
 import { IWorkOrder } from '@/types/IWorkOrder';
-import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth';
-import { hasPermission } from '@/lib/rbac';
+import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth/auth';
+import { hasPermission } from '@/lib/auth/rbac';
 import mongoose from 'mongoose';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

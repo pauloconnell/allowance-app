@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import WorkOrderEditFormWrapper from './edit/WorkOrderEditFormWrapper';
-import { getAllChildren } from '@/lib/children';
+import { getAllChildren } from '@/lib/data/childService';
 
 export const metadata: Metadata = {
   title: 'Work Order Details',

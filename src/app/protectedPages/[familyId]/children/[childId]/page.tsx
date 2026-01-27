@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getChildById } from '@/lib/data/childService';
 
 interface PageProps {
    params: Promise<{ familyId: string; childId: string }>;
@@ -6,6 +7,10 @@ interface PageProps {
 
 export default async function ChildDetailPage({ params }: PageProps) {
    const { familyId, childId } = await params;
+
+
+   // get child data from API or DB direct
+   let child =getChildById(childId, familyId);
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
@@ -25,9 +30,9 @@ export default async function ChildDetailPage({ params }: PageProps) {
                <div className="bg-white rounded-lg shadow-md p-6">
                   <h2 className="text-xl font-semibold mb-4">Profile</h2>
                   <div className="space-y-3">
-                     <p><span className="font-medium">Name:</span> Loading...</p>
-                     <p><span className="font-medium">Age:</span> Loading...</p>
-                     <p><span className="font-medium">Balance:</span> $0.00</p>
+                     <p><span className="font-medium">Name:</span> {child ? child.name : 'Loading...'}</p>
+                     <p><span className="font-medium">Age:</span> {child ? child.age : 'Loading...'}</p>
+                     <p><span className="font-medium">Balance:</span>{child ? child.balance : 'Loading...'}</p>
                   </div>
                </div>
 
