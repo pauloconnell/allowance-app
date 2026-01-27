@@ -6,6 +6,7 @@ import Family from '@/models/Family';
 import UserFamily from '@/models/UserFamily';
 import Invite from '@/models/Invite';
 import { getSession } from '@auth0/nextjs-auth0';
+import { cookies, headers } from 'next/headers';
 import crypto from 'crypto';
 
 /**
@@ -13,21 +14,32 @@ import crypto from 'crypto';
  */
 export async function createFamily(name: string) {
   let newFamilyId: string | null = null;
-    console.log("Family name is ", name)
+    console.log("1Family name is ", name)
   try {
     if (!name || name.trim().length === 0) {
       return { error: 'Family name is required' };
     }
 
+    // FORCE Next.js to treat this as a dynamic, awaited context
+    // before calling the Auth0 SDK
+    await cookies(); 
+    await headers();
+  console.log("2Family name is ", name)
     const session = await getSession();
+      console.log("3made it? ", name)
     if (!session?.user) {
       return { error: 'Not authenticated' };
     }
 
+    const userId = session.user.sub;
+    const email = session.user.email;
+    const firstName = session.user.given_name || '';
+    const lastName = session.user.family_name || '';
+ console.log("got session?",session.user.sub);
     await connectDB();
 
-    const company = await Family.create({
-          userId: session.user.sub,
+    const family = await Family.create({
+          userId: userId,
       name: name.trim(),
       slug: name
         .trim()
@@ -36,19 +48,21 @@ export async function createFamily(name: string) {
         .replace(/^-|-$/g, ''),
       isActive: true,
     });
-console.log("family created")
-    await UserFamily.create({
-      userId: session.user.sub,
-      familyId: company._id,
+console.log("family created", family.name)
+console.log("Data check:", { userId, email, familyId: family._id });
+await UserFamily.create({
+      userId: userId,
+      familyId: family._id.toString(),
       role: 'parent',
-      email: session.user.email,
-      firstName: session.user.given_name || '',
-      lastName: session.user.family_name || '',
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
       isActive: true,
     });
-
-    newFamilyId = company._id.toString();
-    console.log("userFamily created", newFamilyId)
+ 
+    newFamilyId = family._id.toString();
+    console.log("userFamily created? 1")
+    
   } catch (error: any) {
     if (error.code === 11000) {
       return { error: 'A family with this name already exists. Please try a different name.' };
@@ -58,7 +72,7 @@ console.log("family created")
   }
 
   if (newFamilyId) {
-    redirect(`/dashboard/${newFamilyId}`);
+    redirect(`/protectedPages/${newFamilyId}/dashboard`);
   }
 }
 

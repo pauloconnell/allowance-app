@@ -10,8 +10,10 @@ interface PageProps {
 export default async function DashboardPage({ params }: PageProps) {
    const { familyId: familyId } = await params;
    let children = [];
+
+   console.log("go get kids for familyId:", familyId);
    try {
-      children = await getAllChildren(familyId);
+    //  children = await getAllChildren(familyId);
    } catch (err) {
       console.error('Failed to load children:', err);
       return (

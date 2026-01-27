@@ -11,6 +11,12 @@ export default function SetupFamilyPage() {
    const [loading, setLoading] = useState(false);
    const router = useRouter();
 
+
+
+
+
+
+   
    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
       e.preventDefault();
       setError('');

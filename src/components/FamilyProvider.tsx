@@ -1,6 +1,6 @@
 'use client';
 
-import { useFamilyStore } from '@/store/useFamilyStore';
+import { useFamilyStore } from '@/store/useFamilyStore';;
 import { useEffect } from 'react';
 
 /**
