@@ -1,93 +1,84 @@
 import { create } from 'zustand';
-import type { IWorkOrder } from '@/types/IWorkOrder';
-import { useCompanyStore } from './useFamilyStore';
+import type { IChore } from '@/types/IChore';
+import { useFamilyStore } from './useFamilyStore';
 
-interface WorkOrderState {
-   workOrders: IWorkOrder[];
-   selectedWorkOrder: IWorkOrder | null;
+interface ChoreState {
+   chores: IChore[];
+   selectedChore: IChore | null;
    // Setters
-   setSelectedWorkOrder: (wo: IWorkOrder | null) => void;
-   clearSelectedWorkOrder: () => void;
+   setSelectedChore: (chore: IChore | null) => void;
+   clearSelectedChore: () => void;
    // Fetchers
-   fetchAllWorkOrders: (familyId: string) => Promise<void>;
-   fetchWorkOrder: (id: string) => Promise<void>;
+   fetchAllChores: (familyId: string) => Promise<void>;
+   fetchChore: (id: string) => Promise<void>;
    // Derived selectors
-   getWorkOrdersForVehicle: (vehicleId: string) => IWorkOrder[];
-   getUpcomingWorkOrders: () => IWorkOrder[];
-   updateWorkOrderInStore: (wo: IWorkOrder) => void;
+   getChoresForChild: (childId: string) => IChore[];
+   getUpcomingChores: () => IChore[];
+   updateChoreInStore: (chore: IChore) => void;
 }
 
-export const useWorkOrderStore = create<WorkOrderState>((set, get) => ({
-   workOrders: [],
-   selectedWorkOrder: null,
+export const useChoreStore = create<ChoreState>((set, get) => ({
+   chores: [],
+   selectedChore: null,
 
-   setSelectedWorkOrder: (wo) => set({ selectedWorkOrder: wo }),
+   setSelectedChore: (chore) => set({ selectedChore: chore }),
 
-   clearSelectedWorkOrder: () => set({ selectedWorkOrder: null }),
+   clearSelectedChore: () => set({ selectedChore: null }),
 
-   fetchAllWorkOrders: async (familyId: string) => {
-
-      //const familyId = useCompanyStore.getState().activefamilyId;
-      if (!familyId){
-         console.log("No active familyId in store, cannot fetch work orders");
+   fetchAllChores: async (familyId: string) => {
+      if (!familyId) {
+         console.warn("No active familyId provided, cannot fetch chores");
+         return;
       } 
 
       try {
-         const res = await fetch(`/api/work-orders?familyId=${familyId}`);
-         if (!res.ok) {
-            throw new Error(`Failed to fetch work order: ${res.statusText}`);
-         }
-         const data: IWorkOrder[] = await res.json();
-         set({ workOrders: data });
+         const res = await fetch(`/api/chores?familyId=${familyId}`);
+         if (!res.ok) throw new Error(`Failed to fetch chores: ${res.statusText}`);
+         const data: IChore[] = await res.json();
+         set({ chores: data });
       } catch (e) {
-         console.error("error getting work orders:", e)
-         set({ workOrders: [] });
+         console.error("Error getting chores:", e);
+         set({ chores: [] });
       }
-
    },
-         // id = workorderId
-   fetchWorkOrder: async (workOrderId: string) => {
+
+   fetchChore: async (choreId: string) => {
       try {
-         const familyId = useCompanyStore.getState().activefamilyId;
-         const res = await fetch(`/api/work-orders/${workOrderId}?familyId=${familyId}`);
-         if (!res.ok) {
-            throw new Error(`Failed to fetch work order: ${res.statusText}`);
-         }
-         const data: IWorkOrder = await res.json();
-         set({ selectedWorkOrder: data });
-      }
-      catch (e) {
-         console.error("error getting work order:", e);
-         set({ selectedWorkOrder: null });
+         const familyId = useFamilyStore.getState().activeFamilyId;
+         const res = await fetch(`/api/chores/${choreId}?familyId=${familyId}`);
+         if (!res.ok) throw new Error(`Failed to fetch chore: ${res.statusText}`);
+         const data: IChore = await res.json();
+         set({ selectedChore: data });
+      } catch (e) {
+         console.error("Error getting chore:", e);
+         set({ selectedChore: null });
       }
    },
 
-   getWorkOrdersForVehicle: (vehicleId) => {
-      return get().workOrders.filter((wo) => wo.vehicleId === vehicleId);
+   getChoresForChild: (childId) => {
+      return get().chores.filter((chore) => chore.childId === childId);
    },
 
-   // DB Actions
-
-   getUpcomingWorkOrders: () => {
+   getUpcomingChores: () => {
       const now = new Date();
-      const twoWeeksFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+      // Lookahead window (e.g., chores due today or tomorrow)
+      const soonThreshold = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
-      return get().workOrders.filter((wo) => {
-         const dueDate = wo.serviceDueDate ? new Date(wo.serviceDueDate) : null;
-         const dueKM = wo.serviceDueKM;
-         // Show if overdue OR due within next 2 weeks 
-         // Only evaluate date logic if a dueDate exists 
-         const isOverdue = dueDate ? dueDate < now : false;
-         const isDueSoon = dueDate ? (dueDate >= now && dueDate <= twoWeeksFromNow) : false;
-         const kmSoon = dueKM != null && wo.mileage != null && (Number(dueKM) - Number(wo.mileage) <= 100);
-         return isOverdue || isDueSoon || kmSoon;
+      return get().chores.filter((chore) => {
+         if (!chore.dueDate) return false;
+         const dueDate = new Date(chore.dueDate);
+         
+         const isOverdue = dueDate < now && chore.completionStatus < 1.0;
+         const isDueSoon = dueDate >= now && dueDate <= soonThreshold;
+         
+         return isOverdue || isDueSoon;
       });
    },
 
-   updateWorkOrderInStore: (updatedWO: IWorkOrder) =>
+   updateChoreInStore: (updatedChore: IChore) =>
       set((state) => ({
-         workOrders: state.workOrders.map((wo: IWorkOrder) =>
-            wo._id === updatedWO._id ? updatedWO : wo
+         chores: state.chores.map((chore) =>
+            chore._id === updatedChore._id ? updatedChore : chore
          ),
       })),
 }));

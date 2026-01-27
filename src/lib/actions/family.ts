@@ -13,7 +13,7 @@ import crypto from 'crypto';
  */
 export async function createFamily(name: string) {
   let newFamilyId: string | null = null;
-
+    console.log("Family name is ", name)
   try {
     if (!name || name.trim().length === 0) {
       return { error: 'Family name is required' };

@@ -112,7 +112,7 @@ export default async function Home() {
                      )}
                      {isLoggedIn && (
                         <a
-                           href="/setup-family"
+                           href="/protectedPages/setup-family"
                            className="flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg shadow-lg transition duration-150"
                         >
                            Create New Family

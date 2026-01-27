@@ -6,24 +6,30 @@ interface FamilySummary {
   slug?: string;
 }
 
-interface useFamilyState {
+interface FamilyState {
   activeFamilyId: string | null;
+  activeChildId: string | null;
   families: FamilySummary[];
   setFamilies: (families: FamilySummary[]) => void;
   setActiveFamilyId: (id: string | null) => void;
-  clearFamily: () => void;
+  setActiveChildId: (id: string | null) => void;
+  clearStore: () => void;
 }
 
-export const useFamilyStore = create<useFamilyState>((set) => ({
+export const useFamilyStore = create<FamilyState>((set) => ({
   activeFamilyId: null,
+  activeChildId: null,
   families: [],
 
   setFamilies: (families: FamilySummary[]) => set({ families }),
 
   setActiveFamilyId: (id: string | null) => set({ activeFamilyId: id }),
+  
+  setActiveChildId: (id: string | null) => set({ activeChildId: id }),
 
-  clearFamily: () => set({ activeFamilyId: null }),
+  clearStore: () => set({ 
+    activeFamilyId: null, 
+    activeChildId: null, 
+    families: [] 
+  }),
 }));
-
-// Backward compatibility alias
-export const useFamilyStore;
