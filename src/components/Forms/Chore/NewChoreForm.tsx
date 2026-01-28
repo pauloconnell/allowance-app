@@ -22,9 +22,12 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
       taskName: chore?.taskName ?? '',
       rewardAmount: chore?.rewardAmount ?? '',
       isRecurring: chore?.isRecurring ?? false,
+      dueDate: chore?.dueDate
+         ? new Date(chore.dueDate).toISOString().split('T')[0]
+         : new Date().toISOString().split('T')[0],
       intervalDays: chore?.intervalDays ?? '',
-      suggestedTime: chore?.suggestedTime ?? '',
-      choreId: chore?._id ? chore._id : '',
+      suggestedTime: chore?.suggestedTime ?? '', // If it's there, we're editing. If not, we're creating.
+      choreId: chore?._id || '',
       familyId: familyId ?? '',
    });
 
@@ -106,78 +109,108 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
                placeholder="e.g., Make bed, Take out trash"
             />
          </div>
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+               <label htmlFor="isRecurring">
+                  <input
+                     type="checkbox"
+                     name="isRecurring"
+                     checked={form.isRecurring}
+                     onChange={handleChange}
+                     className="mr-2"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                     Recurring Chore
+                  </span>
+               </label>
+            </div>
+       
 
-         <div>
-            <label
-               htmlFor="rewardAmount"
-               className="block text-sm font-medium text-gray-700 mb-2"
-            >
-               Reward Amount ($)
-            </label>
-            <input
-               type="number"
-               id="rewardAmount"
-               name="rewardAmount"
-               value={form.rewardAmount}
-               onChange={handleChange}
-               min="0"
-               step="0.05"
-               required
-               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-               placeholder="0.00"
-            />
+          
          </div>
+         {form.isRecurring && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div>
+                  <label
+                     htmlFor="dueDate"
+                     className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                     Due Date
+                  </label>
+                  <input
+                     type="date"
+                     id="dueDate"
+                     name="dueDate"
+                     value={form.dueDate}
+                     onChange={handleChange}
+                     required={!form.isRecurring} // Optional: maybe only required if not recurring?
+                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  />
+               </div>
+               <div>
+                  <label
+                     htmlFor="intervalDays"
+                     className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                     Repeat Every (days)
+                  </label>
+                  <input
+                     type="number"
+                     id="intervalDays"
+                     name="intervalDays"
+                     value={form.intervalDays}
+                     onChange={handleChange}
+                     min="1"
+                     className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                        !form.isRecurring ? 'bg-gray-100 cursor-not-allowed' : ''
+                     }`}
+                     placeholder="1 for daily, 7 for weekly"
+                     disabled={!form.isRecurring}
+                  />
+               </div>
+            </div>
+         )}
 
-         <div>
-            <label className="flex items-center">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Column 1: Reward Amount */}
+     <div>
+               <label
+                  htmlFor="rewardAmount"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+               >
+                  Reward Amount ($)
+               </label>
                <input
-                  type="checkbox"
-                  name="isRecurring"
-                  checked={form.isRecurring}
+                  type="number"
+                  id="rewardAmount"
+                  name="rewardAmount"
+                  value={form.rewardAmount}
                   onChange={handleChange}
-                  className="mr-2"
+                  min="0"
+                  step="0.05"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="0.00"
                />
-               <span className="text-sm font-medium text-gray-700">Recurring Chore</span>
-            </label>
+            </div>
+            {/* Column 2: Suggested Time */}
+            <div>
+               <label
+                  htmlFor="suggestedTime"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+               >
+                  Suggested Time (optional)
+               </label>
+               <input
+                  type="time"
+                  id="suggestedTime"
+                  name="suggestedTime"
+                  value={form.suggestedTime}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+               />
+            </div>
          </div>
-
-         <div>
-            <label
-               htmlFor="intervalDays"
-               className="block text-sm font-medium text-gray-700 mb-2"
-            >
-               Repeat Every (days)
-            </label>
-            <input
-               type="number"
-               id="intervalDays"
-               name="intervalDays"
-               value={form.intervalDays}
-               onChange={handleChange}
-               min="1"
-               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-               placeholder="1 for daily, 7 for weekly"
-               disabled={!form.isRecurring}
-            />
-         </div>
-
-         <div>
-            <label
-               htmlFor="suggestedTime"
-               className="block text-sm font-medium text-gray-700 mb-2"
-            >
-               Suggested Time (optional)
-            </label>
-            <input
-               type="time"
-               id="suggestedTime"
-               name="suggestedTime"
-               value={form.suggestedTime}
-               onChange={handleChange}
-               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-         </div>
-
          <div className="flex justify-between items-center mt-6">
             <button className="bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700">
                {isEdit ? 'Save Changes' : 'Create Chore'}
