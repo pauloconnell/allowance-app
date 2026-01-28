@@ -59,7 +59,7 @@ export default async function DashboardPage({ params }: PageProps) {
                   <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 sm:p-8">
                      <div className="flex items-center justify-between mb-6">
                         <h2 className="text-2xl font-bold text-secondary-900">
-                           Chores & Daily Records
+                           Chores & Daily Records - 'review' completed chores here
                         </h2>
                         <div className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-lg">
                            <span className="text-primary-600 font-semibold">📋</span>

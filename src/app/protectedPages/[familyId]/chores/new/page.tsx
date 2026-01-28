@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ChoreForm from '@/components/Forms/Child/ChildForm';
+import NewChoreForm from '@/components/Forms/Chore/NewChoreForm';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -21,7 +21,7 @@ export default async function NewChorePage({ params }: PageProps) {
                <h1 className="text-3xl font-bold text-secondary-900">Create New Chore</h1>
             </div>
 
-           <ChoreForm familyId={familyId} />
+           <NewChoreForm familyId={familyId} />
          </div>
       </div>
    );

@@ -17,6 +17,21 @@ export async function createChore(data: Partial<IChore>): Promise<IChore> {
   };
 }
 
+export async function getChoreById(choreId: string): Promise<IChore | null> {
+  await connectDB();
+  const chore = await Chore.findById(choreId ).lean();
+  if (!chore) return null;
+
+  return {
+    ...chore,
+    _id: chore._id?.toString(),
+    familyId: chore.familyId?.toString?.() ?? '',
+    childId: chore.childId?.toString(),
+    createdAt: chore.createdAt?.toISOString() ?? null,
+    updatedAt: chore.updatedAt?.toISOString() ?? null,
+  } as IChore;
+}
+
 export async function getAllChores(familyId: string): Promise<IChore[]> {
   await connectDB();
   const chores = await Chore.find({ familyId }).sort({ createdAt: -1 }).lean();

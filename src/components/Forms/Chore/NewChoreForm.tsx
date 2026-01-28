@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { sanitizeInput } from '@/lib/utils/sanitizeInput';
@@ -12,12 +12,11 @@ interface ChoreFormProps {
    familyId: string;
 }
 
-export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
+export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
    const router = useRouter();
    const isEdit = !!chore;
 
-   const derivedChoreId =
-      chore && '_id' in chore ? chore._id : (chore?.choreId ?? '');
+   //const derivedChoreId = chore && '_id' in chore ? chore._id : (chore?.choreId ?? '');
 
    const [form, setForm] = useState({
       taskName: chore?.taskName ?? '',
@@ -25,17 +24,29 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
       isRecurring: chore?.isRecurring ?? false,
       intervalDays: chore?.intervalDays ?? '',
       suggestedTime: chore?.suggestedTime ?? '',
-      choreId: derivedChoreId,
+      choreId: chore?._id ? chore._id : '',
       familyId: familyId ?? '',
    });
+
+   // // Sync form with incoming chore prop
+   // useEffect(() => {
+   //    if (!chore) return;
+   //    setForm(prev =>({
+   //       ...prev,
+   //       taskName: chore.taskName ?? '',
+   //       rewardAmount: chore.rewardAmount ?? '',
+   //       isRecurring: chore.isRecurring ?? false,
+   //       intervalDays: chore.intervalDays ?? '',
+   //       suggestedTime: chore.suggestedTime ?? '',
+   //       choreId: derivedChoreId,
+   //       familyId: familyId ?? '',
+   //    }));
+   // }, [JSON.stringify(chore)]);
 
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, type, checked, value } = e.target;
 
-      const cleaned =
-         type === 'checkbox'
-            ? checked
-            : sanitizeInput(value);
+      const cleaned = type === 'checkbox' ? checked : sanitizeInput(value);
 
       setForm({ ...form, [name]: cleaned });
    };
@@ -73,9 +84,15 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
    };
 
    return (
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
+      <form
+         onSubmit={handleSubmit}
+         className="space-y-6 bg-white p-6 rounded-lg shadow-md"
+      >
          <div>
-            <label htmlFor="taskName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+               htmlFor="taskName"
+               className="block text-sm font-medium text-gray-700 mb-2"
+            >
                Task Name
             </label>
             <input
@@ -91,7 +108,10 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
          </div>
 
          <div>
-            <label htmlFor="rewardAmount" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+               htmlFor="rewardAmount"
+               className="block text-sm font-medium text-gray-700 mb-2"
+            >
                Reward Amount ($)
             </label>
             <input
@@ -101,7 +121,7 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
                value={form.rewardAmount}
                onChange={handleChange}
                min="0"
-               step="0.25"
+               step="0.05"
                required
                className="w-full px-3 py-2 border border-gray-300 rounded-md"
                placeholder="0.00"
@@ -122,7 +142,10 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
          </div>
 
          <div>
-            <label htmlFor="intervalDays" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+               htmlFor="intervalDays"
+               className="block text-sm font-medium text-gray-700 mb-2"
+            >
                Repeat Every (days)
             </label>
             <input
@@ -139,7 +162,10 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
          </div>
 
          <div>
-            <label htmlFor="suggestedTime" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+               htmlFor="suggestedTime"
+               className="block text-sm font-medium text-gray-700 mb-2"
+            >
                Suggested Time (optional)
             </label>
             <input
@@ -168,7 +194,9 @@ export default function ChoreForm({ chore, familyId }: ChoreFormProps) {
 
          <div>
             {/* Remove after dev */}
-            <pre className="text-xs bg-gray-100 p-2 rounded">{JSON.stringify(form, null, 2)}</pre>
+            <pre className="text-xs bg-gray-100 p-2 rounded">
+               {JSON.stringify(form, null, 2)}
+            </pre>
          </div>
       </form>
    );
