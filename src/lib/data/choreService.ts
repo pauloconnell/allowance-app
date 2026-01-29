@@ -20,6 +20,7 @@ export async function getChoreById(choreId: string): Promise<IChore | null> {
 export async function getAllChores(familyId: string): Promise<IChore[]> {
   await connectDB();
   const chores = await Chore.find({ familyId }).sort({ createdAt: -1 }).lean();
+  //console.log("Got chores for family ", familyId, chores)
   return chores.map(normalizeRecord);
 }
 

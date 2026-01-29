@@ -8,7 +8,7 @@ import type { IChore } from '@/types/IChore';
 import type { IFormChore } from '@/types/IFormChore';
 
 interface ChoreFormProps {
-   chore?: IChore | IFormChore;
+   chore?: IChore ;  // If present, we are in Edit mode
    familyId: string;
 }
 
@@ -49,41 +49,62 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, type, checked, value } = e.target;
 
-      const cleaned = type === 'checkbox' ? checked : sanitizeInput(value);
+     let cleaned: any;
 
+  if (type === 'checkbox') {
+    cleaned = checked;           // check box is clean data
+  } else if (type === 'number') {
+    // Convert to number e.target.value is always a string, handle empty string as 0
+    cleaned = value === '' ? 0 : Number(value);
+  } else {
+    // Sanitize text inputs (taskName, notes, suggestedTime)
+    cleaned = sanitizeInput(value);
+  }
       setForm({ ...form, [name]: cleaned });
    };
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (isEdit && chore) {
-         const savedChore = chore as IChore;
+    
 
-         const res = await fetch(`/api/chores/${savedChore._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...form, familyId }),
-         });
 
-         if (!res.ok) throw new Error(`Failed to update chore id:${savedChore._id}`);
-         toast.success('Chore updated');
 
-         router.push(`/protectedPages/${familyId}/chores/${savedChore._id}`);
-         router.refresh();
-      } else {
-         const res = await fetch('/api/chores', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...form, familyId }),
-         });
+      // Extract choreId from form - form set it/'' either way we cant have it in the DB payload(mongodb hates having duplicate ids)
+  const { choreId, ...payload } = form;
+  const isUpdating = !!(isEdit && choreId);
+  
+  const url = isUpdating ? `/api/chores/${choreId}` : '/api/chores';
+  const method = isUpdating ? 'PUT' : 'POST';
 
-         if (!res.ok) throw new Error('Failed to create chore');
-         toast.success('Chore created');
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, familyId }), // Pure data + family link
+    });
 
-         router.push(`/protectedPages/${familyId}/chores`);
-         router.refresh();
-      }
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Failed to save chore');
+    }
+
+    toast.success(isUpdating ? 'Chore updated' : 'Chore created');
+
+    // Navigation logic
+    const redirectPath = isUpdating 
+      ? `/protectedPages/${familyId}/chores` // edit complete - just same path for now
+      : `/protectedPages/${familyId}/chores`;
+      
+    router.push(redirectPath);
+    router.refresh();
+
+  } catch (error: any) {
+    console.error("Submit error:", error);
+    toast.error(error.message);
+  }
+
+
    };
 
    return (
@@ -161,6 +182,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
                      value={form.intervalDays}
                      onChange={handleChange}
                      min="1"
+                     step="1"
                      className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
                         !form.isRecurring ? 'bg-gray-100 cursor-not-allowed' : ''
                      }`}

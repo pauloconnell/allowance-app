@@ -13,7 +13,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
    const { childId } = await searchParams;
 
    const chores = await getAllChores(familyId);
-   console.log('got chores ', chores)
+   //console.log('got chores ', chores, familyId)
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

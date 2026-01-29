@@ -49,7 +49,7 @@ export default function ChildForm({ child, familyId }: ChildFormProps) {
          if (!res.ok) throw new Error('Failed to update child');
          toast.success('Child updated');
 
-         router.push(`/protectedPages/${familyId}/children/${savedChild._id}`);
+         router.push(`/protectedPages/${familyId}/children`);
          router.refresh();
       } else {
          // CREATE new child

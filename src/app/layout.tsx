@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Maintence Tracker",
-  description: "Maintence Tracking Solution",
+  title: "ChorePay",
+  description: "Empower kids to do chores and earn allowance",
 };
 
 export default function RootLayout({
