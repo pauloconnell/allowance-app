@@ -1,63 +1,71 @@
 import Link from 'next/link';
-import ChoreList from '@/components/ChoreList/ChoreList';
-import type { IChore } from '@/types/IChore';
+import  ChoreManagementList  from '@/components/ChoreList/ChoreManagementList';
 import { getAllChores } from '@/lib/data/choreService';
+import { getChildById } from '@/lib/data/childService';
+import type { IChore } from '@/types/IChore';
+import type { IChild } from '@/types/IChild';
 
 interface PageProps {
-   params: Promise<{ familyId: string }>;
-   searchParams: Promise<{ childId?: string }>;
+  params: Promise<{ familyId: string }>;
+  searchParams: Promise<{ childId?: string }>;
 }
 
 export default async function ChoresPage({ params, searchParams }: PageProps) {
-   const { familyId } = await params;
-   const { childId } = await searchParams;
+  const { familyId } = await params;
+  const { childId } = await searchParams;
 
-   const chores = await getAllChores(familyId);
-   //console.log('got chores ', chores, familyId)
-   return (
-      <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center mb-8">
-               <Link
-                  href={`/protectedPages/${familyId}/dashboard`}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-               >
-                  Dashboard
-               </Link>
-               <h1 className="text-3xl font-bold text-secondary-900">Chores</h1>
-               
+  // Fetching Pool and Child simultaneously
+  const [allChores, child] = await Promise.all([
+    getAllChores(familyId),
+    childId ? getChildById(childId) : Promise.resolve(null)
+  ]);
 
-               <Link
-                  href={`/protectedPages/${familyId}/chores/new`}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-               >
-                  Create Chore
-               </Link>
-            </div>
+  // Sort Master Pool Alphabetically
+  const sortedPool: IChore[] = [...(allChores || [])].sort((a, b) => 
+    a.taskName.localeCompare(b.taskName)
+  );
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-               <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-4">Active Chores</h2>
-                  {childId && (
-                     <p className="text-sm text-gray-600 mb-4">
-                        Filtered for specific child
-                     </p>
-                  )}
-               </div>
-              {chores ?    <ChoreList chores={chores} familyId={familyId} childId={childId} /> :
-               <div className="space-y-4">
-                  <div className="text-center py-12">
-                     <p className="text-gray-500 mb-4">No chores created yet</p>
-                     <Link
-                        href={`/protectedPages/${familyId}/chores/new`}
-                        className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                     >
-                        Create Your First Chore
-                     </Link>
-                  </div>
-               </div> }
-            </div>
-         </div>
+  return (
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+          <div>
+            <Link 
+              href={`/protectedPages/${familyId}/dashboard`}
+              className="text-primary-600 hover:text-primary-700 font-medium text-sm mb-1 inline-block"
+            >
+              ← Back to Dashboard
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {child ? `Chore Assignments: ${child.name}` : 'Chore Library'}
+            </h1>
+          </div>
+          
+          <Link
+            href={`/protectedPages/${familyId}/chores/new`}
+            className="inline-flex items-center justify-center bg-primary-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+          >
+            + Create New Blueprint
+          </Link>
+        </div>
+
+        {child ? (
+          <ChoreManagementList 
+            allChores={sortedPool} 
+            child={child as IChild} 
+            familyId={familyId} 
+          />
+        ) : (
+          <div className="bg-white p-16 rounded-2xl shadow-sm text-center border-2 border-dashed border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Child Selected</h3>
+            <p className="text-gray-500 max-w-sm mx-auto">
+              Please return to the dashboard and select a child to manage their specific chores.
+            </p>
+          </div>
+        )}
       </div>
-   );
+    </div>
+  );
 }
