@@ -66,7 +66,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
             body: JSON.stringify({ ...form, familyId }),
          });
 
-         if (!res.ok) throw new Error('Failed to update chore');
+         if (!res.ok) throw new Error(`Failed to update chore id:${savedChore._id}`);
          toast.success('Chore updated');
 
          router.push(`/protectedPages/${familyId}/chores/${savedChore._id}`);

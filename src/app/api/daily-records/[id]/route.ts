@@ -81,7 +81,7 @@ export async function PUT(
          session.userId,
          dailyRecord.familyId.toString(),
          'daily-record',
-         'write'
+         'update'
       );
       if (!canWrite) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth/requireAuth";
-import { userHasFamily } from "@/lib/familyContext";
+import { userHasFamily } from "@/lib/data/familyService";
 import { redirect } from "next/navigation";
 import { getSession } from "@auth0/nextjs-auth0";
 import { ReactNode } from "react";

@@ -21,5 +21,8 @@ const FamilySchema = new Schema(
 
 // user can't have 2 families with same slug, but diff users can FamilySchema.index({ userId: 1, slug: 1 }, { unique: true });
 
+// If a user can only own ONE family, we make userId unique.
+// If they can own multiple, we keep it as a standard index.
+FamilySchema.index({ userId: 1 });
 
 export default mongoose.models.Family || mongoose.model('Family', FamilySchema);

@@ -4,7 +4,7 @@
  */
 
 export type ResourceType = 'child' | 'chore' | 'daily-record';
-export type ActionType = 'read' | 'write' | 'create' | 'delete' | 'approve';
+export type ActionType = 'read' | 'update' | 'create' | 'delete' | 'approve';
 
 interface Permission {
    resource: ResourceType;
@@ -22,7 +22,7 @@ const PERMISSIONS: Permission[] = [
    // Child can write to their own record (before submission)
    {
       resource: 'daily-record',
-      action: 'write',
+      action: 'update',
       roles: ['child', 'parent', 'admin'],
    },
    // Only parents can approve
@@ -39,7 +39,7 @@ const PERMISSIONS: Permission[] = [
    },
    {
       resource: 'child',
-      action: 'write',
+      action: 'update',
       roles: ['parent', 'admin'],
    },
    {
@@ -60,7 +60,7 @@ const PERMISSIONS: Permission[] = [
    },
    {
       resource: 'chore',
-      action: 'write',
+      action: 'update',
       roles: ['parent', 'admin'],
    },
    {

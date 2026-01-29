@@ -1,7 +1,9 @@
 export interface IChore {
    _id: string;
    familyId: string;
+   childId?: string;
    taskName: string;
+   notes?: string;
    rewardAmount: number;
    isRecurring: boolean;
    intervalDays?: number;

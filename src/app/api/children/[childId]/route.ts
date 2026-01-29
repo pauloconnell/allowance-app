@@ -70,7 +70,7 @@ export async function PUT(
          session.userId,
          child.familyId.toString(),
          'child',
-         'write'
+         'update'
       );
       if (!canWrite) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

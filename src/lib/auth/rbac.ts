@@ -14,10 +14,9 @@ export type ResourceType =
  * Actions that can be performed on resources
  */
 export type Action =
+   'read'
    | 'create'
-   | 'read'
    | 'update'
-   | 'write'
    | 'delete'
    | 'complete'
    | 'approve';
@@ -34,12 +33,12 @@ const PERMISSIONS: Record<UserRole, Partial<Record<ResourceType, Action[]>>> = {
    parent: {
       child: ['read', 'create', 'update'],
       chore: ['read', 'create', 'update', 'delete'],
-      'daily-record': ['read', 'write', 'approve', 'create'],
+      'daily-record': ['read', 'create', 'update', 'complete', 'approve'],
    },
    child: {
       child: ['read'],
-      chore: ['read'],
-      'daily-record': ['read', 'write'],
+      chore: ['read', 'update'],
+      'daily-record': ['read', 'update', 'complete'],
    },
 };
 
@@ -58,7 +57,7 @@ export async function getUserRoleInFamily(
          familyId,
          isActive: true,
       }).lean();
-
+      console.log("Found family", userFamily)
       if (!userFamily) return null;
 
       return userFamily.role as UserRole;
@@ -77,11 +76,16 @@ export async function hasPermission(
    resource: ResourceType,
    action: Action
 ): Promise<boolean> {
+
+   console.log("Checking permission for user:", userId, "family:", familyId, "resource:", resource, "action:", action);
+
+
    // First: check UserFamily (parents)
    const role = await getUserRoleInFamily(userId, familyId);
-
+   console.log("Got role = ", role, resource, action)
    if (role) {
       const allowed = PERMISSIONS[role]?.[resource] ?? [];
+      console.log("Allowed actions:", allowed);
       return allowed.includes(action);
    }
 

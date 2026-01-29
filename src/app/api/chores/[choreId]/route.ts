@@ -11,7 +11,7 @@ import type { IChoreFormData } from '@/types/IChore';
  */
 export async function GET(
    req: NextRequest,
-   { params }: { params: { choreId: string } }
+   { params }: { params: Promise<{ choreId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -52,7 +52,7 @@ export async function GET(
  */
 export async function PUT(
    req: NextRequest,
-   { params }: { params: { choreId: string } }
+   { params }: { params: Promise<{ choreId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -60,17 +60,31 @@ export async function PUT(
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const chore = await Chore.findById(params.choreId);
+      const { choreId } = await params;
+
+      const chore = await Chore.findById(choreId);
       if (!chore) {
          return NextResponse.json({ error: 'Chore not found' }, { status: 404 });
       }
+
+
+      
+      console.log('RBAC Check:', {
+         choreId: chore._id,
+         familyString: chore.familyId.toString(),
+         user: session.userId,
+         family: chore.familyId.toString(),
+         resource: 'chore',
+         action: 'update'
+      });
+
 
       // RBAC: Check write permission
       const canWrite = await hasPermission(
          session.userId,
          chore.familyId.toString(),
          'chore',
-         'write'
+         'update'
       );
       if (!canWrite) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

@@ -3,6 +3,7 @@ import UserFamily from '@/models/UserFamily';
 import Family from '@/models/Family';
 import type { IUserFamily } from '@/types/IUserFamily';
 import type { IFamily } from '@/types/IFamily';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 
 /**
  * Fetch all families a user belongs to
@@ -20,26 +21,33 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
          .populate('familyId')
          .lean();
 
-         console.log("lib/actions got: userFamilies:", userFamilies);
+      console.log("lib/actions got: userFamilies:", userFamilies);
 
-      return userFamilies.map((uc: any) => ({
-         _id: uc.familyId._id.toString(),
-         name: uc.familyId.name,
-        // slug: uc.familyId.slug,
-         description: uc.familyId.description,
-         email: uc.familyId.email,
-         phone: uc.familyId.phone,
-         address: uc.familyId.address,
-         city: uc.familyId.city,
-         state: uc.familyId.state,
-         zipCode: uc.familyId.zipCode,
-         country: uc.familyId.country,
-         logo: uc.familyId.logo,
-         isActive: uc.familyId.isActive,
-         createdAt: uc.familyId.createdAt?.toISOString?.() ?? '',
-         updatedAt: uc.familyId.updatedAt?.toISOString?.() ?? '',
-         role: uc.role,
-      }));
+      return userFamilies.map((userFamily: any) => {
+
+         const normalizedFamily = normalizeRecord(userFamily.familyId);
+         // Return the family data PLUS the role from the link record
+         return {
+            ...normalizedFamily,
+            role: userFamily.role,
+         };
+         //    _id: uc.familyId._id.toString(),
+         //    name: uc.familyId.name,
+         //   // slug: uc.familyId.slug,
+         //    description: uc.familyId.description,
+         //    email: uc.familyId.email,
+         //    phone: uc.familyId.phone,
+         //    address: uc.familyId.address,
+         //    city: uc.familyId.city,
+         //    state: uc.familyId.state,
+         //    zipCode: uc.familyId.zipCode,
+         //    country: uc.familyId.country,
+         //    logo: uc.familyId.logo,
+         //    isActive: uc.familyId.isActive,
+         //    createdAt: uc.familyId.createdAt?.toISOString?.() ?? '',
+         //    updatedAt: uc.familyId.updatedAt?.toISOString?.() ?? '',
+         //    role: uc.role,
+      });
    } catch (error) {
       console.error('Failed to fetch user families:', error);
       return [];
@@ -84,24 +92,12 @@ export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & {
          .populate('familyId')
          .lean();
 
-      if (!userFamily) return null;
+      if (!userFamily || !userFamily.familyId) return null;
+
+      const normalizedFamily = normalizeRecord(userFamily.familyId);
 
       return {
-       //  _id: userFamily.familyId._id.toString(),
-         name: userFamily.familyId.name,
-        // slug: userFamily.familyId.slug,
-         description: userFamily.familyId.description,
-         email: userFamily.familyId?.email,
-         phone: userFamily.familyId.phone,
-         address: userFamily.familyId.address,
-         city: userFamily.familyId.city,
-         state: userFamily.familyId.state,
-         zipCode: userFamily.familyId.zipCode,
-         country: userFamily.familyId.country,
-         logo: userFamily.familyId.logo,
-         isActive: userFamily.familyId.isActive,
-         createdAt: userFamily.familyId.createdAt?.toISOString?.() ?? '',
-         updatedAt: userFamily.familyId.updatedAt?.toISOString?.() ?? '',
+         ...normalizedFamily,
          role: userFamily.role,
       };
    } catch (error) {
