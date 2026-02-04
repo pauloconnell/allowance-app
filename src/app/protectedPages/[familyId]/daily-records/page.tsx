@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAllChildren } from '@/lib/data/childService';
+import { getAllChildren  } from '@/lib/data/childService';
 import {
    getChildDailyRecords,
    getStartOfDay,
@@ -8,7 +8,8 @@ import {
 import type { IChild } from '@/types/IChild';
 import type { IRecord } from '@/types/IRecord';
 import { useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import ChildRecordStoreInitializer from '@/components/StoreInitializers/childRecordStoreInitializer';
+
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -21,20 +22,23 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    let children: IChild[] = [];
    let records: IRecord[] = [];
-   let selectedChild = null;
+  
 
    let errorMessage: string = '';
 
    try {
       children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
-
+   
       if (childId) {
-         selectedChild = children.find((c: any) => c.id === childId);
-         const targetDate = date ? new Date(date) : new Date();
-         const endDate = new Date(targetDate);
-         endDate.setDate(endDate.getDate() + 1);
+      //   selectedChild = children.find((c: any) => c.id === childId);
+         const startDate = date ? new Date(date) : new Date();
+         //const endDate = new Date(targetDate);
+         startDate.setDate(startDate.getMonth() - 1);
+        
 
-         records = await getChildDailyRecords(childId, familyId, targetDate, endDate);
+         records = await getChildDailyRecords(childId, familyId, startDate);
+      }else {
+          children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
       }
    } catch (err) {
       console.error('Failed to load data:', err);
@@ -68,6 +72,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
+        {childId?  <ChildRecordStoreInitializer childId={childId} familyId={familyId} records={records} errorMessage={errorMessage} /> : "" }
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Link
                   href={`/protectedPages/${familyId}/dashboard`}
@@ -106,7 +111,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                </div>
             </div>
 
-            {selectedChild && (
+            {childId && (
                <div className="space-y-8">
                   {/* Live Record Section */}
                   {isToday && (
@@ -214,7 +219,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                </div>
             )}
 
-            {!selectedChild && children.length === 0 && (
+            {!childId && children.length === 0 && (
                <div className="text-center py-12">
                   <p className="text-gray-500 mb-4">No children added yet</p>
                   <Link

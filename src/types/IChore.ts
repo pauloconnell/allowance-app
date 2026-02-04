@@ -30,6 +30,7 @@ export interface IDailyChore {
    parentAdjustedReward?: number; // Parent can override reward amount
    isOverridden: boolean;
    notes?: string;
+   completionDate?: Date | string;
 }
 
 /**

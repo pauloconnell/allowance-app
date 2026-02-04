@@ -318,9 +318,10 @@ export async function getChildDailyRecords(
    childId: string,
    familyId: string,
    startDate: Date,
-   endDate: Date
+   endDate?: Date
 ): Promise<IDailyRecord[]> {
-   const records = await DailyRecord.find({
+                                             // add in RBAC and userId validation later
+   const records = await DailyRecord.find({  
       childId,
       familyId,
       date: {
