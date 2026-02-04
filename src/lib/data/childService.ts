@@ -2,6 +2,8 @@ import { connectDB } from "../mongodb";
 import Child from "@/models/Child";
 import type { IChild } from "@/types/IChild";
 import mongoose from "mongoose";
+import { normalizeRecord } from "../utils/normalizeRecord";
+
 
 
 
@@ -25,14 +27,17 @@ export async function getChildById(childId: string, familyId?: string) {
 
   if (!child) return null;
 
+  // normalizeRecord handles the nested choresList and dates automatically
+  const normalized = normalizeRecord(child);
+
   return {
-    ...child,
-    _id: child._id.toString(),
-    familyId: child.familyId?.toString?.() ?? '',
-    childId: child.childId?.toString() ?? child._id.toString(),
-    createdAt: child.createdAt?.toISOString() ?? null,
-    updatedAt: child.updatedAt?.toISOString() ?? null,
-  };
+    ...normalized
+    // _id: child._id.toString(),
+    // familyId: child.familyId?.toString?.() ?? '',
+    // childId: child.childId?.toString() ?? child._id.toString(),
+    // createdAt: child.createdAt?.toISOString() ?? null,
+    // updatedAt: child.updatedAt?.toISOString() ?? null,
+  } as IChild;
 }
 
 export async function getAllChildren(familyId?: string) {
@@ -41,34 +46,20 @@ export async function getAllChildren(familyId?: string) {
   const query = familyId ? { familyId } : {};
   const children = await Child.find(query).lean();
 
-  return children.map((c) => ({
-    ...c,
-    id: c._id.toString(),
-    _id: c._id.toString(),
-    familyId: c.familyId?.toString?.() ?? c.familyId ?? '',
-    createdAt: c.createdAt?.toISOString() ?? null,
-    updatedAt: c.updatedAt?.toISOString() ?? null,
-  }));
+// Map through and normalize each child in the array
+  return children.map((c) => normalizeRecord(c)) as IChild[];
 }
 
-export async function createChild(data: Partial<IChild>): Promise<Partial<IChild>> {
+
+// note - this isn't used as API route creates child directly from schema
+export async function createChild(data: Partial<IChild>): Promise<{ success: boolean }>  {
   await connectDB();
 
   const c = await Child.create(data);
 
-  // Ensure childId is set
-  if (!c.childId) {
-    c.childId = c._id.toString();
-    await c.save();
-  }
 
-  return {
-    ...c.toObject(),
-    _id: c._id.toString(),
-    childId: c.childId.toString(),
-    createdAt: c.createdAt?.toISOString?.() ?? null,
-    updatedAt: c.updatedAt?.toISOString?.() ?? null,
-  };
+
+ return { success: true };
 }
 
 

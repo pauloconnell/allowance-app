@@ -17,12 +17,24 @@ export function normalizeRecord<T extends Record<string, any>>(doc: T) {
   if (obj.choreId) normalized.choreId = obj.choreId.toString();
   if (obj.userId) normalized.userId = obj.userId.toString();
 
-//  The "Light" Recursion: Handle nested arrays (like choresList)
-  for (const key in normalized) {
-    if (Array.isArray(normalized[key])) {
-      normalized[key] = normalized[key].map((item: any) => 
-        typeof item === 'object' && item !== null ? normalizeRecord(item) : item
+
+  // need to get into the choreList and normalize those too:
+for (const key in normalized) {
+    const value = normalized[key];
+
+    // Handle Dates (Next.js can't pass raw Date objects)
+    if (value instanceof Date) {
+      normalized[key] = value.toISOString();
+    } 
+    // Handle Nested Arrays (like choresList)
+    else if (Array.isArray(value)) {
+      normalized[key] = value.map(item => 
+        (typeof item === 'object' && item !== null) ? normalizeRecord(item) : item
       );
+    }
+    // Handle nested ObjectIds that aren't in our "keysToStringify" list
+    else if (value && value._bsontype === 'ObjectID') {
+      normalized[key] = value.toString();
     }
   }
 

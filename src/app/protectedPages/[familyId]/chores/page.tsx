@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import  ChoreManagementList  from '@/components/ChoreList/ChoreManagementList';
+import ChoreManagementList from '@/components/ChoreList/ChoreManagementList';
+import ChildDropdown from '@/components/ChoreList/ChildDropdown';
 import { getAllChores } from '@/lib/data/choreService';
 import { getChildById } from '@/lib/data/childService';
-import type { IChore } from '@/types/IChore';
-import type { IChild } from '@/types/IChild';
 
 interface PageProps {
   params: Promise<{ familyId: string }>;
@@ -14,14 +13,12 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
   const { familyId } = await params;
   const { childId } = await searchParams;
 
-  // Fetching Pool and Child simultaneously
   const [allChores, child] = await Promise.all([
     getAllChores(familyId),
-    childId ? getChildById(childId) : Promise.resolve(null)
+    childId ? getChildById(childId) : Promise.resolve(null),
   ]);
 
-  // Sort Master Pool Alphabetically
-  const sortedPool: IChore[] = [...(allChores || [])].sort((a, b) => 
+  const sortedPool = [...(allChores || [])].sort((a, b) => 
     a.taskName.localeCompare(b.taskName)
   );
 
@@ -39,32 +36,68 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
               ← Back to Dashboard
             </Link>
             <h1 className="text-3xl font-bold text-gray-900">
-              {child ? `Chore Assignments: ${child.name}` : 'Chore Library'}
+              {child ? `Assigning: ${child.name}` : 'Master Chore Library'}
             </h1>
           </div>
           
-          <Link
-            href={`/protectedPages/${familyId}/chores/new`}
-            className="inline-flex items-center justify-center bg-primary-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
-          >
-            + Create New Blueprint
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* 1. The Switcher */}
+            <ChildDropdown familyId={familyId} currentChildId={childId} />
+
+            {/* 2. The "Edit Master" Button (Active/Inactive state) */}
+            <Link
+              href={`/protectedPages/${familyId}/chores`}
+              className={`px-5 py-2.5 rounded-lg font-semibold transition-all border shadow-sm ${
+                !child 
+                ? 'bg-primary-50 border-primary-200 text-primary-700 ring-2 ring-primary-500/20' 
+                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              🛠️ Edit Master
+            </Link>
+
+            <Link
+              href={`/protectedPages/${familyId}/chores/new`}
+              className="bg-primary-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-primary-700 shadow-sm"
+            >
+              + New Blueprint
+            </Link>
+          </div>
         </div>
 
-        {child ? (
-          <ChoreManagementList 
-            allChores={sortedPool} 
-            child={child as IChild} 
-            familyId={familyId} 
-          />
-        ) : (
-          <div className="bg-white p-16 rounded-2xl shadow-sm text-center border-2 border-dashed border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Child Selected</h3>
-            <p className="text-gray-500 max-w-sm mx-auto">
-              Please return to the dashboard and select a child to manage their specific chores.
-            </p>
-          </div>
-        )}
+        <div className="space-y-10">
+          {child ? (
+            /* ASSIGNMENT MODE */
+            <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-primary-50 border border-primary-100 p-4 rounded-xl flex items-center justify-between mb-6">
+                <span className="text-primary-800 font-medium">
+                  Currently assigning chores to <strong>{child.name}</strong>
+                </span>
+                <Link href={`/protectedPages/${familyId}/chores`} className="text-xs font-bold uppercase tracking-widest text-primary-600 hover:text-primary-700">
+                  Done Assigning ✕
+                </Link>
+              </div>
+              <ChoreManagementList allChores={sortedPool} child={child} familyId={familyId} />
+            </section>
+          ) : (
+            /* LIBRARY MODE */
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedPool.map((chore) => (
+                <Link 
+                  key={chore.id} 
+                  href={`/protectedPages/${familyId}/chores/${chore._id}/`}
+                  className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary-300 hover:shadow-md transition-all"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600">{chore.taskName}</h3>
+                    <span className="text-gray-300 group-hover:text-primary-400">✎</span>
+                  </div>
+                  <p className="text-sm text-gray-500 line-clamp-2">{chore.taskName}</p>
+                </Link>
+              ))}
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );

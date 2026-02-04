@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       // Sanitize input based on Child schema
       const sanitized = sanitizeCreate(Vehicle, { ...body, familyId });
 
-      const vehicle = await createChild(sanitized);
+      const child = await createChild(sanitized);
 
       return NextResponse.json({ success: true }, { status: 201 });
    } catch (err) {

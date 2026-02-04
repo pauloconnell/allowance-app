@@ -9,42 +9,29 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 DONE pollie_db_user 
 
-DONE: we need a page for 'create work order' which essentially just uses the same 'service' form, but instead creates a work order instead of a service record
 
-DONE  need to be able to delete a work order => button on work order to 'convert to completed service record' which deletes the work order and saves as completed service record
-
-
-DONE : save work orders, retrieve work orders, mark complete and save as service record 
-DONE keep work orders seperate from service records - have state of open/completed - the api should only retrieve work orders that are open, seperate endpoint for 'completed' work orders - add in tech's name
-
-DONE: add Zustand - 
-DONE:work order store
-DONE=> vehicle store
-
-DONE: need name of vehicle saved into work order to tell which vehicle when dashboard showing list of all outstanding work orders
-
-
-DONE Review props interface in vehicle
-DONE Review editVehicle wrapper page?
 
 Next:
-Add loading spiner: dashboard
 
-Refactor: CardWorkOrder to have 'priority' dropdown to allow tech to prioritize work orders
+1 Create api/Family route to getAllChildren 
+2 zustand store gets all children from above api
+3 complete circle: useFamilyStore - fetchChildren used in ChildDropdown component
+Add loading spiner: dashboard - and all db actions
+
+Refactor: 
+- API should just call lib/data/services = 1 source of truth
+
 
 TODOD (nice to have):
-remove list of vehicles from work orders and 
+
 
 // ui dashboard
-=> move 'record service' into 'quick actions'
 
-/vehicles/
 
-add 'quick actions here too' just like record service
 
 
 // BUGS
--> Create work order Location: n/a isn't clickable
+
 
 
 
