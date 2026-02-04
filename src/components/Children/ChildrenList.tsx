@@ -2,14 +2,28 @@
 
 import Link from 'next/link';
 import type { IChild } from '@/types/IChild';
+import { toast } from "react-hot-toast";
+import { useEffect } from 'react';
 
 interface ChildrenListProps {
   children: IChild[];
   familyId: string;
+  errorMessage?: string;
 }
 
-export default function ChildrenList({ children, familyId }: ChildrenListProps) {
+export default function ChildrenList({ children, familyId, errorMessage}: ChildrenListProps) {
+  
+  useEffect(() => {
+    if (errorMessage && errorMessage.length > 0){
+      toast.error(errorMessage, {
+        id: 'child-fetch-error', // Unique ID prevents duplicates
+        duration: 4000,          // Stays for 4 seconds
+      });
+    }
+  }, [errorMessage]);
+  
   if (!children || children.length === 0) {
+
     return <p className="text-gray-500">No children found.</p>;
   }
 

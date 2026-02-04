@@ -11,12 +11,13 @@ interface PageProps {
 export default async function DashboardPage({ params }: PageProps) {
    const { familyId: familyId } = await params;
    let children = [];
-
+   let errorMessage = "";
    console.log("go get kids for familyId:", familyId);
    try {
       children = await getAllChildren(familyId);
    } catch (err) {
       console.error('Failed to load children:', err);
+       errorMessage = `Error getting children, error: ${err}`;
       return (
          <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
             <div className="bg-white rounded-xl shadow-lg p-8 text-center max-w-md">
@@ -117,7 +118,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      <span className="text-primary-600 font-semibold">👨‍👩‍👧</span>
                   </div>
                </div>
-               <ChildrenList children={children} familyId={familyId} />
+               <ChildrenList children={children} familyId={familyId} errorMessage={errorMessage} />
             </div>
          </div>
       </div>

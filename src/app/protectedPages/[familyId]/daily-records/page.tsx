@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import { getAllChildren } from '@/lib/data/childService';
-import { getChildDailyRecords, getStartOfDay, getEndOfDay } from '@/lib/data/dailyRecordService';
-import type { IChild } from "@/types/IChild";
-
+import {
+   getChildDailyRecords,
+   getStartOfDay,
+   getEndOfDay,
+} from '@/lib/data/dailyRecordService';
+import type { IChild } from '@/types/IChild';
+import type { IRecord } from '@/types/IRecord';
+import { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -12,28 +18,43 @@ interface PageProps {
 export default async function DailyRecordsPage({ params, searchParams }: PageProps) {
    const { familyId } = await params;
    const { childId, date } = await searchParams;
-   
-   let children:IChild[] = [];
-   let records:IRecord[] = [];
+
+   let children: IChild[] = [];
+   let records: IRecord[] = [];
    let selectedChild = null;
-   
+
+   let errorMessage: string = '';
+
    try {
-      children = await getAllChildren(familyId);
-      
+      children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
+
       if (childId) {
          selectedChild = children.find((c: any) => c.id === childId);
          const targetDate = date ? new Date(date) : new Date();
          const endDate = new Date(targetDate);
          endDate.setDate(endDate.getDate() + 1);
-         
+
          records = await getChildDailyRecords(childId, familyId, targetDate, endDate);
       }
    } catch (err) {
       console.error('Failed to load data:', err);
+      errorMessage = `Error getting children, error: ${err}`;
    }
 
+ 
+
+   if (!children || children.length === 0) {
+    return (
+      <div className="p-4">
+        <p className="text-gray-500">No children found.</p>
+   
+      </div>
+    );
+  }
+
    const today = new Date();
-   const isToday = !date || getStartOfDay(new Date(date)).getTime() === getStartOfDay(today).getTime();
+   const isToday =
+      !date || getStartOfDay(new Date(date)).getTime() === getStartOfDay(today).getTime();
    const todayRecord = records.find((r: any) => {
       const recordDate = new Date(r.date);
       return getStartOfDay(recordDate).getTime() === getStartOfDay(today).getTime();
@@ -58,12 +79,16 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                         key={child.id}
                         href={`/protectedPages/${familyId}/daily-records?childId=${child.id}`}
                         className={`p-4 border rounded-lg hover:bg-gray-50 ${
-                           childId === child.id ? 'border-primary-500 bg-primary-50' : 'border-gray-200'
+                           childId === child.id
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-200'
                         }`}
                      >
                         <h3 className="font-semibold">{child.name}</h3>
                         <p className="text-sm text-gray-600">Age {child.age}</p>
-                        <p className="text-sm text-gray-600">Balance: ${child.currentBalance}</p>
+                        <p className="text-sm text-gray-600">
+                           Balance: ${child.currentBalance}
+                        </p>
                      </Link>
                   ))}
                </div>
@@ -75,35 +100,45 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   {isToday && (
                      <div className="bg-white rounded-lg shadow-md p-6">
                         <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-semibold text-green-700">📅 Today's Record (Live)</h2>
+                           <h2 className="text-xl font-semibold text-green-700">
+                              📅 Today's Record (Live)
+                           </h2>
                            {!todayRecord && (
                               <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                                  Start Today's Record
                               </button>
                            )}
                         </div>
-                        
+
                         {todayRecord ? (
                            <div className="space-y-4">
                               <p className="text-sm text-gray-600">
-                                 Status: {todayRecord.status} | 
-                                 Submitted: {todayRecord.isSubmitted ? 'Yes' : 'No'} |
-                                 Approved: {todayRecord.isApproved ? 'Yes' : 'No'}
+                                 Status: {todayRecord.status} | Submitted:{' '}
+                                 {todayRecord.isSubmitted ? 'Yes' : 'No'} | Approved:{' '}
+                                 {todayRecord.isApproved ? 'Yes' : 'No'}
                               </p>
-                              
+
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 {todayRecord.choresList?.map((chore: any, index: number) => (
-                                    <div key={index} className="border rounded-lg p-4">
-                                       <h4 className="font-medium">{chore.taskName}</h4>
-                                       <p className="text-sm text-gray-600">Reward: ${chore.rewardAmount}</p>
-                                       <p className="text-sm">
-                                          Completion: {chore.completionStatus * 100}%
-                                       </p>
-                                       {chore.isOverridden && (
-                                          <p className="text-sm text-orange-600">Parent Override Applied</p>
-                                       )}
-                                    </div>
-                                 ))}
+                                 {todayRecord.choresList?.map(
+                                    (chore: any, index: number) => (
+                                       <div key={index} className="border rounded-lg p-4">
+                                          <h4 className="font-medium">
+                                             {chore.taskName}
+                                          </h4>
+                                          <p className="text-sm text-gray-600">
+                                             Reward: ${chore.rewardAmount}
+                                          </p>
+                                          <p className="text-sm">
+                                             Completion: {chore.completionStatus * 100}%
+                                          </p>
+                                          {chore.isOverridden && (
+                                             <p className="text-sm text-orange-600">
+                                                Parent Override Applied
+                                             </p>
+                                          )}
+                                       </div>
+                                    )
+                                 )}
                               </div>
                            </div>
                         ) : (
@@ -115,27 +150,38 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   {/* Historical Records */}
                   <div className="bg-white rounded-lg shadow-md p-6">
                      <h2 className="text-xl font-semibold mb-4">Record History</h2>
-                     
+
                      {records.length > 0 ? (
                         <div className="space-y-4">
                            {records.map((record: any) => {
                               const recordDate = new Date(record.date);
-                              const isLive = getStartOfDay(recordDate).getTime() === getStartOfDay(today).getTime();
-                              
+                              const isLive =
+                                 getStartOfDay(recordDate).getTime() ===
+                                 getStartOfDay(today).getTime();
+
                               return (
-                                 <div key={record.id} className={`border rounded-lg p-4 ${
-                                    isLive ? 'border-green-500 bg-green-50' : 'border-gray-200'
-                                 }`}>
+                                 <div
+                                    key={record.id}
+                                    className={`border rounded-lg p-4 ${
+                                       isLive
+                                          ? 'border-green-500 bg-green-50'
+                                          : 'border-gray-200'
+                                    }`}
+                                 >
                                     <div className="flex justify-between items-start">
                                        <div>
                                           <h3 className="font-medium">
                                              {recordDate.toLocaleDateString()}
-                                             {isLive && <span className="ml-2 text-green-600">(Live)</span>}
+                                             {isLive && (
+                                                <span className="ml-2 text-green-600">
+                                                   (Live)
+                                                </span>
+                                             )}
                                           </h3>
                                           <p className="text-sm text-gray-600">
-                                             Status: {record.status} | 
-                                             Chores: {record.choresList?.length || 0} |
-                                             Total: ${record.totalReward || 0}
+                                             Status: {record.status} | Chores:{' '}
+                                             {record.choresList?.length || 0} | Total: $
+                                             {record.totalReward || 0}
                                           </p>
                                        </div>
                                        <Link

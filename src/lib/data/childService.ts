@@ -1,15 +1,36 @@
 import { connectDB } from "../mongodb";
 import Child from "@/models/Child";
-import type { IChild } from "@/types/IChild";
+import type { IChild, IChildInput } from "@/types/IChild";
 import mongoose from "mongoose";
 import { normalizeRecord } from "../SharedFE-BE-Utils/normalizeRecord";
 import { hasPermission } from "@/lib/auth/rbac";
+import { getSession } from '@auth0/nextjs-auth0';
 
 
+/**
+ * INTERNAL HELPER: Centralized Security Check
+ * Checks Auth0 session and RBAC permissions.
+ */
+async function _validateAccess(familyId: string, action: 'read' | 'write' | 'delete' = 'read') {
+  const session = await getSession();
+  if (!session?.user) throw new Error("NOT_LOGGED_IN");
+
+  const userId = session.user.sub;
+  if (!familyId) throw new Error("FAMILY_ID_REQUIRED");
+
+  const allowed = await hasPermission(userId, familyId, 'child', action);
+  if (!allowed) throw new Error("UNAUTHORIZED_ACCESS");
+
+  return { userId, session };
+}
 
 
-export async function getChildById(childId: string, familyId?: string) {
+export async function getChildById(childId: string, familyId: string) {
   await connectDB();
+
+
+  // 1. Security Check (Includes Session and RBAC)
+  await _validateAccess(familyId, 'read');
 
   // Security: ensure validId sent
   if (!mongoose.isValidObjectId(childId)) {
@@ -41,22 +62,16 @@ export async function getChildById(childId: string, familyId?: string) {
   } as IChild;
 }
 
-export async function getAllChildren(familyId : string, userId: string) {
+export async function getAllChildren(familyId : string, userId?: string) {
   await connectDB();
 
-// If no familyId is provided, we probably shouldn't return anything for security
-  if (!familyId || !userId) {
-    throw new Error("Family ID and userId is required for access control.");
-  }
 
-  //RBAC: Ensure this user has permission to view children in this family
-  const canRead = await hasPermission(userId, familyId, 'child', 'read');
 
-  if (!canRead) {
-    // We throw a generic error here; the API route will catch it 
-    // and turn it into a 403 Forbidden response.
-    throw new Error("UNAUTHORIZED_ACCESS");
-  }
+  // 1. Run the security check
+  await _validateAccess(familyId, 'read');
+
+
+ 
 
 
   const query = familyId ? { familyId } : {};
@@ -68,8 +83,11 @@ export async function getAllChildren(familyId : string, userId: string) {
 
 
 // note - this isn't used as API route creates child directly from schema
-export async function createChild(data: Partial<IChild>): Promise<{ success: boolean }>  {
+export async function createChild(data: IChildInput): Promise<{ success: boolean }>  {
   await connectDB();
+
+  // 1. Check for 'write' permission
+  await _validateAccess(data.familyId, 'write');
 
   const c = await Child.create(data);
 

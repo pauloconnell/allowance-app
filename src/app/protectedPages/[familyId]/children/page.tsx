@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ChildrenList from '@/components/Children/ChildrenList';
 import { getSession } from '@auth0/nextjs-auth0'; // The Server-side helper
 import type { IChild } from '@/types/IChild';
+import { hasPermission } from '@/lib/auth/rbac';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -11,27 +12,25 @@ interface PageProps {
 export default async function ChildrenPage({ params }: PageProps) {
    const { familyId } = await params;
 
-// 1. Grab the session directly from the server-side request
-  const session = await getSession();
-
-  // 2. If no session exists, the user isn't logged in
-  if (!session || !session.user) {
-    // You can return a "Please Log In" message or redirect
-    return <div>Access Denied. Please log in.</div>;
-  }
-
-  // 3. Extract the unique ID (sub)
-  const userId = session.user.sub;
-
-
-
 
    let children:IChild[] = [];
+   let errorMessage:string = "";
    try {
-      children = await getAllChildren(familyId, userId);
+      children = await getAllChildren(familyId);    // this function gets userId checks RBAC, and fails or returns data
    } catch (err) {
       console.error('Failed to load children:', err);
+      errorMessage=`Error getting children, error: ${err}`;
+
    }
+
+   if (!children || children.length === 0) {
+    return (
+      <div className="p-4">
+        <p className="text-gray-500">No children found.</p>
+        {/* The toast will still appear even if we show this 'empty' UI */}
+      </div>
+    );
+  }
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
@@ -54,7 +53,7 @@ export default async function ChildrenPage({ params }: PageProps) {
                   Add Child
                </Link>
             </div>
-            <ChildrenList children={children} familyId={familyId} />
+            <ChildrenList children={children} familyId={familyId} errorMessage={errorMessage} />
 
             {children.length === 0 && (
                <div className="text-center py-12">
