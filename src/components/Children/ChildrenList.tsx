@@ -6,14 +6,14 @@ import { toast } from "react-hot-toast";
 import { useEffect } from 'react';
 
 interface ChildrenListProps {
-  children: IChild[];
+  children: IChild[];           // use props instead of store as component is only used on pages where it gets data directly in props
   familyId: string;
   errorMessage?: string;
 }
 
-export default function ChildrenList({ children, familyId, errorMessage}: ChildrenListProps) {
+export default function ChildrenList({ children, familyId, errorMessage}: ChildrenListProps) {    
   
-  useEffect(() => {
+  useEffect(() => {                   // the errorMessage is thrown if server fails to get children data -> but zustand could still already have data and user can just carry
     if (errorMessage && errorMessage.length > 0){
       toast.error(errorMessage, {
         id: 'child-fetch-error', // Unique ID prevents duplicates
@@ -21,6 +21,8 @@ export default function ChildrenList({ children, familyId, errorMessage}: Childr
       });
     }
   }, [errorMessage]);
+
+  
   
   if (!children || children.length === 0) {
 

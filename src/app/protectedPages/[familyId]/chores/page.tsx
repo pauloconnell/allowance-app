@@ -2,7 +2,8 @@ import Link from 'next/link';
 import ChoreManagementList from '@/components/ChoreList/ChoreManagementList';
 import ChildDropdown from '@/components/ChoreList/ChildDropdown';
 import { getAllChores } from '@/lib/data/choreService';
-import { getChildById } from '@/lib/data/childService';
+import { getChildById, getAllChildren } from '@/lib/data/childService';
+import FamilyStoreInitializer from '@/components/StoreInitializers/FamilyStoreInitializer';
 
 interface PageProps {
   params: Promise<{ familyId: string }>;
@@ -13,9 +14,11 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
   const { familyId } = await params;
   const { childId } = await searchParams;
 
-  const [allChores, child] = await Promise.all([
+  const [allChores, children, child] = await Promise.all([
     getAllChores(familyId),
+    getAllChildren(familyId),
     childId ? getChildById(childId, familyId) : Promise.resolve(null),
+
   ]);
 
   const sortedPool = [...(allChores || [])].sort((a, b) => 
@@ -23,7 +26,9 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
   );
 
   return (
+
     <div className="min-h-screen bg-gray-50/50">
+        <FamilyStoreInitializer familyId={familyId} children={children}  />
       <div className="max-w-5xl mx-auto px-4 py-8">
         
         {/* Header Section */}
@@ -45,7 +50,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
             <ChildDropdown familyId={familyId} currentChildId={childId? childId : ""} />
 
             {/* 2. The "Edit Master" Button (Active/Inactive state) */}
-            <Link
+            { childId ? <Link
               href={`/protectedPages/${familyId}/chores`}
               className={`px-5 py-2.5 rounded-lg font-semibold transition-all border shadow-sm ${
                 !child 
@@ -53,14 +58,14 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
                 : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              🛠️ Edit Master
-            </Link>
+              🛠️ Edit Master Chores
+            </Link>: ""}
 
             <Link
               href={`/protectedPages/${familyId}/chores/new`}
               className="bg-primary-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-primary-700 shadow-sm"
             >
-              + New Blueprint
+              + New Family Master Chore
             </Link>
           </div>
         </div>

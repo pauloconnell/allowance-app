@@ -4,6 +4,7 @@ import ChildrenList from '@/components/Children/ChildrenList';
 import { getSession } from '@auth0/nextjs-auth0'; // The Server-side helper
 import type { IChild } from '@/types/IChild';
 import { hasPermission } from '@/lib/auth/rbac';
+import FamilyStoreInitializer from '@/components/StoreInitializers/FamilyStoreInitializer';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -34,6 +35,7 @@ export default async function ChildrenPage({ params }: PageProps) {
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
+         <FamilyStoreInitializer familyId={familyId} children={children} />
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div>
                <Link
@@ -53,7 +55,7 @@ export default async function ChildrenPage({ params }: PageProps) {
                   Add Child
                </Link>
             </div>
-            <ChildrenList children={children} familyId={familyId} errorMessage={errorMessage} />
+            <ChildrenList  familyId={familyId} errorMessage={errorMessage} />
 
             {children.length === 0 && (
                <div className="text-center py-12">

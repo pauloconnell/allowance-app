@@ -1,6 +1,7 @@
 import ServiceDue from '@/components/ServiceDue/ServiceDue';
 import { getAllChildren } from '@/lib/data/childService';
 import ChildrenList from '@/components/Children/ChildrenList';
+import FamilyStoreInitializer from '@/components/StoreInitializers/FamilyStoreInitializer';
 
 import Link from 'next/link';
 
@@ -32,6 +33,7 @@ export default async function DashboardPage({ params }: PageProps) {
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
+         <FamilyStoreInitializer children={children} familyId={familyId} />
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12">
