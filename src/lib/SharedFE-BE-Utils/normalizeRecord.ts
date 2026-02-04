@@ -1,5 +1,14 @@
+
+// this runs on both FE and BE, so must not use Mongoose imports...
+
+
 // this normalizes chore, daily record, and child records for use in frontend
 // ie we use id's in URLs in the frontend - params must be strings, not ObjectId types
+
+
+
+
+
 
 export function normalizeRecord<T extends Record<string, any>>(doc: T) {
   //  Convert Mongoose to Plain Object

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
-import { normalizeRecord } from '@/lib/utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import { connectDB } from '@/lib/mongodb';
 
 interface PageProps {

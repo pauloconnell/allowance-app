@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { sanitizeCreate } from '@/lib/utils/sanitizeCreate';
-import { normalizeRecord } from '@/lib/utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import Chore from '@/models/Chore';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';

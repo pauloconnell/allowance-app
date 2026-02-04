@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import Child from '@/models/Child';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
-import { normalizeRecord } from '@/lib/utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import type { IChildFormData } from '@/types/IChild';
 
 /**

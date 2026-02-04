@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { IChild } from '@/types/IChild';
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 
 interface FamilySummary {
   _id: string;
@@ -40,8 +41,9 @@ export const useFamilyStore = create<FamilyState>((set, get) => ({
 
     set({ childrenLoading: true });
     try {
-      const res = await fetch(`/api/${familyId}/children`);
-      const data = await res.json();
+      const res = await fetch(`/api/children?familyId=${familyId}`);
+      let data = await res.json();
+      data = normalizeRecord(data);
       set({ children: data, childrenLoading: false });
     } catch (error) {
       console.error("Failed to fetch children:", error);

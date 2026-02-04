@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getAllChildren } from '@/lib/data/childService';
 import { getChildDailyRecords, getStartOfDay, getEndOfDay } from '@/lib/data/dailyRecordService';
+import type { IChild } from "@/types/IChild";
+
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -11,8 +13,8 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    const { familyId } = await params;
    const { childId, date } = await searchParams;
    
-   let children = [];
-   let records = [];
+   let children:IChild[] = [];
+   let records:IRecord[] = [];
    let selectedChild = null;
    
    try {

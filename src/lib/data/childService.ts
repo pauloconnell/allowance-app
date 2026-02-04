@@ -2,7 +2,8 @@ import { connectDB } from "../mongodb";
 import Child from "@/models/Child";
 import type { IChild } from "@/types/IChild";
 import mongoose from "mongoose";
-import { normalizeRecord } from "../utils/normalizeRecord";
+import { normalizeRecord } from "../SharedFE-BE-Utils/normalizeRecord";
+import { hasPermission } from "@/lib/auth/rbac";
 
 
 
@@ -40,8 +41,23 @@ export async function getChildById(childId: string, familyId?: string) {
   } as IChild;
 }
 
-export async function getAllChildren(familyId?: string) {
+export async function getAllChildren(familyId : string, userId: string) {
   await connectDB();
+
+// If no familyId is provided, we probably shouldn't return anything for security
+  if (!familyId || !userId) {
+    throw new Error("Family ID and userId is required for access control.");
+  }
+
+  //RBAC: Ensure this user has permission to view children in this family
+  const canRead = await hasPermission(userId, familyId, 'child', 'read');
+
+  if (!canRead) {
+    // We throw a generic error here; the API route will catch it 
+    // and turn it into a 403 Forbidden response.
+    throw new Error("UNAUTHORIZED_ACCESS");
+  }
+
 
   const query = familyId ? { familyId } : {};
   const children = await Child.find(query).lean();

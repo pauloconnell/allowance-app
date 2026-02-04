@@ -3,7 +3,7 @@ import Chore from "@/models/Chore";
 import Child from "@/models/Child";
 import mongoose from "mongoose";
 import { IChore } from "@/types/IChore";
-import { normalizeRecord }  from "@/lib/utils/normalizeRecord"; //
+import { normalizeRecord }  from "@/lib/SharedFE-BE-Utils/normalizeRecord"; //
 
 export async function createChore(data: Partial<IChore>): Promise<IChore> {
   await connectDB();

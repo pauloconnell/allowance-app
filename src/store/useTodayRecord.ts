@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { normalizeRecord } from '@/lib/utils/normalizeRecord'; // Keeping logic consistent with backend
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord'; // Keeping logic consistent with backend
 
 interface IChoreSnapshot {
   choreId: string;

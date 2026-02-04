@@ -4,7 +4,7 @@ import WorkOrder from '@/models/WorkOrder';
 import { IWorkOrder } from '@/types/IWorkOrder';
 import { sanitizeCreate } from '@/lib/utils/sanitizeCreate';
 import { sanitizeUpdate } from '@/lib/utils/sanitizeUpdate';
-import { normalizeRecord } from '@/lib/utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import { getAuthSession, unauthenticatedResponse, validationErrorResponse } from '@/lib/auth/auth';
 import { hasPermission, assertPermission } from '@/lib/auth/rbac';
 import mongoose from 'mongoose';

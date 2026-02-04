@@ -13,7 +13,7 @@ DONE pollie_db_user
 
 Next:
 
-1 Create api/Family route to getAllChildren 
+1 DONE: api/Children/get?FamilyId  POST -> create child (Create api/Family route to getAllChildren )
 2 zustand store gets all children from above api
 3 complete circle: useFamilyStore - fetchChildren used in ChildDropdown component
 Add loading spiner: dashboard - and all db actions
