@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAllChildren  } from '@/lib/data/childService';
+import { getAllChildren } from '@/lib/data/childService';
 import {
    getChildDailyRecords,
    getStartOfDay,
@@ -9,7 +9,7 @@ import type { IChild } from '@/types/IChild';
 import type { IRecord } from '@/types/IRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/childRecordStoreInitializer';
-
+import { isSameDay } from '@/lib/utils/dateHelper';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -22,64 +22,67 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    let children: IChild[] = [];
    let records: IRecord[] = [];
-  
 
    let errorMessage: string = '';
 
    try {
       children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
-   
+
       if (childId) {
-      //   selectedChild = children.find((c: any) => c.id === childId);
+         //   selectedChild = children.find((c: any) => c.id === childId);
          const startDate = date ? new Date(date) : new Date();
          //const endDate = new Date(targetDate);
          startDate.setDate(startDate.getMonth() - 1);
-        
 
-         records = await getChildDailyRecords(childId, familyId, startDate);
-      }else {
-          children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
+         records = await getChildDailyRecords(childId, familyId, startDate);           // note 'todaysRecord' lives in client store only - in server its just records[0]
+      } else {
+         children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
       }
    } catch (err) {
       console.error('Failed to load data:', err);
       errorMessage = `Error getting children, error: ${err}`;
    }
 
- 
+   // determine if viewing today's record
+   const today = new Date();
+   let isTodaysRecord=false;
+   if (records.length > 0) {
+      isTodaysRecord = isSameDay(records[0].date, today);
+   }
 
    if (!children || children.length === 0) {
-    return (
-      <div className="p-4">
-           <Link
-                  href={`/protectedPages/${familyId}/dashboard`}
-                  className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
-               >
-                  ← Back to Dashboard
-               </Link>
-        <p className="text-gray-500">No children found.</p>
-   
-      </div>
-    );
-  }
-
-   const today = new Date();
-   const isToday =
-      !date || getStartOfDay(new Date(date)).getTime() === getStartOfDay(today).getTime();
-   const todayRecord = records.find((r: any) => {
-      const recordDate = new Date(r.date);
-      return getStartOfDay(recordDate).getTime() === getStartOfDay(today).getTime();
-   });
+      return (
+         <div className="p-4">
+            <Link
+               href={`/protectedPages/${familyId}/dashboard`}
+               className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
+            >
+               ← Back to Dashboard
+            </Link>
+            <p className="text-gray-500">No children found.</p>
+         </div>
+      );
+   }
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
-        {childId?  <ChildRecordStoreInitializer childId={childId} familyId={familyId} records={records} errorMessage={errorMessage} /> : "" }
+         {childId ? (
+            <ChildRecordStoreInitializer
+               childId={childId}
+               familyId={familyId}
+               records={records}
+               errorMessage={errorMessage}
+            />
+         ) : (
+            ''
+         )}
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <Link
-                  href={`/protectedPages/${familyId}/dashboard`}
-                  className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
-               >
-                  ← Back to Dashboard
-               </Link>
+            <Link
+               href={`/protectedPages/${familyId}/dashboard`}
+               className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
+            >
+               ← Back to Dashboard
+            </Link>
             <div className="mb-8">
                <h1 className="text-3xl font-bold text-secondary-900">Daily Records</h1>
                <p className="text-secondary-600 mt-2">
@@ -89,7 +92,8 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
             {/* Child Selector */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-               <h2 className="text-xl font-semibold mb-4">Select Child</h2>
+
+               <h2 className="text-xl font-semibold mb-4">Selected Child  {childId? "":": None"}</h2>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {children.map((child: any) => (
                      <Link
@@ -114,29 +118,40 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
             {childId && (
                <div className="space-y-8">
                   {/* Live Record Section */}
-                  {isToday && (
+                 
                      <div className="bg-white rounded-lg shadow-md p-6">
                         <div className="flex justify-between items-center mb-4">
                            <h2 className="text-xl font-semibold text-green-700">
                               📅 Today's Record (Live)
                            </h2>
-                           {!todayRecord && (
-                              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                           {!isTodaysRecord && (
+                              <Link
+                                 href={`/protectedPages/${familyId}/daily-records/`}
+                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              >
                                  Start Today's Record
-                              </button>
+                              </Link>
+                           )}
+                           {isTodaysRecord && (
+                              <Link
+                                 href={`/protectedPages/${familyId}/daily-records/${records[0].id}`}
+                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              >
+                                 Continue Today's Record
+                              </Link>
                            )}
                         </div>
 
-                        {todayRecord ? (
+                        {isTodaysRecord ? (
                            <div className="space-y-4">
                               <p className="text-sm text-gray-600">
-                                 Status: {todayRecord.status} | Submitted:{' '}
-                                 {todayRecord.isSubmitted ? 'Yes' : 'No'} | Approved:{' '}
-                                 {todayRecord.isApproved ? 'Yes' : 'No'}
+                                 Status: {records[0].status} | Submitted:{' '}
+                                 {records[0].isSubmitted ? 'Yes' : 'No'} | Approved:{' '}
+                                 {records[0].isApproved ? 'Yes' : 'No'}
                               </p>
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 {todayRecord.choresList?.map(
+                                 {records[0].choresList?.map(
                                     (chore: any, index: number) => (
                                        <div key={index} className="border rounded-lg p-4">
                                           <h4 className="font-medium">
@@ -162,7 +177,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                            <p className="text-gray-500">No record started for today</p>
                         )}
                      </div>
-                  )}
+                  
 
                   {/* Historical Records */}
                   <div className="bg-white rounded-lg shadow-md p-6">
