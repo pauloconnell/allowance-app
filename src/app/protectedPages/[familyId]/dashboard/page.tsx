@@ -115,7 +115,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      </p>
                   </div>
                   <div className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-lg">
-                     <span className="text-primary-600 font-semibold">👨‍👩‍👧</span>
+                     <Link href={`/protectedPages/${familyId}/children`}><span className="text-primary-600 font-semibold">👨‍👩‍👧</span></Link>
                   </div>
                </div>
                <ChildrenList children={children} familyId={familyId} errorMessage={errorMessage} />

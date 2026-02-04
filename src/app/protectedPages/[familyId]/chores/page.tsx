@@ -15,7 +15,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
 
   const [allChores, child] = await Promise.all([
     getAllChores(familyId),
-    childId ? getChildById(childId) : Promise.resolve(null),
+    childId ? getChildById(childId, familyId) : Promise.resolve(null),
   ]);
 
   const sortedPool = [...(allChores || [])].sort((a, b) => 
@@ -42,7 +42,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
           
           <div className="flex flex-wrap items-center gap-3">
             {/* 1. The Switcher */}
-            <ChildDropdown familyId={familyId} currentChildId={childId} />
+            <ChildDropdown familyId={familyId} currentChildId={childId? childId : ""} />
 
             {/* 2. The "Edit Master" Button (Active/Inactive state) */}
             <Link
@@ -84,7 +84,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedPool.map((chore) => (
                 <Link 
-                  key={chore.id} 
+                  key={chore._id} 
                   href={`/protectedPages/${familyId}/chores/${chore._id}/`}
                   className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-primary-300 hover:shadow-md transition-all"
                 >
