@@ -36,6 +36,7 @@ export async function POST(
 
     if (action === 'assign') {
       const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to start of day
       //  Fetch the Master Chore to get the source-of-truth settings
       const masterChore = await Chore.findById(choreObjectId);
 
@@ -53,8 +54,8 @@ export async function POST(
       console.log("Master Chore:", masterChore, choreObjectId);
       // normalize Master chore: -strip _id so child's choreList can have it's own unique id
       let {_id, __v, createdAt, updatedAt, ...safeMasterChore} = masterChore.toObject();
-      let nextDate = new Date(today);
-      nextDate.setDate(today.getDate() + (masterChore.intervalDays || 1));
+      let dueDate = new Date(today);
+      dueDate.setDate(today.getDate() + (masterChore.intervalDays || 1));
       await Child.findOneAndUpdate(
         { _id: childId, "choresList.choreId": { $ne: choreObjectId } },
         {
@@ -63,7 +64,6 @@ export async function POST(
               ...safeMasterChore,           // Clones name, reward, interval, isRecurring, etc.
               choreId: choreId, // Explicitly link back to master
               dueDate: today,
-              nextDue: nextDate,    // Schedule our next one
               isActive: true,         // Instance-specific tracking
               completionStatus: 0,    // Reset tracking
               rewardEarned: 0,        // Reset tracking
