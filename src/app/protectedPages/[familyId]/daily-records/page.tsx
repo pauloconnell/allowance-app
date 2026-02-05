@@ -1,15 +1,18 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getAllChildren } from '@/lib/data/childService';
 import {
    getChildDailyRecords,
    getStartOfDay,
    getEndOfDay,
+   getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import type { IChild } from '@/types/IChild';
 import type { IRecord } from '@/types/IRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/childRecordStoreInitializer';
 import { isSameDay } from '@/lib/utils/dateHelper';
+
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -24,6 +27,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    let records: IRecord[] = [];
 
    let errorMessage: string = '';
+   let successMessage: string = '';
 
    try {
       children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
@@ -34,7 +38,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          //const endDate = new Date(targetDate);
          startDate.setDate(startDate.getMonth() - 1);
 
-         records = await getChildDailyRecords(childId, familyId, startDate);           // note 'todaysRecord' lives in client store only - in server its just records[0]
+         records = await getChildDailyRecords(childId, familyId, startDate); // note 'todaysRecord' lives in client store only - in server its just records[0]
       } else {
          children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
       }
@@ -45,10 +49,29 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    // determine if viewing today's record
    const today = new Date();
-   let isTodaysRecord=false;
+   let isTodaysRecord = false;
    if (records.length > 0) {
       isTodaysRecord = isSameDay(records[0].date, today);
    }
+
+   // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
+   const handleCreateRecordForToday = async () => {
+      'use server';  // need this to use redirect (can't use router.push on server either)
+      if (!childId) return;
+      let newId: string = '';
+      try {
+         console.log("Created new record for today:");
+         let newRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
+         
+         newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
+         newId=newRecord._id;
+         console.log("Created new record for today:", newRecord);
+        
+      } catch (err) {
+         console.error('Error creating new daily record:', err);
+      }
+       redirect(`/protectedPages/${familyId}/daily-records/${newId}`);
+   };
 
    if (!children || children.length === 0) {
       return (
@@ -92,8 +115,9 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
             {/* Child Selector */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-
-               <h2 className="text-xl font-semibold mb-4">Selected Child  {childId? "":": None"}</h2>
+               <h2 className="text-xl font-semibold mb-4">
+                  Selected Child {childId ? '' : ': None'}
+               </h2>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {children.map((child: any) => (
                      <Link
@@ -118,66 +142,63 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
             {childId && (
                <div className="space-y-8">
                   {/* Live Record Section */}
-                 
-                     <div className="bg-white rounded-lg shadow-md p-6">
-                        <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-semibold text-green-700">
-                              📅 Today's Record (Live)
-                           </h2>
-                           {!isTodaysRecord && (
-                              <Link
-                                 href={`/protectedPages/${familyId}/daily-records/`}
+
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                     <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold text-green-700">
+                           📅 Today's Record (Live)
+                        </h2>
+                        {!isTodaysRecord && (
+                           <form action={handleCreateRecordForToday}>
+                              <button
+                                 type="submit"
                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                               >
                                  Start Today's Record
-                              </Link>
-                           )}
-                           {isTodaysRecord && (
-                              <Link
-                                 href={`/protectedPages/${familyId}/daily-records/${records[0].id}`}
-                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                              >
-                                 Continue Today's Record
-                              </Link>
-                           )}
-                        </div>
-
-                        {isTodaysRecord ? (
-                           <div className="space-y-4">
-                              <p className="text-sm text-gray-600">
-                                 Status: {records[0].status} | Submitted:{' '}
-                                 {records[0].isSubmitted ? 'Yes' : 'No'} | Approved:{' '}
-                                 {records[0].isApproved ? 'Yes' : 'No'}
-                              </p>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 {records[0].choresList?.map(
-                                    (chore: any, index: number) => (
-                                       <div key={index} className="border rounded-lg p-4">
-                                          <h4 className="font-medium">
-                                             {chore.taskName}
-                                          </h4>
-                                          <p className="text-sm text-gray-600">
-                                             Reward: ${chore.rewardAmount}
-                                          </p>
-                                          <p className="text-sm">
-                                             Completion: {chore.completionStatus * 100}%
-                                          </p>
-                                          {chore.isOverridden && (
-                                             <p className="text-sm text-orange-600">
-                                                Parent Override Applied
-                                             </p>
-                                          )}
-                                       </div>
-                                    )
-                                 )}
-                              </div>
-                           </div>
-                        ) : (
-                           <p className="text-gray-500">No record started for today</p>
+                              </button>
+                           </form>
+                        )}
+                        {isTodaysRecord && (
+                           <Link
+                              href={`/protectedPages/${familyId}/daily-records/${records[0]._id}`}
+                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                           >
+                              Continue Today's Record
+                           </Link>
                         )}
                      </div>
-                  
+
+                     {isTodaysRecord ? (
+                        <div className="space-y-4">
+                           <p className="text-sm text-gray-600">
+                              Status: {records[0].status} | Submitted:{' '}
+                              {records[0].isSubmitted ? 'Yes' : 'No'} | Approved:{' '}
+                              {records[0].isApproved ? 'Yes' : 'No'}
+                           </p>
+
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {records[0].choresList?.map((chore: any, index: number) => (
+                                 <div key={index} className="border rounded-lg p-4">
+                                    <h4 className="font-medium">{chore.taskName}</h4>
+                                    <p className="text-sm text-gray-600">
+                                       Reward: ${chore.rewardAmount}
+                                    </p>
+                                    <p className="text-sm">
+                                       Completion: {chore.completionStatus * 100}%
+                                    </p>
+                                    {chore.isOverridden && (
+                                       <p className="text-sm text-orange-600">
+                                          Parent Override Applied
+                                       </p>
+                                    )}
+                                 </div>
+                              ))}
+                           </div>
+                        </div>
+                     ) : (
+                        <p className="text-gray-500">No record started for today</p>
+                     )}
+                  </div>
 
                   {/* Historical Records */}
                   <div className="bg-white rounded-lg shadow-md p-6">
@@ -193,7 +214,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
                               return (
                                  <div
-                                    key={record.id}
+                                    key={record._id}
                                     className={`border rounded-lg p-4 ${
                                        isLive
                                           ? 'border-green-500 bg-green-50'

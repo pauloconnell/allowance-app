@@ -57,7 +57,7 @@ export async function getUserRoleInFamily(
          familyId,
          isActive: true,
       }).lean();
-      console.log("Found family", userFamily)
+      //console.log("Found family", userFamily)
       if (!userFamily) return null;
 
       return userFamily.role as UserRole;

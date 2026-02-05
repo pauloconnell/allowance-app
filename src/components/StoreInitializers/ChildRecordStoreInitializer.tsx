@@ -15,6 +15,7 @@ export default function ChildRecordStoreInitializer({
    familyId,
    records,
    errorMessage,
+   
 }: {
    childId: string;
    familyId: string;
@@ -43,6 +44,12 @@ export default function ChildRecordStoreInitializer({
          toast.error(errorMessage);
       }
    }, [errorMessage]);
+   //    // Fire toast AFTER render phase to avoid SSR issues
+   // useEffect(() => {
+   //    if (successMessage) {
+   //       toast.success(successMessage);
+   //    }
+   // }, [successMessage]);
 
    return null;
 }

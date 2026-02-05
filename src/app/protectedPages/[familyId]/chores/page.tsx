@@ -72,7 +72,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
 
         <div className="space-y-10">
           {child ? (
-            /* ASSIGNMENT MODE */
+            /* ASSIGNMENT MODE  (child must be selected) */
             <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="bg-primary-50 border border-primary-100 p-4 rounded-xl flex items-center justify-between mb-6">
                 <span className="text-primary-800 font-medium">
@@ -85,7 +85,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
               <ChoreManagementList allChores={sortedPool} child={child} familyId={familyId} />
             </section>
           ) : (
-            /* LIBRARY MODE */
+            /* LIBRARY MODE  aka EDIT mode*/
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedPool.map((chore) => (
                 <Link 
@@ -97,7 +97,9 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
                     <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600">{chore.taskName}</h3>
                     <span className="text-gray-300 group-hover:text-primary-400">✎</span>
                   </div>
-                  <p className="text-sm text-gray-500 line-clamp-2">{chore.taskName}</p>
+                  <p className="text-sm text-gray-500 line-clamp-2">{chore.isRecurring ? `Repeats: every ${chore.intervalDays} days`: ''}</p>
+                  <p className="text-sm text-gray-500 line-clamp-2">{chore.notes}</p>
+                  <p className="text-sm text-gray-500 line-clamp-2">Reward: ${chore.rewardAmount}</p>
                 </Link>
               ))}
             </section>

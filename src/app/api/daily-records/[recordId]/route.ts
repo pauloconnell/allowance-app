@@ -16,7 +16,7 @@ import Child from '@/models/Child';
  */
 export async function GET(
    req: NextRequest,
-   { params }: { params: Promise<{ id: string }> }
+   { params }: { params: Promise<{ recordId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -24,8 +24,8 @@ export async function GET(
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { id } = await params;
-      const dailyRecord = await DailyRecord.findById(id);
+      const { recordId } = await params;
+      const dailyRecord = await DailyRecord.findById(recordId);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
       }
@@ -40,6 +40,9 @@ export async function GET(
       if (!canRead) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
+
+
+      
 
       const normalized = normalizeRecord(dailyRecord.toObject());
       return NextResponse.json(normalized);
@@ -59,7 +62,7 @@ export async function GET(
  */
 export async function PUT(
    req: NextRequest,
-   { params }: { params: Promise<{ id: string }> }
+   { params }: { params: Promise<{ recordId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -69,9 +72,9 @@ export async function PUT(
 
       const body = await req.json();
       const { action } = body;
-      const { id } = await params;
+      const { recordId } = await params;
 
-      const dailyRecord = await DailyRecord.findById(id);
+      const dailyRecord = await DailyRecord.findById(recordId);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
       }
@@ -92,12 +95,12 @@ export async function PUT(
       if (action === 'updateChore') {
          const { choreIndex, completionStatus } = body;
          updatedRecord = await updateChoreCompletion(
-            id,
+            recordId,
             choreIndex,
             completionStatus
          );
       } else if (action === 'submit') {
-         updatedRecord = await submitDailyRecord(id);
+         updatedRecord = await submitDailyRecord(recordId);
       } else {
          return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
       }

@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/daily-records
- * Creates or retrieves daily record for a child, or creates standalone penalty
+ * Creates  daily record for a child, or creates standalone penalty
  * Body: { childId, familyId, date?, penalty? }
  */
 export async function POST(req: NextRequest) {
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
       // Handle penalty upsert
       if (penalty) {
-         const targetDate = date ? new Date(date) : new Date();
+         const targetDate = date ? new Date(date) : new Date();                                                            // future
          const dailyRecord = await upsertPenalty(childId, familyId, targetDate, penalty, session.userId);
          const normalized = normalizeRecord(dailyRecord);
          return NextResponse.json(normalized, { status: 200 });

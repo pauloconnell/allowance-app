@@ -13,7 +13,7 @@ export interface IChild {
    name: string;
    age: number;
    currentBalance: number;
-   choresList: IChildChore[];
+   choresList: IChildChore[]; // 
    avatarUrl?: string;
    createdAt?: string;
    updatedAt?: string;

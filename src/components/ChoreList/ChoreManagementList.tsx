@@ -16,14 +16,14 @@ export default function ChoreManagementList({ allChores, child, familyId }: Chor
 
   // Create lookup for IDs already in the child's choresList
   const assignedIds = new Set(
-    (child.choresList || []).map((c: IChildChore) => c.choreId.toString())
+    (child.choresList || []).map((c: IChildChore) => c.choreId?.toString())
   );
 
   // Partition the master pool into two lists
   const assignedChores = allChores.filter((ch) => assignedIds.has(ch._id as string));
   const availablePool = allChores.filter((ch) => !assignedIds.has(ch._id as string));
 
-  const handleToggle = async (choreId: string, isCurrentlyAssigned: boolean) => {
+  const handleToggle = async (choreId: string, isCurrentlyAssigned: boolean) => {   // drilled down 2 levels to choreToggleCard @ bottom of this file
     const action = isCurrentlyAssigned ? 'remove' : 'assign';
     
     try {
