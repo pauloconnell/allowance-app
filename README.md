@@ -11,6 +11,32 @@ DONE pollie_db_user
 
 
 
+Architecture:
+
+App has seperate families 
+
+each Family has Children 1-many
+
+Family has Chores which can be assigned to any child 0-many
+
+Family Parent creates chores and assigns to children
+    Each Child stores it's chores in it's child db under: choreList  - which contains choreId,  nextDue, and isRecurring.
+
+Each child creates it's DailyRecord => which contains that day's chores to track completion and earnings
+
+Each new day Child logs in triggers last DailyRecord to be finalized and new record created -> missed days = no earnings TBD -> could have a cycle through days to get up to today FUTURE
+
+TODO: Finalizing Daily Record ->  Completed Chores are removed from child choreList IF !isRecurring.   Await: Parent signs off to award earnings
+
+TODO: new Daily record creation -> incomplete chores are 'rolled to today', child choreList searched for chores due before tomorrow and populated - if isRecurring, the next instance of that chore is triggered by updating the nextDue date (based on the intervalDays located in the object )   So, today's record has current instance, and choresList has next instance -> already have logic to ensure incomplete chore being 'rolled forward' cancels creating next instance of isRecurring
+
+
+
+
+
+
+
+
 Next:
 
 1 DONE: api/Children/get?FamilyId  POST -> create child (Create api/Family route to getAllChildren )

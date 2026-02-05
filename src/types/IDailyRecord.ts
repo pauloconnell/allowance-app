@@ -7,6 +7,7 @@ export interface IDailyRecord {
    familyId: string;
    childId: string;
    date: Date | string;
+   dueDate: Date | string;
    choresList: IDailyChore[];
    isSubmitted: boolean;
    isApproved: boolean;

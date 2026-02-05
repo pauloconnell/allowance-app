@@ -17,6 +17,7 @@ const ChoreEntrySchema = new Schema({
     default: 0,
     required: true,
   },
+  dueDate: { type: Date, required: true },
   parentAdjustedReward: { type: Number, default: null },
   isOverridden: { type: Boolean, default: false },
   notes: { type: String, default: null },
@@ -43,7 +44,8 @@ const DailyRecordSchema = new Schema(
          required: true, 
          index: true 
       },
-      date: { type: Date, required: true, index: true },
+      dueDate: { type: Date, index: true },
+      date: { type: Date, index: true },
       // Use the ChoreSchema as a subdocument array
       choresList: [ChoreEntrySchema],
       isSubmitted: { type: Boolean, default: false, index: true },

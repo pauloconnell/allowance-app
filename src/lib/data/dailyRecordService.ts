@@ -2,8 +2,8 @@ import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
 import Chore from '@/models/Chore';
 import { IDailyRecord, IPayoutResult } from '@/types/IDailyRecord';
-
 import { IChore, IDailyChore } from '@/types/IChore';
+import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord'; 
 
 /**
  * Get the start of day (00:00:00) for a given date
@@ -53,55 +53,47 @@ export async function getRecurringChores(
 ): Promise<IDailyChore[]> {
 
 
-   const child = await Child.findById(childId); // get child's assigned chores
+   const child = await Child.findById(childId).lean(); // get child's assigned chores = use .lean() = plain array = faster ;)
    if (!child || !child.choresList) return [];
    const now = new Date();
+   now.setHours(0, 0, 0, 0); // Normalize to start of day
    const scheduled: IDailyChore[] = [];
    // 2. Filter the master list for active chores due today that aren't already rolled over
    const choresToProcess = child.choresList
-      .filter(chore =>
+      .filter((chore:IChore) =>
          chore.isActive &&
-         !chore.isCompleted &&
-         chore.nextDue <= now &&
-         !existingChoreIds.includes(chore.choreId.toString())    
+         new Date(chore.dueDate) <= now &&                             // just get chores that are due
+         !existingChoreIds.includes(chore._id.toString())    
       );
 
-   // if (choresToProcess.length === 0) return [];
+    if (choresToProcess.length === 0){
+      console.log("No recurring chores to add for today.");
+      return [];
+    } 
 
-   //     const scheduled= choresToProcess.map((chore): IDailyChore => ({
-   //       ...chore,
-   //       isOverridden: false,
-   //       parentAdjustedReward: undefined,
-   //       parentNotes: "",
-   //     }));
+
    // 2. Loop once: Transform for Today AND Update for the Future
    for (const chore of choresToProcess) {
       // A. Push to the DailyRecord array (Today's Snapshot)
       scheduled.push({
-         ...chore.toObject(),
+         ...chore,
          isOverridden: false,
          parentAdjustedReward: undefined,
          parentNotes: "",
       });
 
-      // B. Calculate the Next occurrence of RECURRING chores
+      // B. Calculate the Next occurrence of RECURRING chores     => NOTE: if !isRecurring -> chore will be removed from choreList upon completion of DailyRecord (if it's completed)
       if (chore.isRecurring) {
-         const nextDate = new Date(chore.nextDue);
-         nextDate.setDate(nextDate.getDate() + (chore.intervalDays || 1));
+         const nextDue = new Date(chore.nextDue);
+         nextDue.setHours(0, 0, 0, 0); // Normalize to start of day
+         nextDue.setDate(nextDue.getDate() + (chore.intervalDays || 1));
 
-         // C. Update the Master List immediately
+         // C. Update the Child's choreList  immediately => simply set nextDue => details of chore completion live in the dailyRecords
          await Child.updateOne(
             { _id: childId, "choresList._id": chore._id },
             {
                $set: {
-                  "choresList.$.nextDue": nextDate,
-                  "choresList.$.completionStatus": 0, // Reset status for the next cycle
-                  "choresList.$.isCompleted": false,
-                  "choresList.$.rewardEarned": 0,
-                  "choresList.$.isOverridden": false,      // Reset override flag
-                  "choresList.$.parentAdjustedReward": 0,  // Reset adjusted amount
-                  "choresList.$.notes": "",                 // Clear any specific notes
-                  "choresList.$.parentNotes": "",                 // Clear any specific notes
+                  "choresList.$.nextDue": nextDue,
                }
             }
          );
@@ -134,10 +126,10 @@ export async function getOrCreateTodaysDailyRecord(      // too many things here
          $gte: startOfDay,
          // $lte: endOfDay,
       },
-   });
+   }).lean();
 
    if (dailyRecord) {                                 // if today is already set up, just return that record
-      return dailyRecord.toObject() as IDailyRecord;
+      return JSON.parse(JSON.stringify(dailyRecord)) as IDailyRecord;
    }
 
    
@@ -151,6 +143,8 @@ export async function getOrCreateTodaysDailyRecord(      // too many things here
    
    // Combine chores
    const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
+
+   console.log("chores for new record are: ", choresList);
 
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({
@@ -373,7 +367,7 @@ export async function getChildDailyRecords(
       },
    }).sort({ date: -1 });
 
-   return records.map((r) => r.toObject() as IDailyRecord);
+   return records.map((r) => normalizeRecord(r) as IDailyRecord);
 }
 
 /**

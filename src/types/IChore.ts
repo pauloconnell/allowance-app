@@ -8,7 +8,7 @@ export interface IChore {
    isRecurring: boolean;
    intervalDays?: number;
    suggestedTime?: string;
-   dueDate?: Date | string;
+   dueDate: Date | string;
    isActive: boolean;
    createdAt?: string;
    updatedAt?: string;

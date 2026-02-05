@@ -12,6 +12,7 @@ import type { IRecord } from '@/types/IRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/childRecordStoreInitializer';
 import { isSameDay } from '@/lib/utils/dateHelper';
+import { handleCreateRecordForToday } from '@/lib/actions/record';
 
 
 interface PageProps {
@@ -49,29 +50,39 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    // determine if viewing today's record
    const today = new Date();
+   today.setHours(0, 0, 0, 0);
    let isTodaysRecord = false;
    if (records.length > 0) {
       isTodaysRecord = isSameDay(records[0].date, today);
    }
 
-   // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
-   const handleCreateRecordForToday = async () => {
-      'use server';  // need this to use redirect (can't use router.push on server either)
-      if (!childId) return;
-      let newId: string = '';
-      try {
-         console.log("Created new record for today:");
-         let newRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
+   if(!isTodaysRecord && childId){
+      console.log("Not today's record - no live record present");
+      //process last record
+
+      // create today's record
+      await handleCreateRecordForToday(childId, familyId);
+   }
+
+
+   // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
+   // async function handleCreateRecordForToday() {
+   //    'use server';  // need this to use redirect (can't use router.push on server either)
+   //    if (!childId) return;
+   //    let newId: string = '';
+   //    try {
+   //       console.log("Created new record for today:");
+   //       let newRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
          
-         newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
-         newId=newRecord._id;
-         console.log("Created new record for today:", newRecord);
+   //       newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
+   //       newId=newRecord._id;
+   //       console.log("Created new record for today:", newRecord);
         
-      } catch (err) {
-         console.error('Error creating new daily record:', err);
-      }
-       redirect(`/protectedPages/${familyId}/daily-records/${newId}`);
-   };
+   //    } catch (err) {
+   //       console.error('Error creating new daily record:', err);
+   //    }
+   //     redirect(`/protectedPages/${familyId}/daily-records/${newId}?childId=${childId}`);
+   // };
 
    if (!children || children.length === 0) {
       return (
@@ -160,7 +171,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                         )}
                         {isTodaysRecord && (
                            <Link
-                              href={`/protectedPages/${familyId}/daily-records/${records[0]._id}`}
+                              href={`/protectedPages/${familyId}/daily-records/${records[0]._id}?childId=${childId}`}
                               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                            >
                               Continue Today's Record

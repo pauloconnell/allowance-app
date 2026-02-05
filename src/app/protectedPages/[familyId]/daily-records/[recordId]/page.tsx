@@ -3,30 +3,44 @@ import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
 import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import { connectDB } from '@/lib/mongodb';
+import { isSameDay } from '@/lib/utils/dateHelper';
+import {
+   getChildDailyRecords,
+   getStartOfDay,
+   getEndOfDay,
+   getOrCreateTodaysDailyRecord,
+} from '@/lib/data/dailyRecordService';
+import { redirect } from 'next/navigation';
+import { IChild } from '@/types/Child';
+import { handleCreateRecordForToday } from '@/lib/actions/record';
 
 interface PageProps {
    params: Promise<{ familyId: string; recordId: string }>;
+   searchParams: Promise<{ childId?: string }>;
 }
 
-export default async function DailyRecordDetailPage({ params }: PageProps) {
+export default async function DailyRecordDetailPage({ params, searchParams }: PageProps) {
    const { familyId, recordId } = await params;
-   
+   let { childId } = await searchParams;
+
    let record = null;
-   let child = null;
+   let child:IChild = null;
    let error = null;
 
    try {
       await connectDB();
-      
+
       const dailyRecord = await DailyRecord.findById(recordId);
       if (!dailyRecord) {
          error = 'Daily record not found';
       } else {
          record = normalizeRecord(dailyRecord.toObject());
-         
-         const childDoc = await Child.findById(record.childId);
-         if (childDoc) {
-            child = normalizeRecord(childDoc.toObject());
+         if (!childId) {                                                // delete this if we want childID to be required -> faster =1 less api call
+            let child = await Child.findById(record.childId);
+            if (child) {
+               child = normalizeRecord(child.toObject());
+               childId = child._id;
+            }
          }
       }
    } catch (err) {
@@ -56,6 +70,40 @@ export default async function DailyRecordDetailPage({ params }: PageProps) {
    const recordDate = new Date(record.date);
    const isToday = new Date().toDateString() === recordDate.toDateString();
 
+   // determine if viewing today's record
+   const today = new Date();
+   today.setHours(0, 0, 0, 0);
+   let isTodaysRecord = false;
+   if (record && record.date) {
+      isTodaysRecord = isSameDay(record.date, today);
+   }
+
+   if (!isTodaysRecord && childId) {
+      console.log("Not today's record - no live record present", record);
+      //process last record
+
+      // create today's record
+      await handleCreateRecordForToday(childId, familyId);
+   }
+
+   // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
+   // async function handleCreateRecordForToday() {
+   //    'use server'; // need this to use redirect (can't use router.push on server either)
+   //    if (!child) return;
+   //    let newId: string = '';
+   //    try {
+   //       console.log('Created new record for today:');
+   //       let newRecord = await getOrCreateTodaysDailyRecord(child._id, familyId);
+
+   //       newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
+   //       newId = newRecord._id;
+   //       console.log('Created new record for today:', newRecord);
+   //    } catch (err) {
+   //       console.error('Error creating new daily record:', err);
+   //    }
+   //    redirect(`/protectedPages/${familyId}/daily-records/${newId}`);
+   // }
+
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -80,16 +128,23 @@ export default async function DailyRecordDetailPage({ params }: PageProps) {
             <div className="space-y-8">
                {/* Record Status */}
                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold mb-4">Record Status</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                     <div className="text-center">
+                  <h2 className="text-xl font-semibold mb-4">Record Status:</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                     <div className="text-center ">
                         <p className="text-sm text-gray-600">Status</p>
-                        <p className={`font-semibold ${
-                           record.status === 'approved' ? 'text-green-600' :
-                           record.status === 'submitted' ? 'text-blue-600' :
-                           record.status === 'rejected' ? 'text-red-600' : 'text-gray-600'
-                        }`}>
-                           {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                        <p
+                           className={`font-semibold ${
+                              record.status === 'approved'
+                                 ? 'text-green-600'
+                                 : record.status === 'submitted'
+                                   ? 'text-blue-600'
+                                   : record.status === 'rejected'
+                                     ? 'text-red-600'
+                                     : 'text-gray-600'
+                           }`}
+                        >
+                           {record.status.charAt(0).toUpperCase() +
+                              record.status.slice(1)}
                         </p>
                      </div>
                      <div className="text-center">
@@ -161,7 +216,10 @@ export default async function DailyRecordDetailPage({ params }: PageProps) {
                      <h2 className="text-xl font-semibold mb-4">Penalties</h2>
                      <div className="space-y-3">
                         {record.penalties.map((penalty: any, index: number) => (
-                           <div key={index} className="border-l-4 border-red-500 bg-red-50 p-4">
+                           <div
+                              key={index}
+                              className="border-l-4 border-red-500 bg-red-50 p-4"
+                           >
                               <div className="flex justify-between items-start">
                                  <div>
                                     <p className="font-medium text-red-700">
@@ -173,7 +231,9 @@ export default async function DailyRecordDetailPage({ params }: PageProps) {
                                  </div>
                                  <div className="text-right text-xs text-red-500">
                                     {penalty.appliedAt && (
-                                       <p>{new Date(penalty.appliedAt).toLocaleString()}</p>
+                                       <p>
+                                          {new Date(penalty.appliedAt).toLocaleString()}
+                                       </p>
                                     )}
                                  </div>
                               </div>
@@ -190,9 +250,7 @@ export default async function DailyRecordDetailPage({ params }: PageProps) {
                      <p className="text-3xl font-bold text-green-600">
                         ${record.totalReward || 0}
                      </p>
-                     <p className="text-sm text-gray-600 mt-2">
-                        Final payout amount
-                     </p>
+                     <p className="text-sm text-gray-600 mt-2">Final payout amount</p>
                   </div>
                </div>
 
