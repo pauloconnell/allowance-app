@@ -1,3 +1,5 @@
+// ToDo -> refact  using code at bottom of page and update throughout
+
 export interface IChore {
    _id: string;
    familyId: string;
@@ -7,6 +9,7 @@ export interface IChore {
    rewardAmount: number;
    isRecurring: boolean;
    intervalDays?: number;
+   completionStatus: 0 | 0.5 | 1; // 0 = not done, 0.5 = partial, 1 = complete
    suggestedTime?: string;
    dueDate: Date | string;
    isActive: boolean;
@@ -42,3 +45,63 @@ export interface IPenalty {
    appliedBy?: string; // User ID of parent who applied
    appliedAt?: Date | string;
 }
+
+
+
+// Refactor:
+
+// the above will become:
+/**
+ * Shared properties for both Master Templates and Daily Instances
+ */
+// export interface IBaseChore {
+//    taskName: string;
+//    rewardAmount: number;
+//    notes?: string;
+// }
+
+/**
+ * MASTER TEMPLATE (Blueprint)
+ * Lives in the 'chores' collection. Used to generate daily tasks.
+//  */
+// export interface IChore extends IBaseChore {
+//    _id: string;
+//    familyId: string;
+//    childId?: string;
+//    isRecurring: boolean;
+//    intervalDays?: number;
+//    suggestedTime?: string;
+//    dueDate: Date | string;
+//    isActive: boolean;
+//    createdAt?: string;
+//    updatedAt?: string;
+// }
+
+// /**
+//  * DAILY INSTANCE (The "Receipt")
+//  * Lives inside a DailyRecord. Includes snapshot data + tracking.
+//  */
+// export interface IDailyChore extends IBaseChore {
+//    choreId: string; // Reference to original master IChore
+//    completionStatus: 0 | 0.5 | 1;
+//    parentAdjustedReward?: number;
+//    isOverridden: boolean;
+//    completionDate?: Date | string;
+// }
+
+// /**
+//  * Utility Types for Forms/Actions
+//  */
+// export type IChoreInput = Omit<IChore, '_id' | 'createdAt' | 'updatedAt'>;
+// export type IChoreFormData = Omit<IChoreInput, 'familyId'>;
+
+// /**
+//  * Penalty entry in DailyRecord
+//  */
+// export interface IPenalty {
+//    _id?: string; // Helpful for React list keys
+//    amount: number;
+//    reason: string;
+//    appliedBy?: string;
+//    appliedAt: Date | string;
+// }

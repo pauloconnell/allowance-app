@@ -11,8 +11,11 @@ import {
    getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import { redirect } from 'next/navigation';
-import { IChild } from '@/types/Child';
+import { IChild } from '@/types/IChild';
+import { IChore } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
+import ChoreItem from '@/components/Chores/ChoreItem';
+import { updateChoreStatus } from '@/lib/actions/record';
 
 interface PageProps {
    params: Promise<{ familyId: string; recordId: string }>;
@@ -24,24 +27,25 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    let { childId } = await searchParams;
 
    let record = null;
-   let child:IChild = null;
+   let child: IChild|null= null;
    let error = null;
 
    try {
       await connectDB();
 
-      const dailyRecord = await DailyRecord.findById(recordId);
+      const dailyRecord = await DailyRecord.findById(recordId).lean();
       if (!dailyRecord) {
          error = 'Daily record not found';
       } else {
-         record = normalizeRecord(dailyRecord.toObject());
-         if (!childId) {                                                // delete this if we want childID to be required -> faster =1 less api call
-            let child = await Child.findById(record.childId);
+         record = normalizeRecord(dailyRecord);
+       
+            // delete this if we want childID to be required -> faster =1 less api call
+            child = await Child.findById(record.childId).lean();
             if (child) {
-               child = normalizeRecord(child.toObject());
+               child = normalizeRecord(child);
                childId = child._id;
             }
-         }
+         
       }
    } catch (err) {
       console.error('Failed to load daily record:', err);
@@ -67,15 +71,17 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       );
    }
 
-   const recordDate = new Date(record.date);
+   const recordDate = new Date(record.dueDate);
+   recordDate.setHours(0,0,0,0);
    const isToday = new Date().toDateString() === recordDate.toDateString();
 
    // determine if viewing today's record
    const today = new Date();
    today.setHours(0, 0, 0, 0);
    let isTodaysRecord = false;
-   if (record && record.date) {
-      isTodaysRecord = isSameDay(record.date, today);
+   
+   if (record && record.dueDate) {
+      isTodaysRecord = isSameDay(record.dueDate, today);
    }
 
    if (!isTodaysRecord && childId) {
@@ -86,23 +92,20 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       await handleCreateRecordForToday(childId, familyId);
    }
 
-   // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
-   // async function handleCreateRecordForToday() {
-   //    'use server'; // need this to use redirect (can't use router.push on server either)
-   //    if (!child) return;
-   //    let newId: string = '';
-   //    try {
-   //       console.log('Created new record for today:');
-   //       let newRecord = await getOrCreateTodaysDailyRecord(child._id, familyId);
+   // motivate kids by showing earnings:
+   // Calculate running totals for the motivation section
+   const currentEarnings =
+      record.choresList?.reduce((sum: number, chore: IChore) => {
+         return sum + chore.rewardAmount * chore.completionStatus;
+      }, 0) || 0;
 
-   //       newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
-   //       newId = newRecord._id;
-   //       console.log('Created new record for today:', newRecord);
-   //    } catch (err) {
-   //       console.error('Error creating new daily record:', err);
-   //    }
-   //    redirect(`/protectedPages/${familyId}/daily-records/${newId}`);
-   // }
+   const potentialTotal =
+      record.choresList?.reduce((sum: number, chore: IChore) => {
+         return sum + chore.rewardAmount * 1; // 1 is 100% completion
+      }, 0) || 0;
+
+   const totalPenalties = record.penalties?.reduce((sum: number, p: number) => sum + p.amount, 0) || 0;
+   const finalTakeHome = currentEarnings - totalPenalties;
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
@@ -179,29 +182,43 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                      <div className="space-y-4">
                         {record.choresList.map((chore: any, index: number) => (
                            <div key={index} className="border rounded-lg p-4">
-                              <div className="flex justify-between items-start">
-                                 <div>
-                                    <h3 className="font-medium">{chore.taskName}</h3>
-                                    <p className="text-sm text-gray-600">
-                                       Base Reward: ${chore.rewardAmount}
-                                    </p>
-                                 </div>
-                                 <div className="text-right">
-                                    <p className="font-medium">
-                                       {chore.completionStatus * 100}% Complete
-                                    </p>
-                                    {chore.isOverridden && (
-                                       <p className="text-sm text-orange-600">
-                                          Parent Override: ${chore.parentAdjustedReward}
+                              <div>
+                                 <div className="flex justify-between items-start">
+                                    <div>
+                                       <h3 className="font-medium">{chore.taskName}</h3>
+                                       <div className="flex justify-between space-x-2 w-full">
+                                          <p className="text-sm text-gray-600">
+                                             Base Reward: ${chore.rewardAmount}
+                                          </p>
+                                       </div>
+                                    </div>
+                                    <div className="text-right">
+                                       <p className="font-medium">
+                                          {chore.completionStatus * 100}% Complete
                                        </p>
-                                    )}
+                                       <p className="text-sm text-gray-600">
+                                          Amount Earned: ${' '}
+                                          {chore.rewardAmount * chore.completionStatus}
+                                       </p>
+                                       {chore.isOverridden && (
+                                          <p className="text-sm text-orange-600">
+                                             Parent Override: $
+                                             {chore.parentAdjustedReward}
+                                          </p>
+                                       )}
+                                    </div>
                                  </div>
+                                 {chore.notes && (
+                                    <p className="text-sm text-gray-600 mt-2">
+                                       Notes: {chore.notes}
+                                    </p>
+                                 )}
                               </div>
-                              {chore.notes && (
-                                 <p className="text-sm text-gray-600 mt-2">
-                                    Notes: {chore.notes}
-                                 </p>
-                              )}
+                              <ChoreItem
+                                 key={chore._id}
+                                 chore={chore}
+                                 recordId={record._id}
+                              />
                            </div>
                         ))}
                      </div>
@@ -244,13 +261,79 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                )}
 
                {/* Total Reward */}
-               <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold mb-4">Total Reward</h2>
-                  <div className="text-center">
-                     <p className="text-3xl font-bold text-green-600">
-                        ${record.totalReward || 0}
-                     </p>
-                     <p className="text-sm text-gray-600 mt-2">Final payout amount</p>
+               {/* Motivation Station: Payout Summary */}
+               <div className="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-green-100">
+                  <div className="bg-green-600 p-4 text-white text-center">
+                     <h2 className="text-xl font-bold italic tracking-wide">
+                        💰 Your Earnings Tracker
+                     </h2>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                     {/* Daily Progress Row */}
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-4 bg-gray-50 rounded-lg">
+                           <p className="text-xs text-gray-500 uppercase font-bold">
+                              Earned So Far
+                           </p>
+                           <p className="text-2xl font-black text-green-600">
+                              ${currentEarnings.toFixed(2)}
+                           </p>
+                        </div>
+                        <div className="text-center p-4 bg-gray-50 rounded-lg">
+                           <p className="text-xs text-gray-500 uppercase font-bold">
+                              Total Potential
+                           </p>
+                           <p className="text-2xl font-black text-blue-600">
+                              ${potentialTotal.toFixed(2)}
+                           </p>
+                        </div>
+                     </div>
+
+                     {/* The Math Breakdown */}
+                     <div className="border-t border-b border-gray-100 py-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                           <span className="text-gray-600">Daily Chore Total:</span>
+                           <span className="font-medium text-gray-900">
+                              ${currentEarnings.toFixed(2)}
+                           </span>
+                        </div>
+                        {totalPenalties > 0 && (
+                           <div className="flex justify-between text-sm">
+                              <span className="text-red-600 font-medium">
+                                 Penalties Deducted:
+                              </span>
+                              <span className="font-medium text-red-600">
+                                 -${totalPenalties.toFixed(2)}
+                              </span>
+                           </div>
+                        )}
+                        <div className="flex justify-between text-lg font-bold pt-2 border-t border-dashed border-gray-200">
+                           <span>Today's Payout:</span>
+                           <span className="text-green-600">
+                              ${Math.max(0, finalTakeHome).toFixed(2)}
+                           </span>
+                        </div>
+                     </div>
+
+                     {/* Lifetime Balance Check */}
+                     {child && (
+                        <div className="bg-secondary-50 p-4 rounded-xl flex items-center justify-between border border-secondary-100">
+                           <div>
+                              <p className="text-xs text-secondary-500 font-bold uppercase">
+                                 Total Bank Balance
+                              </p>
+                              <p className="text-lg font-bold text-secondary-900">
+                                 ${child.currentBalance.toFixed(2)}
+                              </p>
+                           </div>
+                           <div className="text-right">
+                              <p className="text-[10px] text-secondary-400 italic">
+                                 Increases when record is approved!
+                              </p>
+                           </div>
+                        </div>
+                     )}
                   </div>
                </div>
 

@@ -37,7 +37,8 @@ export async function getRolloverChores(
 
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
-
+   normalizeRecord(prevRecord.choresList);
+   console.log("check dueDate:", prevRecord.choresList)
    // Return chores with completionStatus === 0
    return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus === 0);
 }
@@ -74,6 +75,8 @@ export async function getRecurringChores(
 
    // 2. Loop once: Transform for Today AND Update for the Future
    for (const chore of choresToProcess) {
+
+      if(existingChoreIds.includes(chore.choreId)) continue;   // don't add chores already in list
       // A. Push to the DailyRecord array (Today's Snapshot)
       scheduled.push({
          ...chore,
@@ -84,16 +87,16 @@ export async function getRecurringChores(
 
       // B. Calculate the Next occurrence of RECURRING chores     => NOTE: if !isRecurring -> chore will be removed from choreList upon completion of DailyRecord (if it's completed)
       if (chore.isRecurring) {
-         const nextDue = new Date(chore.nextDue);
-         nextDue.setHours(0, 0, 0, 0); // Normalize to start of day
-         nextDue.setDate(nextDue.getDate() + (chore.intervalDays || 1));
+         const dueDate = new Date(chore.dueDate);
+         dueDate.setHours(0, 0, 0, 0); // Normalize to start of day
+         dueDate.setDate(dueDate.getDate() + (chore.intervalDays || 1));
 
          // C. Update the Child's choreList  immediately => simply set nextDue => details of chore completion live in the dailyRecords
          await Child.updateOne(
             { _id: childId, "choresList._id": chore._id },
             {
                $set: {
-                  "choresList.$.nextDue": nextDue,
+                  "choresList.$.dueDate": dueDate,
                }
             }
          );
@@ -138,7 +141,7 @@ export async function getOrCreateTodaysDailyRecord(      // too many things here
    const rolloverChores = await getRolloverChores(childId, familyId);
 
    // Get recurring chores
-   const existingChoreIds = rolloverChores?.map((c) => c?.choreId);
+   const existingChoreIds = rolloverChores?.map((c) => c?.choreId.toString());
    const recurringChores = await getRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore 
    
    // Combine chores
@@ -150,7 +153,7 @@ export async function getOrCreateTodaysDailyRecord(      // too many things here
    const newRecord = new DailyRecord({
       childId,
       familyId,
-      date: startOfDay,
+      dueDate: startOfDay,
       choresList,
       isSubmitted: false,
       isApproved: false,

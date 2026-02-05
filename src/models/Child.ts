@@ -55,7 +55,8 @@ const ChildChoreSchema = new Schema({ // this is just keeping data on the curren
    rewardEarned: {    // actual amount earned
       type: Number,
       default: 0
-    }
+    },
+
 
 
 }, { _id: true }); // We keep _id: true so we can uniquely identify an instance of Chore if needed

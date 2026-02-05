@@ -39,6 +39,13 @@ TODO: new Daily record creation -> incomplete chores are 'rolled to today', chil
 
 Next:
 
+
+
+*** chores/?childId => can't unselect chore
+
+
+
+
 1 DONE: api/Children/get?FamilyId  POST -> create child (Create api/Family route to getAllChildren )
 2 zustand store gets all children from above api
 3 complete circle: useFamilyStore - fetchChildren used in ChildDropdown component
