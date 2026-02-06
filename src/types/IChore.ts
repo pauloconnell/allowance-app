@@ -26,13 +26,18 @@ export type IChoreFormData = Omit<IChoreInput, 'familyId'>;
  * Represents a chore assigned to a child for a specific day
  */
 export interface IDailyChore {
+   _id?: string; 
    choreId: string; // Reference to master Chore
    taskName: string;
    rewardAmount: number;
    completionStatus: 0 | 0.5 | 1; // 0 = not done, 0.5 = partial, 1 = complete
    parentAdjustedReward?: number; // Parent can override reward amount
-   isOverridden: boolean;
+   isOverridden?: boolean;
+   isRecurring: boolean;
+   intervalDays?: number; // For recurring chores, how many days until next occurrence
+   dueDate: Date | string; // Snapshot of due date at time of assignment
    notes?: string;
+   parentNotes?: string; // Notes added by parent during review
    completionDate?: Date | string;
 }
 

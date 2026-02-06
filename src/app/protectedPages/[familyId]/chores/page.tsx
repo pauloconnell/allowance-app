@@ -10,6 +10,10 @@ interface PageProps {
   searchParams: Promise<{ childId?: string }>;
 }
 
+// This page serves dual purposes based on whether a child is selected:
+// 1. If no childId is in the query, it shows the Master Chore Library for editing.
+// 2. If a childId is present, it switches to Assignment Mode, allowing chores to be assigned to that child.
+
 export default async function ChoresPage({ params, searchParams }: PageProps) {
   const { familyId } = await params;
   const { childId } = await searchParams;

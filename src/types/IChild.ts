@@ -2,7 +2,7 @@
 export interface IChildChore {
   choreId: string;      // The ID of the Master Chore blueprint
   dueDate: Date | string; 
-  isRecurring: Boolean;
+  isRecurring: boolean;
   intervalDays: number;
   taskName: string;
    rewardAmount: number;

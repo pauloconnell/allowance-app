@@ -11,6 +11,7 @@ interface ChoreManagementListProps {
   familyId: string;
 }
 
+// shows parent which chores are assigned to this child
 export default function ChoreManagementList({ allChores, child, familyId }: ChoreManagementListProps) {
   const router = useRouter();
 
