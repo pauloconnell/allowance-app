@@ -8,9 +8,9 @@ import {
    getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import type { IChild } from '@/types/IChild';
-import type { IRecord } from '@/types/IRecord';
+import type { IDailyRecord } from '@/types/IDailyRecord';
 import { useEffect } from 'react';
-import ChildRecordStoreInitializer from '@/components/StoreInitializers/childRecordStoreInitializer';
+import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
 import { isSameDay } from '@/lib/utils/dateHelper';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 
@@ -25,7 +25,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    const { childId, date } = await searchParams;
 
    let children: IChild[] = [];
-   let records: IRecord[] = [];
+   let records: IDailyRecord[] = [];
 
    let errorMessage: string = '';
    let successMessage: string = '';

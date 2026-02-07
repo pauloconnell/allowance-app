@@ -29,7 +29,7 @@ export async function handleCreateRecordForToday(childId: string, familyId: stri
 /**
  * 2. Logic for updating specific chore status (The Sync Bridge)
  */
-export async function updateChoreStatus(recordId: string, choreId: string, newStatus: number) {
+export async function updateChoreStatus(recordId: string, choreId: string, newStatus: number, isParent?: boolean) {  // add isParent to update isOverridden - WIP  TBD
    try {
       await connectDB();
 

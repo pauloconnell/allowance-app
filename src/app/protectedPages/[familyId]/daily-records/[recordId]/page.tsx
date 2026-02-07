@@ -12,9 +12,9 @@ import {
 } from '@/lib/data/dailyRecordService';
 import { redirect } from 'next/navigation';
 import { IChild } from '@/types/IChild';
-import { IChore } from '@/types/IChore';
+import { IChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
-import ChoreItem from '@/components/Chores/ChoreItem';
+import ChoreItem from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
 
 interface PageProps {
@@ -71,9 +71,9 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       );
    }
 
-   const recordDate = new Date(record.dueDate);
-   recordDate.setHours(0,0,0,0);
-   const isToday = new Date().toDateString() === recordDate.toDateString();
+   // const recordDate = new Date(record.createdAt);
+   // recordDate.setHours(0,0,0,0);
+   // const isToday = new Date().toDateString() === recordDate.toDateString();
 
    // determine if viewing today's record
    const today = new Date();
@@ -89,7 +89,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       //process last record
 
       // create today's record
-      await handleCreateRecordForToday(childId, familyId);
+      await handleCreateRecordForToday(childId, familyId);  // this get today's record, or will change page to new record
    }
 
    // motivate kids by showing earnings:
@@ -104,7 +104,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
          return sum + chore.rewardAmount * 1; // 1 is 100% completion
       }, 0) || 0;
 
-   const totalPenalties = record.penalties?.reduce((sum: number, p: number) => sum + p.amount, 0) || 0;
+   const totalPenalties = record.penalties?.reduce((sum: number, p: IPenalty) => sum + p.amount, 0) || 0;
    const finalTakeHome = currentEarnings - totalPenalties;
 
    return (
@@ -118,8 +118,8 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                   ← Back to Daily Records
                </Link>
                <h1 className="text-3xl font-bold text-secondary-900">
-                  Daily Record - {recordDate.toLocaleDateString()}
-                  {isToday && <span className="ml-2 text-green-600">(Today)</span>}
+                  Daily Record - {record.dueDate.split("T")[0]}
+                  {isTodaysRecord && <span className="ml-2 text-green-600">(Today)</span>}
                </h1>
                {child && (
                   <p className="text-secondary-600 mt-2">

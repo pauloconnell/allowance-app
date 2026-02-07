@@ -9,6 +9,7 @@ export interface IDailyRecord {
    date: Date | string;
    dueDate: Date | string;
    choresList: IDailyChore[];
+   copyOfChildChoresSubmitted: IDailyChore[]; // Snapshot of chore details submitted for ref - saved at end of day and copied to choresList for parent to update and award actual earnings upon 'approval'
    isSubmitted: boolean;
    isApproved: boolean;
    submittedAt?: Date | string;
@@ -33,10 +34,10 @@ export interface IDailyRecordFormData {
 }
 
 /**
- * Parent review payload for approving a daily record
+ * Parent review **payload** TYPE for approving a daily record
  */
 export interface IParentReview {
-   dailyRecordId: string;
+   dailyRecordId: string;           
    choreAdjustments: Array<{
       choreIndex: number;
       parentAdjustedReward?: number;

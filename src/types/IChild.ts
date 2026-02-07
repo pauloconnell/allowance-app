@@ -11,7 +11,7 @@ export interface IChildChore {
   isActive: boolean;
 }
 
-export interface IChild {
+export interface IChild {        // NOTE: parent fields are only recored on IDailyRecords
    _id: string;
    familyId: string;
    auth0UserId?: string;

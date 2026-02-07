@@ -5,7 +5,7 @@ import { updateChoreStatus } from '@/lib/actions/record';
 
 // Notice we use recordId (string) because it's serializable 
 // and we removed onUpdate because a Server Page can't pass it.
-export default function ChoreItem({ chore, recordId }: { chore: any, recordId: string }) {
+export default function ChoreCompletionBoxes({ chore, recordId, isParent }: { chore: any, recordId: string, isParent?: boolean }) {
   const [isPending, startTransition] = useTransition();
 
   const handleToggle = (val: number) => {

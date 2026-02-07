@@ -10,16 +10,15 @@ const ChoreEntrySchema = new Schema({
     required: true 
   },
   taskName: { type: String, required: true },
-  rewardAmount: { type: Number, required: true, min: 0 },
+  rewardAmount: { type: Number, required: true, min: 0 },      
   completionStatus: {
     type: Number,
     enum: [0, 0.5, 1], // 0: None, 0.5: Half, 1: Complete
     default: 0,
     required: true,
   },
-  dueDate: { type: Date, required: true },
-  parentAdjustedReward: { type: Number, default: null },
   isOverridden: { type: Boolean, default: false },
+  dueDate: { type: Date, required: true },
   notes: { type: String, default: null },
 }, { 
   _id: true, // IMPORTANT: Every entry gets its own unique ID for React keys and targeted updates
@@ -48,6 +47,7 @@ const DailyRecordSchema = new Schema(
       date: { type: Date, index: true },
       // Use the ChoreSchema as a subdocument array
       choresList: [ChoreEntrySchema],
+      copyOfChildChoresSubmitted: [ChoreEntrySchema], // snapshot of chores at submission  by child for reference (immutable after submission)
       isSubmitted: { type: Boolean, default: false, index: true },
       isApproved: { type: Boolean, default: false, index: true },
       submittedAt: { type: Date, default: null },

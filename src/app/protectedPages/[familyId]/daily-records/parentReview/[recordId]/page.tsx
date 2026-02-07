@@ -14,7 +14,7 @@ import { redirect } from 'next/navigation';
 import { IChild } from '@/types/IChild';
 import { IChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
-import ChoreItem from '@/components/Chores/ChoreItem';
+import ChoreCompletionBoxes from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
 
 interface PageProps {
@@ -22,12 +22,16 @@ interface PageProps {
    searchParams: Promise<{ childId?: string }>;
 }
 
-export default async function ParentReviewDailyRecordDetailPage({ params, searchParams }: PageProps) {
+export default async function ParentReviewDailyRecordDetailPage({
+   params,
+   searchParams,
+}: PageProps) {
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
    let record = null;
-   let child: IChild|null= null;
+   let childRecord = null; // read only -> display what child had submitted
+   let child: IChild | null = null;
    let error = null;
 
    try {
@@ -38,14 +42,13 @@ export default async function ParentReviewDailyRecordDetailPage({ params, search
          error = 'Daily record not found';
       } else {
          record = normalizeRecord(dailyRecord);
-       
-            // delete this if we want childID to be required -> faster =1 less api call
-            child = await Child.findById(record.childId).lean();
-            if (child) {
-               child = normalizeRecord(child);
-               childId = child._id;
-            }
-         
+
+         // delete this if we want childID to be required -> faster =1 less api call
+         child = await Child.findById(record.childId).lean();
+         if (child) {
+            child = normalizeRecord(child);
+            childId = child._id;
+         }
       }
    } catch (err) {
       console.error('Failed to load daily record:', err);
@@ -72,14 +75,14 @@ export default async function ParentReviewDailyRecordDetailPage({ params, search
    }
 
    const recordDate = new Date(record.dueDate);
-   recordDate.setHours(0,0,0,0);
+   recordDate.setHours(0, 0, 0, 0);
    const isToday = new Date().toDateString() === recordDate.toDateString();
 
    // determine if viewing today's record
    const today = new Date();
    today.setHours(0, 0, 0, 0);
    let isTodaysRecord = false;
-   
+
    if (record && record.dueDate) {
       isTodaysRecord = isSameDay(record.dueDate, today);
    }
@@ -104,7 +107,8 @@ export default async function ParentReviewDailyRecordDetailPage({ params, search
          return sum + chore.rewardAmount * 1; // 1 is 100% completion
       }, 0) || 0;
 
-   const totalPenalties = record.penalties?.reduce((sum: number, p: IPenalty) => sum + p.amount, 0) || 0;
+   const totalPenalties =
+      record.penalties?.reduce((sum: number, p: IPenalty) => sum + p.amount, 0) || 0;
    const finalTakeHome = currentEarnings - totalPenalties;
 
    return (
@@ -200,24 +204,31 @@ export default async function ParentReviewDailyRecordDetailPage({ params, search
                                           Amount Earned: ${' '}
                                           {chore.rewardAmount * chore.completionStatus}
                                        </p>
-                                       {chore.isOverridden && (
+                                       {record.copyOfChildChoresSubmitted[index]
+                                          .completionStatus != chore.completionStatus && (
                                           <p className="text-sm text-orange-600">
-                                             Parent Override: $
-                                             {chore.parentAdjustedReward}
+                                             Child reported:
+                                             {record.copyOfChildChoresSubmitted[index]
+                                                .completionStatus * 100}
+                                             % Complete
                                           </p>
                                        )}
                                     </div>
                                  </div>
-                                 {chore.notes && (
-                                    <p className="text-sm text-gray-600 mt-2">
-                                       Notes: {chore.notes}
-                                    </p>
-                                 )}
+
+                                 <p className="text-sm text-gray-600 mt-2">
+                                    Notes: {chore.notes}
+                                 </p>
+                                 <p className="text-sm text-gray-600 mt-2">
+                                    ChildNotes:{' '}
+                                    {record.copyOfChildChoresSubmitted[index].notes}
+                                 </p>
                               </div>
-                              <ChoreItem
+                              <ChoreCompletionBoxes
                                  key={chore._id}
                                  chore={chore}
                                  recordId={record._id}
+                                 isParent={true}
                               />
                            </div>
                         ))}

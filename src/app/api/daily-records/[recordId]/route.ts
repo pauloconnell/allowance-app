@@ -56,7 +56,7 @@ export async function GET(
 }
 
 /**
- * PUT /api/daily-records/[id]
+ * PUT /api/daily-records/[id]                                                            // actually - submit usually occurs on server automaticaly when current record date<today's date
  * Updates a chore or submits the daily record
  * Body: { action: 'updateChore' | 'submit', choreIndex?, completionStatus?, ... }
  */

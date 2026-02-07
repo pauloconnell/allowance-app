@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import ChoreManagementList from '@/components/Chores/ChoreManagementList';
-import ChildDropdown from '@/components/Chores/ChildDropdown';
+import ChildDropdown from '@/components/Children/ChildDropdown';
 import { getAllChores } from '@/lib/data/choreService';
 import { getChildById, getAllChildren } from '@/lib/data/childService';
 import FamilyStoreInitializer from '@/components/StoreInitializers/FamilyStoreInitializer';
