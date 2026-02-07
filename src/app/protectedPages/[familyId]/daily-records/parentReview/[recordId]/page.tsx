@@ -1,3 +1,5 @@
+import { getAuthSession } from '@/lib/auth/auth';
+import { isParentInFamily }   from '@/lib/access-control/childAccess'
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
@@ -16,16 +18,21 @@ import { IChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 import ChoreCompletionBoxes from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
+import { approveDailyRecord } from '@/lib/data/dailyRecordService';
 
 interface PageProps {
    params: Promise<{ familyId: string; recordId: string }>;
    searchParams: Promise<{ childId?: string }>;
 }
 
+
+// this is the parent review/override page to approve childs chores for this day
+
 export default async function ParentReviewDailyRecordDetailPage({
    params,
    searchParams,
 }: PageProps) {
+   
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
@@ -33,6 +40,27 @@ export default async function ParentReviewDailyRecordDetailPage({
    let childRecord = null; // read only -> display what child had submitted
    let child: IChild | null = null;
    let error = null;
+
+   // 1. Get logged-in user
+   const {userId}  = await getAuthSession();
+   if (!userId) {
+      redirect('/login');
+   }
+
+   // RBAC: Get this user's role from userFamily:
+
+   let isParent = isParentInFamily(userId, familyId);
+
+   // 2. Enforce RBAC: must be a parent
+   if (userId.role !== 'parent') {
+      redirect('/unauthorized');
+   }
+   // 3. Ensure parent belongs to this family
+   if (userId.familyId !== familyId) {
+      redirect('/unauthorized');
+   }
+   // 4. Extract parent userId for later use
+   const parentUserId = userId;
 
    try {
       await connectDB();
@@ -87,13 +115,13 @@ export default async function ParentReviewDailyRecordDetailPage({
       isTodaysRecord = isSameDay(record.dueDate, today);
    }
 
-   if (!isTodaysRecord && childId) {
-      console.log("Not today's record - no live record present", record);
-      //process last record
+   // if (!isTodaysRecord && childId) {
+   //    console.log("Not today's record - no live record present", record);
+   //    //process last record
 
-      // create today's record
-      await handleCreateRecordForToday(childId, familyId);
-   }
+   //    // create today's record
+   //    await handleCreateRecordForToday(childId, familyId);
+   // }
 
    // motivate kids by showing earnings:
    // Calculate running totals for the motivation section
@@ -205,7 +233,8 @@ export default async function ParentReviewDailyRecordDetailPage({
                                           {chore.rewardAmount * chore.completionStatus}
                                        </p>
                                        {record.copyOfChildChoresSubmitted[index]
-                                          .completionStatus != chore.completionStatus && (
+                                          ?.completionStatus !=
+                                          chore.completionStatus && (
                                           <p className="text-sm text-orange-600">
                                              Child reported:
                                              {record.copyOfChildChoresSubmitted[index]
@@ -239,37 +268,43 @@ export default async function ParentReviewDailyRecordDetailPage({
                </div>
 
                {/* Penalties */}
-               {record.penalties && record.penalties.length > 0 && (
-                  <div className="bg-white rounded-lg shadow-md p-6">
-                     <h2 className="text-xl font-semibold mb-4">Penalties</h2>
-                     <div className="space-y-3">
-                        {record.penalties.map((penalty: any, index: number) => (
-                           <div
-                              key={index}
-                              className="border-l-4 border-red-500 bg-red-50 p-4"
-                           >
-                              <div className="flex justify-between items-start">
-                                 <div>
-                                    <p className="font-medium text-red-700">
-                                       -${penalty.amount}
-                                    </p>
-                                    <p className="text-sm text-red-600">
-                                       {penalty.reason}
-                                    </p>
-                                 </div>
-                                 <div className="text-right text-xs text-red-500">
-                                    {penalty.appliedAt && (
-                                       <p>
-                                          {new Date(penalty.appliedAt).toLocaleString()}
-                                       </p>
-                                    )}
-                                 </div>
+
+               <div className="bg-white rounded-lg shadow-md p-6">
+                  <h2 className="text-xl font-semibold mb-4">Penalties</h2>
+                  <div className="space-y-3">
+                     {record.penalties.map((penalty: any, index: number) => (
+                        <div
+                           key={index}
+                           className="border-l-4 border-red-500 bg-red-50 p-4"
+                        >
+                           <div className="flex justify-between items-start">
+                              <div>
+                                 <p className="font-medium text-red-700">
+                                    -${penalty.amount}
+                                 </p>
+                                 <p className="text-sm text-red-600">{penalty.reason}</p>
+                              </div>
+                              <div className="text-right text-xs text-red-500">
+                                 {penalty.appliedAt && (
+                                    <p>{new Date(penalty.appliedAt).toLocaleString()}</p>
+                                 )}
                               </div>
                            </div>
-                        ))}
-                     </div>
+                        </div>
+                     ))}
                   </div>
-               )}
+               </div>
+
+               <form
+                  action={approveDailyRecord(recordId, userId, record.penalties)}
+               >
+                  <button
+                     type="submit"
+                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                     Approve This Day's Record
+                  </button>
+               </form>
 
                {/* Total Reward */}
                {/* Motivation Station: Payout Summary */}

@@ -41,8 +41,11 @@ Next:
 
 
 
-*** chores/?childId => can't unselect chore
+*** upon new day, autosubmit should add copyOfChildChoresSubmitted: IDailyChore[]; to old record -> but isn't  
 
+
+dailyRecordService
+APPROVE DAILY ACTION     line292 needs to be removed
 
 
 

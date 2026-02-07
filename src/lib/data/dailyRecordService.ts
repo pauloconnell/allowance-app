@@ -30,27 +30,27 @@ export function getEndOfDay(date: Date = new Date()): Date {
  */
 export async function getRolloverChores(
    childId: string,
-   familyId: string,
-
+   familyId: string
 ): Promise<IDailyChore[]> {
-
-   const [latestRecord] = await DailyRecord.find({ childId, familyId }).sort({ date: -1 }).limit(1);
+   const [latestRecord] = await DailyRecord.find({ childId, familyId })
+      .sort({ dueDate: -1 })
+      .limit(1);
 
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
    normalizeRecord(prevRecord.choresList);
-   console.log("check dueDate:", prevRecord.choresList)
+   console.log('check dueDate:', prevRecord.choresList);
    // Return chores with completionStatus === 0
    // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
    return prevRecord.choresList.map((chore: IDailyChore) => {
-
-      //ensure incomplete chores don't reward child: 
-      if (chore.completionStatus == .5) {
+      //ensure incomplete chores don't reward child:
+      if (chore.completionStatus == 0.5) {
          chore.rewardAmount = Math.round((chore.rewardAmount / 2) * 100) / 100; // adjust reward for partial completion ie. max reward is now 1/2
          chore.completionStatus = 0; // reset to 0 so it doesn't trigger reward
       }
 
-      if (chore.completionStatus < 1) {            // get all incomplete chores
+      if (chore.completionStatus < 1) {
+         // get all incomplete chores
          return chore;
       }
    });
@@ -65,78 +65,67 @@ export async function getRecurringChores(
    childId: string,
    existingChoreIds: string[]
 ): Promise<IDailyChore[]> {
-
-
    const child = await Child.findById(childId).lean(); // get child's assigned chores = use .lean() = plain array = faster ;)
    if (!child || !child.choresList) return [];
    const now = new Date();
    now.setHours(0, 0, 0, 0); // Normalize to start of day
    const scheduled: IDailyChore[] = [];
 
-
    // 2. Filter the master list for active chores due today that aren't already rolled over - update any chores rolled over to reschedule based on today ( if recurring)
 
    const choresToProcess: IDailyChore[] = [];
    child.choresList.forEach((chore: IChildChore) => {
-      if (new Date(chore.dueDate) <= now) {                             // only look at chores due
+      if (new Date(chore.dueDate) <= now) {
+         // only look at chores due
 
-         if (!existingChoreIds.includes(chore.choreId.toString())) {    // only include chores not already assigned(ie. not completed from yesterday)
+         if (!existingChoreIds.includes(chore.choreId.toString())) {
+            // only include chores not already assigned(ie. not completed from yesterday)
             choresToProcess.push(chore);
          } else {
             //chore is already in record - so reschedule that chore if recurring
-            if (chore.isRecurring && chore.intervalDays) {                // if chore is recurring, update next due date in choreList immediately => details of chore completion{
+            if (chore.isRecurring && chore.intervalDays) {
+               // if chore is recurring, update next due date in choreList immediately => details of chore completion{
 
                const dueDate = new Date(chore.dueDate);
-               dueDate.setHours(0, 0, 0, 0);                               // Normalize to start of day
-               dueDate.setDate(dueDate.getDate() + (chore.intervalDays || 1));   // push out next occurance from today (assuming child does it today)
+               dueDate.setHours(0, 0, 0, 0); // Normalize to start of day
+               dueDate.setDate(dueDate.getDate() + (chore.intervalDays || 1)); // push out next occurance from today (assuming child does it today)
                Child.updateOne(
-                  { _id: childId, "choresList.choreId": chore.choreId },
+                  { _id: childId, 'choresList.choreId': chore.choreId },
                   {
                      $set: {
-                        "choresList.$.dueDate": dueDate,
-                     }
+                        'choresList.$.dueDate': dueDate,
+                     },
                   }
                );
             }
          }
       }
-
    });
 
-
-
    if (choresToProcess.length === 0) {
-      console.log("No recurring chores to add for today.");
+      console.log('No recurring chores to add for today.');
       return [];
    }
 
-
    // 2. Loop once: Transform for Today AND Update for the Future
    for (const chore of choresToProcess) {
-
-      if (existingChoreIds.includes(chore.choreId)) continue;   // don't add chores already in list
+      if (existingChoreIds.includes(chore.choreId)) continue; // don't add chores already in list
       // A. Push to the DailyRecord array (Today's Snapshot)
       scheduled.push({
          ...chore,
          isOverridden: false,
-         parentNotes: "",
+         parentNotes: '',
       });
-
-
-
    }
-
-
 
    return scheduled;
 }
-
 
 /**
  * Initialize or retrieve today's DailyRecord for a child
  * Implements rollover and recurrence logic
  */
-export async function getOrCreateTodaysDailyRecord(      // too many things here -> simple createTOdaysDailyRecord -> call this from submitDailyRecord - or Directly if no records exist yet
+export async function getOrCreateTodaysDailyRecord( // too many things here -> simple createTOdaysDailyRecord -> call this from submitDailyRecord - or Directly if no records exist yet
    childId: string,
    familyId: string,
    today: Date = new Date()
@@ -148,29 +137,32 @@ export async function getOrCreateTodaysDailyRecord(      // too many things here
    let recentRecord = await DailyRecord.findOne(
       { childId, familyId },
       null,
-      { sort: { dueDate: -1 } }   // newest → oldest
+      { sort: { dueDate: -1 } } // newest → oldest
    ).lean();
 
-   console.log(recentRecord.createdAt, startOfDay, "recent record found is: ", recentRecord);
+   console.log(
+      recentRecord.createdAt,
+      startOfDay,
+      'recent record found is: ',
+      recentRecord
+   );
    if (recentRecord.dueDate >= startOfDay) {
-      console.log("already have record for today")
+      console.log('already have record for today');
       // if today is already set up, just return that record
       return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
    }
-
-
 
    // Get rollover chores from yesterday
    const rolloverChores = await getRolloverChores(childId, familyId);
 
    // Get recurring chores
    const existingChoreIds = rolloverChores?.map((c) => c?.choreId.toString());
-   const recurringChores = await getRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore 
+   const recurringChores = await getRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore
 
    // Combine chores
    const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
 
-   console.log("chores for new record are: ", choresList);
+   console.log('chores for new record are: ', choresList);
 
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({
@@ -190,7 +182,7 @@ export async function getOrCreateTodaysDailyRecord(      // too many things here
    // Need to submit old record if it exists and isn't submitted - will trigger copy of child's chores completion status for parent to approve for payment
    if (recentRecord && !recentRecord.isSubmitted) {
       let triggerCreate = false;
-      submitDailyRecord(recentRecord._id, triggerCreate)
+      submitDailyRecord(recentRecord._id, triggerCreate);
       //     recentRecord.isSubmitted = true;
       // recentRecord.submittedAt = new Date();
       // recentRecord.status = 'submitted';
@@ -235,7 +227,11 @@ export async function updateChoreCompletion(
  * Sets isSubmitted to true and submittedAt timestamp
  * UI becomes read-only after this
  */
-export async function submitDailyRecord(dailyRecordId: string, triggerCreate = true): Promise<IDailyRecord> {         // not really used -> submit is automatic when record.date(createdAt) < today's date
+export async function submitDailyRecord(
+   dailyRecordId: string,
+   triggerCreate = true
+): Promise<IDailyRecord> {
+   // not really used -> submit is automatic when record.date(createdAt) < today's date
    const record = await DailyRecord.findById(dailyRecordId);
 
    if (!record) {
@@ -252,12 +248,35 @@ export async function submitDailyRecord(dailyRecordId: string, triggerCreate = t
    record.copyOfChildChoresSubmitted = JSON.parse(JSON.stringify(record.choresList)); // create snapshot for parent review
    await record.save();
 
-   if (triggerCreate) {       // this flag prevents calling below function-as it may call this function (below function gets triggered automatically by day changing - in which case it will call this function.  Note: submit API triggers this function directly, and needs to call below function)
+   if (triggerCreate) {
+      // this flag prevents calling below function-as it may call this function (below function gets triggered automatically by day changing - in which case it will call this function.  Note: submit API triggers this function directly, and needs to call below function)
       // create next day's record
       await getOrCreateTodaysDailyRecord(record.childId, record.familyId, new Date());
    }
 
    return record.toObject() as IDailyRecord;
+}
+
+// get records for parent to approve either by child, or all for family
+export async function getRecordsNeedingApproval(
+   familyId: string,
+   childId?: string
+): Promise<IDailyRecord[]> {
+
+   const query: any = {
+      familyId,
+     // isSubmitted: true,
+      isApproved: false,
+      dueDate: { $lte: getStartOfDay(new Date()) },
+   };
+
+   if (childId) {
+      query.childId = childId;
+   }
+
+   const records = await DailyRecord.find(query).sort({ dueDate: -1 });
+
+   return records.map((r) => normalizeRecord(r) as IDailyRecord);
 }
 
 /**
@@ -267,11 +286,6 @@ export async function submitDailyRecord(dailyRecordId: string, triggerCreate = t
 export async function approveDailyRecord(
    dailyRecordId: string,
    parentUserId: string,
-   choreAdjustments: Array<{
-      choreIndex: number;
-      parentAdjustedReward?: number;
-      isOverridden: boolean;
-   }>,
    penalties: Array<{ amount: number; reason: string }>
 ): Promise<IPayoutResult> {
    const record = await DailyRecord.findById(dailyRecordId);
@@ -284,15 +298,15 @@ export async function approveDailyRecord(
       throw new Error('Record must be submitted before approval');
    }
 
-   // Apply chore adjustments
-   choreAdjustments.forEach(({ choreIndex, parentAdjustedReward, isOverridden }) => {
-      if (choreIndex >= 0 && choreIndex < record.choresList.length) {
-         record.choresList[choreIndex].isOverridden = isOverridden;
-         if (parentAdjustedReward !== undefined && isOverridden) {
-            record.choresList[choreIndex].parentAdjustedReward = parentAdjustedReward;
-         }
-      }
-   });
+   // // Apply chore adjustments
+   // choreAdjustments.forEach(({ choreIndex, parentAdjustedReward, isOverridden }) => {
+   //    if (choreIndex >= 0 && choreIndex < record.choresList.length) {
+   //       record.choresList[choreIndex].isOverridden = isOverridden;
+   //       if (parentAdjustedReward !== undefined && isOverridden) {
+   //          record.choresList[choreIndex].parentAdjustedReward = parentAdjustedReward;
+   //       }
+   //    }
+   // });
 
    // Add penalties with metadata
    const penaltiesWithMetadata = penalties.map((p) => ({
@@ -322,14 +336,18 @@ export async function approveDailyRecord(
  * Formula: (sum of parent-adjusted rewards) - (sum of penalty amounts)
  */
 async function calculateAndApplyPayout(
-   record: any,
+   record: IDailyCHore,
    parentUserId: string
 ): Promise<IPayoutResult> {
    // Calculate total chore reward
-   const totalChoreReward = record.choresList.reduce((sum: number, chore: IDailyChore) => {   // USE record/parentChoresList here: 
-      const reward = chore.rewardAmount * (chore.completionStatus || 0);
-      return sum + reward;
-   }, 0);
+   const totalChoreReward = record.choresList.reduce(
+      (sum: number, chore: IDailyChore) => {
+         // USE record/parentChoresList here:
+         const reward = chore.rewardAmount * (chore.completionStatus || 0);
+         return sum + reward;
+      },
+      0
+   );
 
    // Calculate total penalties
    const totalPenalties = record.penalties.reduce(
@@ -366,10 +384,13 @@ async function calculateAndApplyPayout(
  * Does not touch the database. Useful for unit tests & UI previews.
  */
 export function computePayoutTotals(record: any) {
-   const totalChoreReward = record.choresList.reduce((sum: number, chore: IDailyChore) => {
-      const reward = chore.rewardAmount * (chore.completionStatus || 0);
-      return sum + reward;
-   }, 0);
+   const totalChoreReward = record.choresList.reduce(
+      (sum: number, chore: IDailyChore) => {
+         const reward = chore.rewardAmount * (chore.completionStatus || 0);
+         return sum + reward;
+      },
+      0
+   );
 
    const totalPenalties = (record.penalties || []).reduce(
       (sum: number, penalty: any) => sum + (penalty.amount || 0),
@@ -398,7 +419,7 @@ export async function getChildDailyRecords(
    const records = await DailyRecord.find({
       childId,
       familyId,
-      date: {
+      dueDate: {
          $gte: getStartOfDay(startDate),
          $lte: getEndOfDay(endDate),
       },
@@ -417,7 +438,7 @@ export async function getFamilyDailyRecords(
 ): Promise<IDailyRecord[]> {
    const records = await DailyRecord.find({
       familyId,
-      date: {
+      dueDate: {
          $gte: getStartOfDay(startDate),
          $lte: getEndOfDay(endDate),
       },
@@ -434,7 +455,7 @@ export async function getFamilyDailyRecords(
 export async function upsertPenalty(
    childId: string,
    familyId: string,
-   date: Date,
+   dueDate: Date,
    penalty: { amount: number; reason: string },
    parentUserId: string
 ): Promise<IDailyRecord> {
@@ -445,7 +466,7 @@ export async function upsertPenalty(
    let dailyRecord = await DailyRecord.findOne({
       childId,
       familyId,
-      date: {
+      dueDate: {
          $gte: startOfDay,
          $lte: endOfDay,
       },
@@ -466,7 +487,7 @@ export async function upsertPenalty(
       dailyRecord = new DailyRecord({
          childId,
          familyId,
-         date: startOfDay,
+         dueDate: startOfDay,
          choresList: [],
          isSubmitted: true,
          isApproved: true,

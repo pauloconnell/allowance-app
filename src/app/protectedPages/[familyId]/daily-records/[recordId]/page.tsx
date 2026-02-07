@@ -22,6 +22,8 @@ interface PageProps {
    searchParams: Promise<{ childId?: string }>;
 }
 
+// this is the page the child sees to complete thier chores
+
 export default async function DailyRecordDetailPage({ params, searchParams }: PageProps) {
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
