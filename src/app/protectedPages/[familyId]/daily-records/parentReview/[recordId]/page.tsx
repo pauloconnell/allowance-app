@@ -32,7 +32,7 @@ export default async function ParentReviewDailyRecordDetailPage({
    params,
    searchParams,
 }: PageProps) {
-   
+
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
@@ -41,27 +41,26 @@ export default async function ParentReviewDailyRecordDetailPage({
    let child: IChild | null = null;
    let error = null;
 
-   // 1. Get logged-in user
-   const {userId}  = await getAuthSession();
-   if (!userId) {
-      redirect('/login');
-   }
+
+     // 1. Get logged-in user
+   const session = await getAuthSession(); 
+   if (!session) redirect("/login"); 
+   const userId = session.userId;
+
+
+ 
+ 
 
    // RBAC: Get this user's role from userFamily:
 
    let isParent = isParentInFamily(userId, familyId);
 
    // 2. Enforce RBAC: must be a parent
-   if (userId.role !== 'parent') {
+   if (!isParent) {
       redirect('/unauthorized');
    }
-   // 3. Ensure parent belongs to this family
-   if (userId.familyId !== familyId) {
-      redirect('/unauthorized');
-   }
-   // 4. Extract parent userId for later use
-   const parentUserId = userId;
 
+  
    try {
       await connectDB();
 

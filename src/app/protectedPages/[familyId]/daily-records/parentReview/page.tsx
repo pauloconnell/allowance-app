@@ -37,7 +37,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          
          childName = children.filter(child=>child._id.toString() === childId)[0]?.name || '';
 
-         records = await getRecordsNeedingApproval(childId, familyId); // note 'todaysRecord' lives in client store only - in server its just records[0]
+         records = await getRecordsNeedingApproval( familyId,childId ); // note 'todaysRecord' lives in client store only - in server its just records[0]
          console.log(
             'parentReview got records for approval for child:',
             { childId },

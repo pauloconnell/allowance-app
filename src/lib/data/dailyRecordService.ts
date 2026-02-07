@@ -270,6 +270,7 @@ export async function getRecordsNeedingApproval(
       dueDate: { $lte: getStartOfDay(new Date()) },
    };
 
+   console.log("adding childId", {childId})
    if (childId) {
       query.childId = childId;
    }
