@@ -26,8 +26,7 @@ export default async function ChoresPage({ params, searchParams }: PageProps) {
   ]);
 
   const sortedPool = [...(allChores || [])].sort((a, b) => 
-    a.taskName.localeCompare(b.taskName)
-  );
+   (a.suggestedTime || "").localeCompare(b.suggestedTime || "" ));
 
   return (
 

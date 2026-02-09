@@ -146,20 +146,27 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       { sort: { dueDate: -1 } } // newest → oldest
    ).lean();
 
+
+
    // console.log(
    //    recentRecord.createdAt,
    //    startOfDay,
    //    'recent record found is: ',
    //    recentRecord
    // );
-   if (recentRecord.dueDate >= startOfDay) {
+ let rolloverChores:IDailyChore[]=[];  // IChildChore becomes IDailyChore
+   if (recentRecord) {    // skip this if it's child's first day ie no daily record
 
-      // if today is already set up, just return that record
-      return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
+      if (recentRecord.dueDate >= startOfDay) {
+
+         // if today is already set up, just return that record
+         return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
+      }
+
+      // Get rollover chores from yesterday
+      rolloverChores = await getRolloverChores(childId, familyId);
+
    }
-
-   // Get rollover chores from yesterday
-   const rolloverChores = await getRolloverChores(childId, familyId);
 
    // Get recurring chores
    const existingChoreIds = rolloverChores?.map((c) => c?.choreId.toString());

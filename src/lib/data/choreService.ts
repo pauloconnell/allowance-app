@@ -19,7 +19,7 @@ export async function getChoreById(choreId: string): Promise<IChore | null> {
 
 export async function getAllChores(familyId: string): Promise<IChore[]> {
   await connectDB();
-  const chores = await Chore.find({ familyId }).sort({ createdAt: -1 }).lean();
+  const chores = await Chore.find({ familyId }).sort({ suggestedTime:1 }).lean();
   //console.log("Got chores for family ", familyId, chores)
   return chores.map(normalizeRecord);
 }
@@ -29,7 +29,7 @@ export async function getChoresForChild(childId: string, familyId?: string): Pro
   const query: any = { childId, isActive: true };
   if (familyId) query.familyId = familyId;
   
-  const chores = await Chore.find(query).sort({ createdAt: -1 }).lean();
+  const chores = await Chore.find(query).sort({ suggestedTime:1 }).lean();
   return chores.map(normalizeRecord);
 }
 
