@@ -5,7 +5,7 @@ import { updateChoreStatus } from '@/lib/actions/record';
 
 // Notice we use recordId (string) because it's serializable 
 // and we removed onUpdate because a Server Page can't pass it.
-export default function ChoreCompletionBoxes({ chore, recordId, isParent }: { chore: any, recordId: string, isParent?: boolean }) {
+export default function ChoreCompletionBoxes({ chore, recordId, isDisabled }: { chore: any, recordId: string, isDisabled?: boolean }) {
   const [isPending, startTransition] = useTransition();
 
   const handleToggle = (val: number) => {
@@ -32,7 +32,7 @@ export default function ChoreCompletionBoxes({ chore, recordId, isParent }: { ch
     <div className={`mt-4 p-2 rounded-md transition-all ${isPending ? 'bg-gray-50 opacity-60' : ''}`}>
       <div className="flex justify-between items-center mb-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Update Progress
+          {isDisabled ? 'Child Entered: ' : 'Update Progress'}
         </span>
         {isPending && (
           <span className="text-xs text-blue-600 animate-pulse font-medium">
@@ -45,13 +45,13 @@ export default function ChoreCompletionBoxes({ chore, recordId, isParent }: { ch
         {options.map((opt) => (
           <button
             key={opt.value}
-            disabled={isPending}
+            disabled={isPending || isDisabled}
             onClick={() => handleToggle(opt.value)}
             className={`flex-1 py-2 rounded-md border text-sm transition-all
               ${chore.completionStatus === opt.value 
                 ? `${opt.color} border-current font-bold ring-2 ring-offset-1 ring-blue-400` 
                 : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
-              } ${isPending ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}`}
+              } ${isPending || isDisabled ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}`}
           >
             {opt.label}
           </button>

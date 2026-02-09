@@ -70,6 +70,8 @@ export default async function ParentReviewDailyRecordDetailPage({
       } else {
          record = normalizeRecord(dailyRecord);
 
+         console.log("daily record for parent review:", record.copyOfChildChoresSubmitted[2]); // record);
+
          // delete this if we want childID to be required -> faster =1 less api call
          child = await Child.findById(record.childId).lean();
          if (child) {
@@ -248,6 +250,17 @@ export default async function ParentReviewDailyRecordDetailPage({
                                     Notes: {chore.notes}
                                  </p>
                                  <p className="text-sm text-gray-600 mt-2">
+                                    Child Selected:
+                                 </p>
+                                 <ChoreCompletionBoxes
+                                    key={index}
+                                    chore={record.copyOfChildChoresSubmitted[index]}
+                                    recordId={record.copyOfChildChoresSubmitted[index]._id}
+                                    isDisabled={ true }
+                                       />
+                                    
+
+                                 <p className="text-sm text-gray-600 mt-2">
                                     ChildNotes:{' '}
                                     {record.copyOfChildChoresSubmitted[index].notes}
                                  </p>
@@ -256,7 +269,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                                  key={chore._id}
                                  chore={chore}
                                  recordId={record._id}
-                                 isParent={true}
+                               
                               />
                            </div>
                         ))}
