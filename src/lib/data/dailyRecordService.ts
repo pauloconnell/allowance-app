@@ -24,6 +24,9 @@ export function getEndOfDay(date: Date = new Date()): Date {
    return d;
 }
 
+
+
+
 /**
  * Rollover Logic: Identify incomplete chores from previous day
  * Returns array of chores that were not completed (completionStatus === 0)
@@ -45,7 +48,9 @@ export async function getRolloverChores(
    return prevRecord.choresList.map((chore: IDailyChore) => {
       //ensure incomplete chores don't reward child:
       if (chore.completionStatus == 0.5) {
-         chore.rewardAmount = Math.round((chore.rewardAmount / 2) * 100) / 100; // adjust reward for partial completion ie. max reward is now 1/2
+         if (!chore.isRecurring) {
+            chore.rewardAmount = Math.round((chore.rewardAmount / 2) * 100) / 100; // adjust reward for partial completion ie. max reward is now 1/2 UNLESS it's recurring then it's worth full value again
+         }
          chore.completionStatus = 0; // reset to 0 so it doesn't trigger reward
       }
 
@@ -60,7 +65,7 @@ export async function getRolloverChores(
  * Recurrence Logic: Get active recurring chores that should be added to today  from DB
  * Filters out chores that are already in the rollover list
  */
-export async function getRecurringChores(
+export async function doRecurringChores(
    familyId: string,
    childId: string,
    existingChoreIds: string[]
@@ -84,6 +89,7 @@ export async function getRecurringChores(
          } else {
             //chore is already in record - so reschedule that chore if recurring
             if (chore.isRecurring && chore.intervalDays) {
+
                // if chore is recurring, update next due date in choreList immediately => details of chore completion{
 
                const dueDate = new Date(chore.dueDate);
@@ -140,14 +146,14 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       { sort: { dueDate: -1 } } // newest → oldest
    ).lean();
 
-   console.log(
-      recentRecord.createdAt,
-      startOfDay,
-      'recent record found is: ',
-      recentRecord
-   );
+   // console.log(
+   //    recentRecord.createdAt,
+   //    startOfDay,
+   //    'recent record found is: ',
+   //    recentRecord
+   // );
    if (recentRecord.dueDate >= startOfDay) {
-      console.log('already have record for today');
+
       // if today is already set up, just return that record
       return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
    }
@@ -157,7 +163,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    // Get recurring chores
    const existingChoreIds = rolloverChores?.map((c) => c?.choreId.toString());
-   const recurringChores = await getRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore
+   const recurringChores = await doRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore
 
    // Combine chores
    const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
@@ -265,12 +271,12 @@ export async function getRecordsNeedingApproval(
 
    const query: any = {
       familyId,
-     // isSubmitted: true,
+      // isSubmitted: true,
       isApproved: false,
       dueDate: { $lte: getStartOfDay(new Date()) },
    };
 
-   console.log("adding childId", {childId})
+   console.log("adding childId", { childId })
    if (childId) {
       query.childId = childId;
    }
