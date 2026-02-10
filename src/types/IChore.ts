@@ -30,6 +30,7 @@ export interface IDailyChore {
    choreId: string; // Reference to master Chore
    taskName: string;
    rewardAmount: number;
+   suggestedTime?: string;
    completionStatus: 0 | 0.5 | 1; // 0 = not done, 0.5 = partial, 1 = complete   // Parent can override completion/reward amount in DailyRecord ParentChoresList (which is source of truth for actual payouts)
    isOverridden?: boolean;
    isRecurring: boolean;

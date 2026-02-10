@@ -42,10 +42,11 @@ export async function getRolloverChores(
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
    normalizeRecord(prevRecord.choresList);
-   console.log('check dueDate:', prevRecord.choresList);
+   
    // Return chores with completionStatus === 0
    // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
-   return prevRecord.choresList.map((chore: IDailyChore) => {
+   return prevRecord.choresList.reduce((acc:IDailyChore[], chore: IDailyChore) => {
+
       //ensure incomplete chores don't reward child:
       if (chore.completionStatus == 0.5) {
          if (!chore.isRecurring) {
@@ -56,9 +57,11 @@ export async function getRolloverChores(
 
       if (chore.completionStatus < 1) {
          // get all incomplete chores
-         return chore;
+         acc.push(chore);
       }
-   });
+      return acc;
+   },[]);   // initial value of acc must be set to [] here;)
+
 }
 
 /**
@@ -79,7 +82,7 @@ export async function doRecurringChores(
    // 2. Filter the master list for active chores due today that aren't already rolled over - update any chores rolled over to reschedule based on today ( if recurring)
 
    const choresToProcess: IDailyChore[] = [];
-   child.choresList.forEach((chore: IChildChore) => {
+   child.choresList.forEach((chore:  IDailyChore) => {
       if (new Date(chore.dueDate) <= now) {
          // only look at chores due
 
@@ -173,9 +176,11 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    const recurringChores = await doRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore
 
    // Combine chores
-   const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
+   const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores]; 
 
-   console.log('chores for new record are: ', choresList);
+   console.log('chores for new record are: ', rolloverChores, recurringChores);
+
+  choresList.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || "") );
 
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({

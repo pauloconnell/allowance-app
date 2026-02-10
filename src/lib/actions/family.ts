@@ -36,8 +36,9 @@ export async function createFamily(name: string) {
     const firstName = session.user.given_name || '';
     const lastName = session.user.family_name || '';
  console.log("got session?",session.user.sub);
+ console.log("Using DB URI:", process.env.MONGODB_URI);
     await connectDB();
-
+console.log("Using DB URI:", process.env.MONGODB_URI);
     const family = await Family.create({
           userId: userId,
       name: name.trim(),

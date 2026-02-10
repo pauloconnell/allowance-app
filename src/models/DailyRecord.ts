@@ -17,6 +17,7 @@ const ChoreEntrySchema = new Schema({
     default: 0,
     required: true,
   },
+  suggestedTime: String,
   isOverridden: { type: Boolean, default: false },
   dueDate: { type: Date, required: true },
   notes: { type: String, default: null },

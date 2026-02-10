@@ -19,6 +19,7 @@ const ChildChoreSchema = new Schema({ // this is just keeping data on the curren
     type: Date,
     default: null
   },
+  suggestedTime: String,
   nextDue: { 
     type: Date, 
     default: Date.now 
