@@ -33,5 +33,5 @@
       "**/*.mts"
 ,   ],
    "exclude": ["node_modules", "vitest.config.ts", "tsconfig.vitest.json"],
-   "references": [{ "path": "./tsconfig.config.json" }]
+  
 }
