@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import Child from '@/models/Child';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
@@ -10,16 +10,17 @@ import type { IChildFormData } from '@/types/IChild';
  * Retrieves a specific child
  */
 export async function GET(
-   req: NextRequest,
-   { params }: { params: { childId: string } }
+   request: Request,
+  { params } : {params:  Promise<{ childId: string }> }
 ) {
+   const { childId } = await params;
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const child = await Child.findById(params.childId);
+      const child = await Child.findById(childId);
       if (!child) {
          return NextResponse.json({ error: 'Child not found' }, { status: 404 });
       }
@@ -51,16 +52,17 @@ export async function GET(
  * Updates a child's information
  */
 export async function PUT(
-   req: NextRequest,
-   { params }: { params: { childId: string } }
+   request: Request,
+  { params } : {params:  Promise<{ childId: string }> }
 ) {
+   const { childId } = await params;
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const child = await Child.findById(params.childId);
+      const child = await Child.findById(childId);
       if (!child) {
          return NextResponse.json({ error: 'Child not found' }, { status: 404 });
       }
@@ -76,7 +78,7 @@ export async function PUT(
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const body = (await req.json()) as Partial<IChildFormData>;
+      const body = (await request.json()) as Partial<IChildFormData>;
 
       // Only allow updating these fields
       if (body.name) child.name = body.name;
@@ -101,16 +103,17 @@ export async function PUT(
  * Deletes a child
  */
 export async function DELETE(
-   req: NextRequest,
-   { params }: { params: { childId: string } }
+   request: Request,
+  { params } : {params:  Promise<{ childId: string }> }
 ) {
+   const { childId } = await params;
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const child = await Child.findById(params.childId);
+      const child = await Child.findById(childId);
       if (!child) {
          return NextResponse.json({ error: 'Child not found' }, { status: 404 });
       }
@@ -126,7 +129,7 @@ export async function DELETE(
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      await Child.deleteOne({ _id: params.childId });
+      await Child.deleteOne({ _id: childId });
 
       return NextResponse.json({ success: true });
    } catch (err) {

@@ -133,7 +133,7 @@ export async function assertPermission(
 export async function getUserPermissions(
    userId: string,
    familyId: string
-): Promise<Record<ResourceType, Action[]> | null> {
+): Promise<Partial<Record<ResourceType, Action[]>> | null> {
    const role = await getUserRoleInFamily(userId, familyId);
    if (!role) return null;
 

@@ -309,7 +309,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                </div>
 
                <form
-                  action={approveDailyRecord(recordId, userId, record.penalties)}
+                  action={async()=>{approveDailyRecord(recordId, userId, record.penalties)}}
                >
                   <button
                      type="submit"

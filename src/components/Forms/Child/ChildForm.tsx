@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { sanitizeInput } from '@/lib/utils/sanitizeInput';
 import type { IChild } from '@/types/IChild';
-import type { IFormChild } from '@/types/IFormChild';
 
 interface ChildFormProps {
-   child?: IChild | IFormChild;
+   child?: IChild;
    familyId: string;
 }
 
@@ -17,8 +16,7 @@ export default function ChildForm({ child, familyId }: ChildFormProps) {
    const isEdit = !!child;
 
    // Handle ID for edit mode
-   const derivedChildId =
-      child && '_id' in child ? child._id : (child?.childId ?? '');
+   const derivedChildId = child?._id ?? '';
 
    const [form, setForm] = useState({
       name: child?.name ?? '',

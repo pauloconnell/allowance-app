@@ -11,7 +11,7 @@ import { getSession } from '@auth0/nextjs-auth0';
  * INTERNAL HELPER: Centralized Security Check
  * Checks Auth0 session and RBAC permissions.
  */
-async function _validateAccess(familyId: string, action: 'read' | 'write' | 'delete' = 'read') {
+async function _validateAccess(familyId: string, action: 'read' | 'create' | 'update' | 'delete' = 'read') {
   const session = await getSession();
   if (!session?.user) throw new Error("NOT_LOGGED_IN");
 
@@ -86,8 +86,8 @@ export async function getAllChildren(familyId : string, userId?: string) {
 export async function createChild(data: IChildInput): Promise<{ success: boolean }>  {
   await connectDB();
 
-  // 1. Check for 'write' permission
-  await _validateAccess(data.familyId, 'write');
+  // 1. Check for 'create' permission
+  await _validateAccess(data.familyId, 'create');
 
   const c = await Child.create(data);
 

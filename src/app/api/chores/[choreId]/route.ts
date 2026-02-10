@@ -1,25 +1,33 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import Chore from '@/models/Chore';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
 import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import type { IChoreFormData } from '@/types/IChore';
 
+
+type RouteContext = {
+  params: Promise<{ choreId: string }>;
+};
+
 /**
  * GET /api/chores/[choreId]
  * Retrieves a specific chore
  */
 export async function GET(
-   req: NextRequest,
-   { params }: { params: Promise<{ choreId: string }> }
+   request: Request,
+   context: { params: Promise<{ choreId: string }> }
 ) {
+const { choreId } = await context.params;
+   
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const chore = await Chore.findById(params.choreId);
+    
+      const chore = await Chore.findById(choreId);
       if (!chore) {
          return NextResponse.json({ error: 'Chore not found' }, { status: 404 });
       }
@@ -51,16 +59,18 @@ export async function GET(
  * Updates a chore
  */
 export async function PUT(
-   req: NextRequest,
-   { params }: { params: Promise<{ choreId: string }> }
+   request: Request,
+   context: { params: Promise<{ choreId: string }> }
 ) {
+const { choreId } = await context.params;
+
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { choreId } = await params;
+     
 
       const chore = await Chore.findById(choreId);
       if (!chore) {
@@ -90,7 +100,7 @@ export async function PUT(
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const body = (await req.json()) as Partial<IChoreFormData>;
+      const body = (await request.json()) as Partial<IChoreFormData>;
 
       // Only allow updating these fields
       if (body.taskName) chore.taskName = body.taskName;
@@ -118,16 +128,17 @@ export async function PUT(
  * Soft deletes a chore (sets isActive to false)
  */
 export async function DELETE(
-   req: NextRequest,
-   { params }: { params: { choreId: string } }
+   request: Request,
+   context: { params: Promise<{ choreId: string }> }
 ) {
+   const { choreId } = await context.params;
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const chore = await Chore.findById(params.choreId);
+      const chore = await Chore.findById(choreId);
       if (!chore) {
          return NextResponse.json({ error: 'Chore not found' }, { status: 404 });
       }

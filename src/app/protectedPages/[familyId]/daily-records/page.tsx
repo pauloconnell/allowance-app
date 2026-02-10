@@ -14,7 +14,6 @@ import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRec
 import { isSameDay } from '@/lib/utils/dateHelper';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 
-
 interface PageProps {
    params: Promise<{ familyId: string }>;
    searchParams: Promise<{ childId?: string; date?: string }>;
@@ -56,14 +55,13 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
       isTodaysRecord = isSameDay(records[0].date, today);
    }
 
-   if(!isTodaysRecord && childId){
+   if (!isTodaysRecord && childId) {
       console.log("Not today's record - no live record present");
       //process last record
 
       // create today's record
       await handleCreateRecordForToday(childId, familyId);
    }
-
 
    // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
    // async function handleCreateRecordForToday() {
@@ -73,11 +71,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    //    try {
    //       console.log("Created new record for today:");
    //       let newRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
-         
+
    //       newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
    //       newId=newRecord._id;
    //       console.log("Created new record for today:", newRecord);
-        
+
    //    } catch (err) {
    //       console.error('Error creating new daily record:', err);
    //    }
@@ -160,7 +158,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                            📅 Today's Record (Live)
                         </h2>
                         {!isTodaysRecord && (
-                           <form action={handleCreateRecordForToday}>
+                           <form
+                              action={async () => {
+                                 await handleCreateRecordForToday(childId, familyId);
+                              }}
+                           >
                               <button
                                  type="submit"
                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"

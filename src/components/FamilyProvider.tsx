@@ -16,7 +16,7 @@ export default function FamilyProvider({
    familyId: string;
 }) {
    useEffect(() => {
-      useFamilyStore.setState({ activefamilyId: familyId });
+      useFamilyStore.setState({ activeFamilyId: familyId });
    }, [familyId]);
 
    return <>{children}</>;

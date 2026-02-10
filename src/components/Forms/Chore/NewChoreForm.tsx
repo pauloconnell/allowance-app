@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { sanitizeInput } from '@/lib/utils/sanitizeInput';
 import type { IChore } from '@/types/IChore';
-import type { IFormChore } from '@/types/IFormChore';
 
 interface ChoreFormProps {
    chore?: IChore ;  // If present, we are in Edit mode

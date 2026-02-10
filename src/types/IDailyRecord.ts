@@ -2,6 +2,8 @@ import { IDailyChore, IPenalty } from './IChore';
 
 export type DailyRecordStatus = 'pending' | 'submitted' | 'approved' | 'rejected';
 
+export type { IDailyChore };
+
 export interface IDailyRecord {
    _id: string;
    familyId: string;

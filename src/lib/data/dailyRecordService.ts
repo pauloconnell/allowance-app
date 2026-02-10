@@ -355,7 +355,7 @@ export async function approveDailyRecord(
  * Formula: (sum of parent-adjusted rewards) - (sum of penalty amounts)
  */
 async function calculateAndApplyPayout(
-   record: IDailyCHore,
+   record: IDailyRecord,
    parentUserId: string
 ): Promise<IPayoutResult> {
    // Calculate total chore reward
@@ -478,8 +478,8 @@ export async function upsertPenalty(
    penalty: { amount: number; reason: string },
    parentUserId: string
 ): Promise<IDailyRecord> {
-   const startOfDay = getStartOfDay(date);
-   const endOfDay = getEndOfDay(date);
+   const startOfDay = getStartOfDay(dueDate);
+   const endOfDay = getEndOfDay(dueDate);
 
    // Check if record exists for this date
    let dailyRecord = await DailyRecord.findOne({

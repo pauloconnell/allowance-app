@@ -23,6 +23,6 @@ const FamilySchema = new Schema(
 
 // If a user can only own ONE family, we make userId unique.
 // If they can own multiple, we keep it as a standard index.
-FamilySchema.index({ userId: 1 });
+
 
 export default mongoose.models.Family || mongoose.model('Family', FamilySchema);

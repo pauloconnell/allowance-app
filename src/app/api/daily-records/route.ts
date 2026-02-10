@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import {
    getOrCreateTodaysDailyRecord,
    getChildDailyRecords,
@@ -15,14 +15,14 @@ import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
  * Retrieves daily records for a child
  * Query params: childId, familyId, startDate?, endDate?
  */
-export async function GET(req: NextRequest) {
+export async function GET(request: Request) {
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { searchParams } = new URL(req.url);
+      const { searchParams } = new URL(request.url);
       const childId = searchParams.get('childId');
       const familyId = searchParams.get('familyId');
       const startDateStr = searchParams.get('startDate');
@@ -62,14 +62,14 @@ export async function GET(req: NextRequest) {
  * Creates  daily record for a child, or creates standalone penalty
  * Body: { childId, familyId, date?, penalty? }
  */
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const body = await req.json();
+      const body = await request.json();
       const { childId, familyId, date, penalty } = body;
 
       if (!childId || !familyId) {

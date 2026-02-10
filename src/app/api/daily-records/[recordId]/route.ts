@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import {
    updateChoreCompletion,
    submitDailyRecord,
@@ -15,8 +15,8 @@ import Child from '@/models/Child';
  * Retrieves a specific daily record
  */
 export async function GET(
-   req: NextRequest,
-   { params }: { params: Promise<{ recordId: string }> }
+   request: Request,
+   context: { params: Promise<{ recordId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -24,7 +24,7 @@ export async function GET(
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { recordId } = await params;
+      const { recordId } = await context.params;
       const dailyRecord = await DailyRecord.findById(recordId);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
@@ -61,8 +61,8 @@ export async function GET(
  * Body: { action: 'updateChore' | 'submit', choreIndex?, completionStatus?, ... }
  */
 export async function PUT(
-   req: NextRequest,
-   { params }: { params: Promise<{ recordId: string }> }
+   request: Request,
+   context: { params: Promise<{ recordId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -70,9 +70,9 @@ export async function PUT(
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const body = await req.json();
+      const body = await request.json();
       const { action } = body;
-      const { recordId } = await params;
+      const { recordId } = await context.params;
 
       const dailyRecord = await DailyRecord.findById(recordId);
       if (!dailyRecord) {

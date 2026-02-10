@@ -23,16 +23,16 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
       return userCompanies.map((uc: any) => ({
          _id: uc.familyId._id.toString(),
          name: uc.familyId.name,
-         //slug: uc.familyId.slug,
          description: uc.familyId.description,
          email: uc.familyId.email,
-         phone: uc.familyId.phone,
+         primaryEmail: uc.familyId.primaryEmail,
+         primaryPhone: uc.familyId.primaryPhone,
          address: uc.familyId.address,
          city: uc.familyId.city,
          state: uc.familyId.state,
          zipCode: uc.familyId.zipCode,
          country: uc.familyId.country,
-         logo: uc.familyId.logo,
+         avatar: uc.familyId.avatar,
          isActive: uc.familyId.isActive,
          createdAt: uc.familyId.createdAt?.toISOString?.() ?? '',
          updatedAt: uc.familyId.updatedAt?.toISOString?.() ?? '',
@@ -87,23 +87,18 @@ export async function getUserPrimaryFamily(userId: string): Promise<(IFamily & {
       return {
          _id: userCompany.familyId._id.toString(),
          name: userCompany.familyId.name,
-         //slug: userCompany.familyId.slug,
          description: userCompany.familyId.description,
          email: userCompany.familyId.email,
-         phone: userCompany.familyId.phone,
+         primaryEmail: userCompany.familyId.primaryEmail,
+         primaryPhone: userCompany.familyId.primaryPhone,
          address: userCompany.familyId.address,
          city: userCompany.familyId.city,
          state: userCompany.familyId.state,
          zipCode: userCompany.familyId.zipCode,
          country: userCompany.familyId.country,
-         logo: userCompany.familyId.logo,
+         avatar: userCompany.familyId.avatar,
          isActive: userCompany.familyId.isActive,
-         createdAt: userCompany.familyId.createdAt,
-      };
-      
-   }catch (err) {
-          console.error(`Failed to get user family membership: ${error}`);
-         return null;?.toISOString?.() ?? '',
+         createdAt: userCompany.familyId.createdAt?.toISOString?.() ?? '',
          updatedAt: userCompany.familyId.updatedAt?.toISOString?.() ?? '',
          role: userCompany.role,
       };

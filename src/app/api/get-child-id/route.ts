@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth/auth';
 import { getChildIdIfMember } from '@/lib/access-control/childAccess';
 
@@ -7,14 +7,14 @@ import { getChildIdIfMember } from '@/lib/access-control/childAccess';
  * Gets the child ID for the current user in a family
  * Query params: familyId
  */
-export async function GET(req: NextRequest) {
+export async function GET(request: Request) {
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { searchParams } = new URL(req.url);
+      const { searchParams } = new URL(request.url);
       const familyId = searchParams.get('familyId');
 
       if (!familyId) {

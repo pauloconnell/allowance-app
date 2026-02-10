@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { approveDailyRecord } from '@/lib/data/dailyRecordService';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
@@ -14,8 +14,8 @@ import DailyRecord from '@/models/DailyRecord';
  * }
  */
 export async function POST(
-   req: NextRequest,
-   { params }: { params: Promise<{ id: string }> }
+   request: Request,
+   context: { params: Promise<{ recordId: string }> }
 ) {
    try {
       const session = await getAuthSession();
@@ -23,11 +23,11 @@ export async function POST(
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const body = await req.json();
+      const body = await request.json();
       const { choreAdjustments = [], penalties = [] } = body;
-      const { id } = await params;
+      const { recordId } = await context.params;
 
-      const dailyRecord = await DailyRecord.findById(id);
+      const dailyRecord = await DailyRecord.findById(recordId);
       if (!dailyRecord) {
          return NextResponse.json({ error: 'Daily record not found' }, { status: 404 });
       }
@@ -44,13 +44,13 @@ export async function POST(
       }
 
       const payoutResult = await approveDailyRecord(
-         id,
+         recordId,
          session.userId,
-         choreAdjustments,
-         penalties
+         choreAdjustments
+         
       );
 
-      const updatedRecord = await DailyRecord.findById(id);
+      const updatedRecord = await DailyRecord.findById(recordId);
       const normalized = normalizeRecord(updatedRecord.toObject());
 
       return NextResponse.json({

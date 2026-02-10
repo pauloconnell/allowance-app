@@ -32,7 +32,7 @@ export default async function ChildDetailPage({ params }: PageProps) {
                   <div className="space-y-3">
                      <p><span className="font-medium">Name:</span> {child ? child.name : 'Loading...'}</p>
                      <p><span className="font-medium">Age:</span> {child ? child.age : 'Loading...'}</p>
-                     <p><span className="font-medium">Balance:</span>{child ? child.balance : 'Loading...'}</p>
+                     <p><span className="font-medium">Balance:</span>{child ? child.currentBalance : 'Loading...'}</p>
                   </div>
                </div>
 

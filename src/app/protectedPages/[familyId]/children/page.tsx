@@ -55,7 +55,7 @@ export default async function ChildrenPage({ params }: PageProps) {
                   Add Child
                </Link>
             </div>
-            <ChildrenList  familyId={familyId} errorMessage={errorMessage} />
+            <ChildrenList children={children} familyId={familyId} errorMessage={errorMessage} />
 
             {children.length === 0 && (
                <div className="text-center py-12">

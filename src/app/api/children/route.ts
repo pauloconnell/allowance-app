@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { sanitizeCreate } from '@/lib/utils/sanitizeCreate';
 import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
 import Child from '@/models/Child';
@@ -11,14 +11,14 @@ import type { IChildFormData } from '@/types/IChild';
  * Retrieves all children in a family
  * Query params: familyId
  */
-export async function GET(req: NextRequest) {
+export async function GET(request: Request) {
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { searchParams } = new URL(req.url);
+      const { searchParams } = new URL(request.url);
       const familyId = searchParams.get('familyId');
 
       if (!familyId) {
@@ -49,14 +49,14 @@ export async function GET(req: NextRequest) {
  * Creates a new child
  * Body: { name, age, avatarUrl?, familyId }
  */
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
    try {
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const body = (await req.json()) as IChildFormData & { familyId?: string };
+      const body = (await request.json()) as IChildFormData & { familyId?: string };
       const familyId = body.familyId;
 
       if (!familyId) {

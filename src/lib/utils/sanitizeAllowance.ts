@@ -111,7 +111,7 @@ export function sanitizeUpdateChore(data: Partial<IChore>): Partial<IChore> {
    }
    if (data.isRecurring !== undefined) sanitized.isRecurring = Boolean(data.isRecurring);
    if (data.intervalDays !== undefined) {
-      sanitized.intervalDays = parseInt(String(data.intervalDays)) || null;
+      sanitized.intervalDays = parseInt(String(data.intervalDays)) || undefined;
    }
    if (data.suggestedTime) sanitized.suggestedTime = String(data.suggestedTime).trim();
    if (data.dueDate) sanitized.dueDate = new Date(data.dueDate);
