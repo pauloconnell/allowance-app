@@ -8,10 +8,10 @@ interface PageProps {
 export default async function ChildDetailPage({ params }: PageProps) {
    const { familyId, childId } = await params;
 
- //  console.log( "Get data for this child ", childId, familyId);
+   //  console.log( "Get data for this child ", childId, familyId);
    // get child data from API or DB direct
-   let child =await getChildById(childId, familyId);
-  // console.log(child)
+   let child = await getChildById(childId, familyId);
+   // console.log(child)
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -29,10 +29,24 @@ export default async function ChildDetailPage({ params }: PageProps) {
                {/* Child Info */}
                <div className="bg-white rounded-lg shadow-md p-6">
                   <h2 className="text-xl font-semibold mb-4">Profile</h2>
-                  <div className="space-y-3">
-                     <p><span className="font-medium">Name:</span> {child ? child.name : 'Loading...'}</p>
-                     <p><span className="font-medium">Age:</span> {child ? child.age : 'Loading...'}</p>
-                     <p><span className="font-medium">Balance:</span>{child ? child.currentBalance : 'Loading...'}</p>
+                  <div className="flex items-center space-x-4 mb-6">
+                     <div className="space-y-3">
+                        <p>
+                           <span className="font-medium">Name:</span>{' '}
+                           {child ? child.name : 'Loading...'}
+                        </p>
+                        <p>
+                           <span className="font-medium">Age:</span>{' '}
+                           {child ? child.age : 'Loading...'}
+                        </p>
+                      
+                     </div>
+                     <div className="space-y-3 ml-auto">
+                        <p>
+                           <span className="font-medium">Balance:</span>{' '}
+                           {child ? child.currentBalance : 'Loading...'}
+                        </p>
+                     </div>
                   </div>
                </div>
 

@@ -15,10 +15,12 @@ import {
 import { redirect } from 'next/navigation';
 import { IChild } from '@/types/IChild';
 import { IChore, IDailyChore, IPenalty } from '@/types/IChore';
+import { IDailyRecord } from '@/types/IDailyRecord';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 import ChoreCompletionBoxes from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
 import { approveDailyRecord } from '@/lib/data/dailyRecordService';
+import FormSubmit from '@/components/Buttons/FormSubmit/ApproveDailyRecord';
 
 interface PageProps {
    params: Promise<{ familyId: string; recordId: string }>;
@@ -36,7 +38,7 @@ export default async function ParentReviewDailyRecordDetailPage({
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
-   let record = null;
+   let record: IDailyRecord | null = null;
    let childRecord = null; // read only -> display what child had submitted
    let child: IChild | null = null;
    let error = null;
@@ -71,10 +73,10 @@ export default async function ParentReviewDailyRecordDetailPage({
       } else {
          record = normalizeRecord(dailyRecord);
 
-         console.log("daily record for parent review:", record.copyOfChildChoresSubmitted[2]); // record);
+         console.log("daily record for parent review:", record?.copyOfChildChoresSubmitted[2]); // record);
 
          // delete this if we want childID to be required -> faster =1 less api call
-         child = await Child.findById(record.childId).lean();
+         child = await Child.findById(record?.childId).lean();
          if (child) {
             child = normalizeRecord(child);
             childId = child._id;
@@ -85,7 +87,8 @@ export default async function ParentReviewDailyRecordDetailPage({
       error = 'Failed to load daily record';
    }
 
-   if (error) {
+
+   if (error || !record) {
       return (
          <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -104,7 +107,7 @@ export default async function ParentReviewDailyRecordDetailPage({
       );
    }
 
-   const recordDate = new Date(record.dueDate);
+   const recordDate = new Date(record?.dueDate);
    recordDate.setHours(0, 0, 0, 0);
    const isToday = new Date().toDateString() === recordDate.toDateString();
 
@@ -132,14 +135,17 @@ export default async function ParentReviewDailyRecordDetailPage({
          return sum + chore.rewardAmount * chore.completionStatus;
       }, 0) || 0;
 
-   const potentialTotal =
-      record.choresList?.reduce((sum: number, chore: IChore) => {
-         return sum + chore.rewardAmount * 1; // 1 is 100% completion
+   const potentialTotal:number =
+      record.choresList?.reduce((sum: number, chore: any) => {
+         return sum + chore?.rewardAmount * 1; // 1 is 100% completion
       }, 0) || 0;
 
    const totalPenalties =
       record.penalties?.reduce((sum: number, p: IPenalty) => sum + p.amount, 0) || 0;
    const finalTakeHome = currentEarnings - totalPenalties;
+
+
+
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
@@ -187,22 +193,22 @@ export default async function ParentReviewDailyRecordDetailPage({
                      <div className="text-center">
                         <p className="text-sm text-gray-600">Submitted</p>
                         <p className="font-semibold">
-                           {record.isSubmitted ? 'Yes' : 'No'}
+                           {record?.isSubmitted ? 'Yes' : 'No'}
                         </p>
-                        {record.submittedAt && (
+                        {record?.submittedAt && (
                            <p className="text-xs text-gray-500">
-                              {new Date(record.submittedAt).toLocaleString()}
+                              {new Date(record?.submittedAt).toLocaleString()}
                            </p>
                         )}
                      </div>
                      <div className="text-center">
                         <p className="text-sm text-gray-600">Approved</p>
                         <p className="font-semibold">
-                           {record.isApproved ? 'Yes' : 'No'}
+                           {record?.isApproved ? 'Yes' : 'No'}
                         </p>
-                        {record.approvedAt && (
+                        {record?.approvedAt && (
                            <p className="text-xs text-gray-500">
-                              {new Date(record.approvedAt).toLocaleString()}
+                              {new Date(record?.approvedAt).toLocaleString()}
                            </p>
                         )}
                      </div>
@@ -247,16 +253,14 @@ export default async function ParentReviewDailyRecordDetailPage({
                                     </div>
                                  </div>
 
-                                 <p className="text-sm text-gray-600 mt-2">
-                                    Notes: {chore.notes}
-                                 </p>
-                                 <p className="text-sm text-gray-600 mt-2">
-                                    Child Selected:
+                               
+                                 <p className="text-sm text-center text-gray-600 mt-2">
+                                    Child entry:
                                  </p>
                                  <ChoreCompletionBoxes
                                     key={index}
                                     chore={record.copyOfChildChoresSubmitted[index]}
-                                    recordId={record.copyOfChildChoresSubmitted[index]._id}
+                                    recordId={record?.copyOfChildChoresSubmitted[index]?._id}
                                     isDisabled={ true }
                                        />
                                     
@@ -266,12 +270,18 @@ export default async function ParentReviewDailyRecordDetailPage({
                                     {record.copyOfChildChoresSubmitted[index].notes}
                                  </p>
                               </div>
+                              <div className="flex justify-center font-medium">
+                                 Parent override: 
+                                 </div>
                               <ChoreCompletionBoxes
                                  key={chore._id}
                                  chore={chore}
                                  recordId={record._id}
                                
                               />
+                                <p className="text-sm text-gray-600 mt-2">
+                                    Notes: {chore.notes}
+                                 </p>
                            </div>
                         ))}
                      </div>
@@ -307,9 +317,9 @@ export default async function ParentReviewDailyRecordDetailPage({
                      ))}
                   </div>
                </div>
-
-               <form
-                  action={async()=>{approveDailyRecord(recordId, userId, record.penalties)}}
+                     <FormSubmit recordId={recordId} userId={userId}  penalties={record?.penalties} />
+               {/* <form
+                  action={handleApprove()}
                >
                   <button
                      type="submit"
@@ -317,7 +327,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                   >
                      Approve This Day's Record
                   </button>
-               </form>
+               </form> */}
 
                {/* Total Reward */}
                {/* Motivation Station: Payout Summary */}

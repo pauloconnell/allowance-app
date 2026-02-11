@@ -42,25 +42,41 @@ export async function getRolloverChores(
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
    normalizeRecord(prevRecord.choresList);
-   
+
    // Return chores with completionStatus === 0
    // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
-   return prevRecord.choresList.reduce((acc:IDailyChore[], chore: IDailyChore) => {
+   return prevRecord.choresList.reduce((acc: IDailyChore[], chore: IDailyChore) => {
+      let rewardAmount=0;
+      let choreC={...chore};
+      //ensure incomplete chores don't reward child: 1/2 done = 1/2 reward for tomorrow
+      if (choreC.completionStatus == 0.5) {
+         //if (!chore.isRecurring) {
+         choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
+         choreC.completionStatus = 0;
+         choreC.completionStatus = 0; // reset to 0 so it defaults back to 0
+      }
+      if (choreC.isRecurring && choreC.intervalDays && choreC.completionStatus < 1) {
 
-      //ensure incomplete chores don't reward child:
-      if (chore.completionStatus == 0.5) {
-         if (!chore.isRecurring) {
-            chore.rewardAmount = Math.round((chore.rewardAmount / 2) * 100) / 100; // adjust reward for partial completion ie. max reward is now 1/2 UNLESS it's recurring then it's worth full value again
+         // Define the Expiry for Recurring Chores
+         let choreDueAgain = new Date(choreC.dueDate);
+         choreDueAgain.setHours(0, 0, 0, 0);
+         choreDueAgain.setDate(choreDueAgain.getDate() + (choreC.intervalDays || 0));  // date this chore will be scheduled again(and therefore we will NOT include it)
+         let today = new Date();
+         today.setHours(0, 0, 0, 0);
+
+         if (choreDueAgain > today) {
+            //if chore is outstanding, and next occurance of chore isn't due yet, add it to todays chorelist
+            choreC.completionStatus = 0;
+            acc.push(choreC);
          }
-         chore.completionStatus = 0; // reset to 0 so it doesn't trigger reward
       }
 
-      if (chore.completionStatus < 1) {
-         // get all incomplete chores
-         acc.push(chore);
+      if (choreC.completionStatus < 1 && !choreC.isRecurring) {
+         // get all incomplete chores - except recurring (dealt with above and below)
+         acc.push(choreC);
       }
       return acc;
-   },[]);   // initial value of acc must be set to [] here;)
+   }, []);   // initial value of acc must be set to [] here;)
 
 }
 
@@ -82,7 +98,7 @@ export async function doRecurringChores(
    // 2. Filter the master list for active chores due today that aren't already rolled over - update any chores rolled over to reschedule based on today ( if recurring)
 
    const choresToProcess: IDailyChore[] = [];
-   child.choresList.forEach((chore:  IDailyChore) => {
+   child.choresList.forEach((chore: IDailyChore) => {
       if (new Date(chore.dueDate) <= now) {
          // only look at chores due
 
@@ -157,7 +173,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    //    'recent record found is: ',
    //    recentRecord
    // );
- let rolloverChores:IDailyChore[]=[];  // IChildChore becomes IDailyChore
+   let rolloverChores: IDailyChore[] = [];  // IChildChore becomes IDailyChore
    if (recentRecord) {    // skip this if it's child's first day ie no daily record
 
       if (recentRecord.dueDate >= startOfDay) {
@@ -176,11 +192,11 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    const recurringChores = await doRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore
 
    // Combine chores
-   const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores]; 
+   const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
 
    console.log('chores for new record are: ', rolloverChores, recurringChores);
 
-  choresList.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || "") );
+   choresList.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || ""));
 
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({
@@ -375,7 +391,7 @@ async function calculateAndApplyPayout(
    );
 
    // Calculate net payout
-   const netPayout = Math.max(0, totalChoreReward - totalPenalties);
+   const netPayout = +Math.max(0, totalChoreReward - totalPenalties).toFixed(2);       // Math.mx to prevent loosing money in a day -> can change this to allow it
 
    // Atomically update child's balance
    const child = await Child.findByIdAndUpdate(

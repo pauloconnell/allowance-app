@@ -120,12 +120,14 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                   ← Back to Daily Records
                </Link>
                <h1 className="text-3xl font-bold text-secondary-900">
-                  Daily Record - {record.dueDate.split("T")[0]}
+                  Daily Record:
+                  <div>  {record.dueDate.split("T")[0]}
                   {isTodaysRecord && <span className="ml-2 text-green-600">(Today)</span>}
+                  </div>
                </h1>
                {child && (
-                  <p className="text-secondary-600 mt-2">
-                     Child: {child.name} | Balance: ${child.currentBalance}
+                  <p className="text-secondary-600 text-xl font-semibold mt-2 text-center">
+                     Child: {child.name} | Balance: $<span className="underline">{child.currentBalance}</span>
                   </p>
                )}
             </div>

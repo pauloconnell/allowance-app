@@ -32,7 +32,7 @@ export default function ChoreCompletionBoxes({ chore, recordId, isDisabled }: { 
     <div className={`mt-4 p-2 rounded-md transition-all ${isPending ? 'bg-gray-50 opacity-60' : ''}`}>
       <div className="flex justify-between items-center mb-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-          {isDisabled ? 'Child Entered: ' : 'Update Progress'}
+          {isDisabled ? 'Child selected: ' : 'Update Progress'}
         </span>
         {isPending && (
           <span className="text-xs text-blue-600 animate-pulse font-medium">
