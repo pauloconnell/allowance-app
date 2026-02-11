@@ -134,7 +134,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
 
             <div className="space-y-8">
                {/* Record Status */}
-               <div className="bg-white rounded-lg shadow-md p-6">
+               <div className="bg-white/50 rounded-lg shadow-md p-6">
                   <h2 className="text-xl font-semibold mb-4">Record Status:</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                      <div className="text-center ">
@@ -180,7 +180,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                </div>
 
                {/* Chores */}
-               <div className="bg-white rounded-lg shadow-md p-6">
+               <div className="bg-white/80 rounded-lg shadow-md p-6">
                   <h2 className="text-xl font-semibold mb-4">Chores</h2>
                   {record.choresList && record.choresList.length > 0 ? (
                      <div className="space-y-4">
