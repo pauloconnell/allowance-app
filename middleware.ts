@@ -1,5 +1,6 @@
 import { withMiddlewareAuthRequired, getSession } from '@auth0/nextjs-auth0/edge';
 import { NextRequest, NextResponse } from 'next/server';
+import { getUserRoles } from '@/lib/access-control/childAccess';
 
 /**
  * Middleware to enforce company membership gatekeeper
@@ -22,6 +23,18 @@ export default withMiddlewareAuthRequired(async function middleware(req: NextReq
    if (isAllowedPath) {
       return res;
    }
+
+// 2. RBAC Redirect Logic
+   if (pathname === '/') {
+      const user = session?.user;
+
+      if(user){
+         //get rbac -> kids go right to daily records
+         let role = getUserRoles(user.id)
+
+      }
+   }
+
 
    // For protected pages, you can now safely proceed
    return res;

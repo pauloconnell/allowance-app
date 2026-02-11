@@ -1,8 +1,10 @@
 import { getAllChildren } from '@/lib/data/childService';
 import ChildrenList from '@/components/Children/ChildrenList';
 import FamilyStoreInitializer from '@/components/StoreInitializers/FamilyStoreInitializer';
-
+import { getSession } from '@auth0/nextjs-auth0'; 
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { getUserRoles } from '@/lib/access-control/childAccess'; 
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -29,6 +31,21 @@ export default async function DashboardPage({ params }: PageProps) {
          </div>
       );
    }
+
+//  Get the session to find the Auth0 ID (sub)
+   const session = await getSession();
+   if (!session?.user) redirect('/api/auth/login');
+   
+   const userId = session.user.sub; 
+
+   // 3. Check the role immediately
+   const userProfile = await getUserRoles(userId);
+   
+   if (userProfile?.role === 'child') {
+      redirect(`/${familyId}/daily-records/`);
+   }
+
+
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">

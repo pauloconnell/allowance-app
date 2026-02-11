@@ -110,3 +110,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   }
 
 }
+
+.goldieKnows {
+  background-image: url('/images/GoldieKnows.PNG');
+  background-size: cover;
+  background-position: center;
+  
+}

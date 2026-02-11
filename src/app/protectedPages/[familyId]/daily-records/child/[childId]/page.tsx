@@ -1,0 +1,309 @@
+// this page is landing point for when a child logs in, goes to dashboard and is directed here.
+// we must get the recordId for child to complete
+
+
+
+
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getAllChildren } from '@/lib/data/childService';
+import {
+   getChildDailyRecords,
+   getStartOfDay,
+   getEndOfDay,
+   getOrCreateTodaysDailyRecord,
+} from '@/lib/data/dailyRecordService';
+import type { IChild } from '@/types/IChild';
+import type { IDailyRecord } from '@/types/IDailyRecord';
+import { useEffect } from 'react';
+import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
+import { isSameDay } from '@/lib/utils/dateHelper';
+import { handleCreateRecordForToday } from '@/lib/actions/record';
+
+interface PageProps {
+   params: Promise<{ familyId: string, childId: string; }>;
+   searchParams: Promise<{ childId?: string; date?: string }>;
+}
+
+export default async function ChildDailyRecordsPage({ params, searchParams }: PageProps) {
+   const { familyId, childId } = await params;
+   const {  date } = await searchParams;
+
+   let children: IChild[] = [];
+   let records: IDailyRecord[] = [];
+
+   let errorMessage: string = '';
+   let successMessage: string = '';
+
+   try {
+
+      children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
+      // if not child in this family, go back to select your family at index page
+      if(!children.some(c=>c._id==childId)) redirect("/");
+      
+     
+
+      if (childId) {
+         //   selectedChild = children.find((c: any) => c.id === childId);
+         const startDate = date ? new Date(date) : new Date();
+         //const endDate = new Date(targetDate);
+         startDate.setMonth(startDate.getMonth() - 1);
+
+         records = await getChildDailyRecords(childId, familyId, startDate); // note 'todaysRecord' lives in client store only - in server its just records[0]
+      } 
+      
+    
+   } catch (err) {
+      console.error('Failed to load data:', err);
+      errorMessage = `Error getting children, error: ${err}`;
+   }
+
+   // determine if viewing today's record
+   const today = new Date();
+   today.setHours(0, 0, 0, 0);
+   let isTodaysRecord = false;
+   if (records.length > 0) {
+      isTodaysRecord = isSameDay(records[0].date, today);
+   }
+
+
+   // this is being replaced by the 'start today record button'   OR   'continue today's record'  in the UI ***************
+   // Testing....
+   
+
+
+
+   // if (!isTodaysRecord && childId) {
+   //    console.log("Not today's record - no live record present");
+   //    //process last record
+
+   //    // create today's record
+   //    await handleCreateRecordForToday(childId, familyId);
+   // }
+
+
+
+
+
+// older code to delete?
+
+   // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
+   // async function handleCreateRecordForToday() {
+   //    'use server';  // need this to use redirect (can't use router.push on server either)
+   //    if (!childId) return;
+   //    let newId: string = '';
+   //    try {
+   //       console.log("Created new record for today:");
+   //       let newRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
+
+   //       newRecord = JSON.parse(JSON.stringify(newRecord)); // serialize for client use
+   //       newId=newRecord._id;
+   //       console.log("Created new record for today:", newRecord);
+
+   //    } catch (err) {
+   //       console.error('Error creating new daily record:', err);
+   //    }
+   //     redirect(`/protectedPages/${familyId}/daily-records/${newId}?childId=${childId}`);
+   // };
+
+   if (!children || children.length === 0) {
+      return (
+         <div className="p-4">
+            <Link
+               href={`/protectedPages/${familyId}/dashboard`}
+               className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
+            >
+               ← Back to Dashboard
+            </Link>
+            <p className="text-gray-500">No children found.</p>
+         </div>
+      );
+   }
+
+   return (
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
+         {childId ? (
+            <ChildRecordStoreInitializer
+               childId={childId}
+               familyId={familyId}
+               records={records}
+               errorMessage={errorMessage}
+            />
+         ) : (
+            ''
+         )}
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Link
+               href={`/protectedPages/${familyId}/dashboard`}
+               className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
+            >
+               ← Back to Dashboard
+            </Link>
+            <div className="mb-8">
+               <h1 className="text-3xl font-bold text-secondary-900">Daily Records</h1>
+               <p className="text-secondary-600 mt-2">
+                  Track and review daily chore completion
+               </p>
+            </div>
+
+            {/* Child Selector */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+               <h2 className="text-xl font-semibold mb-4">
+                  Selected Child {childId ? '' : ': None'}
+               </h2>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {children.map((child: any) => (
+                     <Link
+                        key={child.id}
+                        href={`/protectedPages/${familyId}/daily-records?childId=${child.id}`}
+                        className={`p-4 border rounded-lg hover:bg-gray-50 ${
+                           childId === child.id
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-200'
+                        }`}
+                     >
+                        <h3 className="font-semibold">{child.name}</h3>
+                        <p className="text-sm text-gray-600">Age {child.age}</p>
+                        <p className="text-sm text-gray-600">
+                           Balance: ${child.currentBalance}
+                        </p>
+                     </Link>
+                  ))}
+               </div>
+            </div>
+
+            {childId && (
+               <div className="space-y-8">
+                  {/* Live Record Section */}
+
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                     <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold text-green-700">
+                           📅 Today's Record (Live)
+                        </h2>
+                        {!isTodaysRecord && (
+                           <form
+                              action={async () => {
+                                 await handleCreateRecordForToday(childId, familyId);
+                              }}
+                           >
+                              <button
+                                 type="submit"
+                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              >
+                                 Start Today's Record
+                              </button>
+                           </form>
+                        )}
+                        {isTodaysRecord && (
+                           <Link
+                              href={`/protectedPages/${familyId}/daily-records/${records[0]._id}?childId=${childId}`}
+                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                           >
+                              Continue Today's Record
+                           </Link>
+                        )}
+                     </div>
+
+                     {isTodaysRecord ? (
+                        <div className="space-y-4">
+                           <p className="text-sm text-gray-600">
+                              Status: {records[0].status} | Submitted:{' '}
+                              {records[0].isSubmitted ? 'Yes' : 'No'} | Approved:{' '}
+                              {records[0].isApproved ? 'Yes' : 'No'}
+                           </p>
+
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {records[0].choresList?.map((chore: any, index: number) => (
+                                 <div key={index} className="border rounded-lg p-4">
+                                    <h4 className="font-medium">{chore.taskName}</h4>
+                                    <p className="text-sm text-gray-600">
+                                       Reward: ${chore.rewardAmount}
+                                    </p>
+                                    <p className="text-sm">
+                                       Completion: {chore.completionStatus * 100}%
+                                    </p>
+                                    {chore.isOverridden && (
+                                       <p className="text-sm text-orange-600">
+                                          Parent Override Applied
+                                       </p>
+                                    )}
+                                 </div>
+                              ))}
+                           </div>
+                        </div>
+                     ) : (
+                        <p className="text-gray-500">No record started for today</p>
+                     )}
+                  </div>
+
+                  {/* Historical Records */}
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                     <h2 className="text-xl font-semibold mb-4">Record History</h2>
+
+                     {records.length > 0 ? (
+                        <div className="space-y-4">
+                           {records.map((record: any) => {
+                              const recordDate = new Date(record.date);
+                              const isLive =
+                                 getStartOfDay(recordDate).getTime() ===
+                                 getStartOfDay(today).getTime();
+
+                              return (
+                                 <div
+                                    key={record._id}
+                                    className={`border rounded-lg p-4 ${
+                                       isLive
+                                          ? 'border-green-500 bg-green-50'
+                                          : 'border-gray-200'
+                                    }`}
+                                 >
+                                    <div className="flex justify-between items-start">
+                                       <div>
+                                          <h3 className="font-medium">
+                                             {recordDate.toLocaleDateString()}
+                                             {isLive && (
+                                                <span className="ml-2 text-green-600">
+                                                   (Live)
+                                                </span>
+                                             )}
+                                          </h3>
+                                          <p className="text-sm text-gray-600">
+                                             Status: {record.status} | Chores:{' '}
+                                             {record.choresList?.length || 0} | Total: $
+                                             {record.totalReward || 0}
+                                          </p>
+                                       </div>
+                                       <Link
+                                          href={`/protectedPages/${familyId}/daily-records/${record.id}`}
+                                          className="text-primary-600 hover:text-primary-700 text-sm"
+                                       >
+                                          View Details →
+                                       </Link>
+                                    </div>
+                                 </div>
+                              );
+                           })}
+                        </div>
+                     ) : (
+                        <p className="text-gray-500">No records found for this child</p>
+                     )}
+                  </div>
+               </div>
+            )}
+
+            {!childId && children.length === 0 && (
+               <div className="text-center py-12">
+                  <p className="text-gray-500 mb-4">No children added yet</p>
+                  <Link
+                     href={`/protectedPages/${familyId}/children/new`}
+                     className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                     Add Your First Child
+                  </Link>
+               </div>
+            )}
+         </div>
+      </div>
+   );
+}
