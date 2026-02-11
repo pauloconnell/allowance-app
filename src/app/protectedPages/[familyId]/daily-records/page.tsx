@@ -52,11 +52,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    today.setHours(0, 0, 0, 0);
    let isTodaysRecord = false;
    if (records.length > 0) {
-      isTodaysRecord = isSameDay(records[0].date, today);
+      isTodaysRecord = isSameDay(records[0].dueDate, today);
    }
 
    if (!isTodaysRecord && childId) {
-      console.log("Not today's record - no live record present");
+      console.log("Not today's record - no live record present", records[0].dueDate);
       //process last record
 
       // create today's record
@@ -155,7 +155,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   <div className="bg-white rounded-lg shadow-md p-6">
                      <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-green-700">
-                           📅 Today's Record (Live)
+                           📅 Today's Record (Live Status View)
                         </h2>
                         {!isTodaysRecord && (
                            <form
@@ -220,7 +220,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                      {records.length > 0 ? (
                         <div className="space-y-4">
                            {records.map((record: any) => {
-                              const recordDate = new Date(record.date);
+                              const recordDate = new Date(record.dueDate);
                               const isLive =
                                  getStartOfDay(recordDate).getTime() ===
                                  getStartOfDay(today).getTime();
@@ -251,7 +251,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                           </p>
                                        </div>
                                        <Link
-                                          href={`/protectedPages/${familyId}/daily-records/${record.id}`}
+                                          href={`/protectedPages/${familyId}/daily-records/parentReview/${record.id}`}
                                           className="text-primary-600 hover:text-primary-700 text-sm"
                                        >
                                           View Details →

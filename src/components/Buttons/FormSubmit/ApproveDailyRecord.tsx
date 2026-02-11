@@ -1,5 +1,7 @@
 'use client';
 
+// this button lives on the client to handle the 'approve' - this calls a server function which does the DB update from server side and updates page
+
 import { useState } from 'react';
 import { handleApproveRecordAction } from '@/lib/actions/approveRecordAction';
 import { useRouter } from 'next/navigation';
