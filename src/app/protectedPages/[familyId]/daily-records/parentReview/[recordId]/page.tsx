@@ -190,6 +190,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                               record.status.slice(1)}
                         </p>
                      </div>
+                  
                      <div className="text-center">
                         <p className="text-sm text-gray-600">Submitted</p>
                         <p className="font-semibold">
@@ -213,6 +214,12 @@ export default async function ParentReviewDailyRecordDetailPage({
                         )}
                      </div>
                   </div>
+                     {record.status != 'approved' ? (
+                        <div className="flex justify-center mt-1">
+                         <FormSubmit recordId={recordId} userId={userId}  penalties={record?.penalties} />
+                         </div>
+                     ):''}
+                     
                </div>
 
                {/* Chores */}
