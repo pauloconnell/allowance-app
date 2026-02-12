@@ -20,7 +20,7 @@ export default function HeaderClient() {
         {!isLoading && (
           user ? (
             <>
-              <span className="text-sm opacity-80">{user.name}</span>
+              <span className="hidden md:block text-sm opacity-80">{user.name}</span>
               <LogoutButton />
             </>
           ) : (

@@ -150,10 +150,14 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                  className="block p-4 hover:bg-gray-50"
                               >
                                  <div className="flex items-center justify-between">
-                                    <div>
+                                    <div className="w-full">
+                                       <div className="flex justify-between">
                                        <p className="font-semibold">
                                           {new Date(record.dueDate).toLocaleDateString()}
                                        </p>
+                                       <p className="hidden sm:block"> Id:{record.childId.slice(-6)}</p>
+                                       <p className="hidden sm:block"></p>
+                                       </div>
                                        <p className="text-sm text-gray-600">
                                           Status: {record.status}
                                        </p>
