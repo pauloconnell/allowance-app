@@ -251,12 +251,15 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                              {record.totalReward || 0}
                                           </p>
                                        </div>
+                                       {isLive && 'Use Continue button above'}
+                                       {!isLive && (
                                        <Link
                                           href={`/protectedPages/${familyId}/daily-records/parentReview/${record.id}`}
                                           className="text-primary-600 hover:text-primary-700 text-sm"
                                        >
                                           View Details →
                                        </Link>
+                                       )}
                                     </div>
                                  </div>
                               );
