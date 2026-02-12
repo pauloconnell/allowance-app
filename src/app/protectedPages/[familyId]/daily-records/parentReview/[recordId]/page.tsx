@@ -267,7 +267,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                                  <ChoreCompletionBoxes
                                     key={index}
                                     chore={record.copyOfChildChoresSubmitted[index]}
-                                    recordId={record?.copyOfChildChoresSubmitted[index]?._id}
+                                    recordId={record?.copyOfChildChoresSubmitted[index]?._id || ""}
                                     isDisabled={ true }
                                        />
                                     

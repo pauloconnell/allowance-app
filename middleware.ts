@@ -30,7 +30,8 @@ export default withMiddlewareAuthRequired(async function middleware(req: NextReq
 
       if(user){
          //get rbac -> kids go right to daily records
-         let role = getUserRoles(user.id)
+      //   let role = getUserRoles(user.id)
+         //TODO: Implement 
 
       }
    }

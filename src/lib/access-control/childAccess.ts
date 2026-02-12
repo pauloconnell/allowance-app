@@ -14,8 +14,12 @@ export type UserRole = 'parent' | 'child' | 'admin';
 /**
  * Extract roles from Auth0 session
  */
-export async function getUserRoles(userId: string): Promise<UserRole[]> {
+export async function getUserRoles(userId?: string): Promise<UserRole[]> {
    try {
+
+
+      //  TODO ***   implement RBAC for child
+
       const session = await getSession();
       if (!session?.user) return [];
 

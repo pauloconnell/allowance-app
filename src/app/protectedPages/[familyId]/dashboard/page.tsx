@@ -39,12 +39,15 @@ export default async function DashboardPage({ params }: PageProps) {
 
    const userId = session.user.sub;
 
-   // 3. Check the role immediately
-   const userProfile = await getUserRoles(userId);
 
-   if (userProfile?.role === 'child') {
-      redirect(`/${familyId}/daily-records/`);
-   }
+   // TODO: implement child roles RBAC
+
+   // 3. Check the role immediately
+ //  const userProfile = await getUserRoles(userId);
+// console.log('AUTH0 USER DATA:', JSON.stringify(session?.user, null, 2));
+//    if (userProfile?.some(p=>p.role === 'child')) {
+//       redirect(`/${familyId}/daily-records/`);
+//    }
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
