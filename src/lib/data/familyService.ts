@@ -3,7 +3,7 @@ import UserFamily from '@/models/UserFamily';
 import Family from '@/models/Family';
 import type { IUserFamily } from '@/types/IUserFamily';
 import type { IFamily } from '@/types/IFamily';
-import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 
 /**
  * Fetch all families a user belongs to

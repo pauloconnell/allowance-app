@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { IChild } from '@/types/IChild';
-import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 
 interface FamilySummary {
   _id: string;

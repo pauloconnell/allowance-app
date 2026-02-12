@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Chore from '@/models/Chore';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
-import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import type { IChoreFormData } from '@/types/IChore';
 
 

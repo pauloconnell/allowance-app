@@ -2,7 +2,7 @@ import { connectDB } from "../mongodb";
 import Child from "@/models/Child";
 import type { IChild, IChildInput } from "@/types/IChild";
 import mongoose from "mongoose";
-import { normalizeRecord } from "../SharedFE-BE-Utils/normalizeRecord";
+import { normalizeRecord } from "../utils/normalizeRecord";
 import { hasPermission } from "@/lib/auth/rbac";
 import { getSession } from '@auth0/nextjs-auth0';
 

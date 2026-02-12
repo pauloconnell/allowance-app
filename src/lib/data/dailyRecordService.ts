@@ -4,7 +4,14 @@ import Chore from '@/models/Chore';
 import { IDailyRecord, IPayoutResult } from '@/types/IDailyRecord';
 import { IChore, IDailyChore } from '@/types/IChore';
 import { IChild, IChildChore } from '@/types/IChild';
-import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
+import { isSameDay, getLocalTodayString, stringToDate, getLocalTodayDate } from '@/lib/utils/dateHelper';
+
+
+
+
+// TODO: remove these, use new utils/dateHelper -> all dates in FE should be string yymmdd
+
 
 /**
  * Get the start of day (00:00:00) for a given date
@@ -41,7 +48,7 @@ export async function getRolloverChores(
 
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
-   normalizeRecord(prevRecord.choresList);
+   prevRecord.choresList = (normalizeRecord(prevRecord.choresList));
 
    // Return chores with completionStatus === 0
    // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
@@ -91,14 +98,14 @@ export async function doRecurringChores(
 ): Promise<IDailyChore[]> {
    const child = await Child.findById(childId).lean(); // get child's assigned chores = use .lean() = plain array = faster ;)
    if (!child || !child.choresList) return [];
-   const now = new Date();
-   now.setHours(0, 0, 0, 0); // Normalize to start of day
+   const now = getLocalTodayDate();
+  // already done now.setHours(0, 0, 0, 0); // Normalize to start of day
    const scheduled: IDailyChore[] = [];
 
    // 2. Filter the master list for active chores due today that aren't already rolled over - update any chores rolled over to reschedule based on today ( if recurring)
 
    const choresToProcess: IDailyChore[] = [];
-   child.choresList.forEach((chore: IDailyChore) => {
+   child.choresList?.forEach((chore: IDailyChore) => {
       if (new Date(chore.dueDate) <= now) {
          // only look at chores due
 
@@ -152,31 +159,31 @@ export async function doRecurringChores(
  */
 export async function getOrCreateTodaysDailyRecord( // too many things here -> simple createTOdaysDailyRecord -> call this from submitDailyRecord - or Directly if no records exist yet
    childId: string,
-   familyId: string,
-   today: Date = new Date()
+   familyId: string  
 ): Promise<IDailyRecord> {
-   const startOfDay = getStartOfDay(today);
-   const endOfDay = getEndOfDay(today);
+   const today = getLocalTodayString();
+  
 
    // get most recent Record
    let recentRecord = await DailyRecord.findOne(
       { childId, familyId },
       null,
-      { sort: { dueDate: -1 } } // newest → oldest
+      { sort: { dueDate: -1 } } // newest → oldest => gets most recent record
    ).lean();
 
+   if(recentRecord){
+      recentRecord = normalizeRecord(recentRecord);
+   }
+
+   
 
 
-   // console.log(
-   //    recentRecord.createdAt,
-   //    startOfDay,
-   //    'recent record found is: ',
-   //    recentRecord
-   // );
+
+
    let rolloverChores: IDailyChore[] = [];  // IChildChore becomes IDailyChore
    if (recentRecord) {    // skip this if it's child's first day ie no daily record
 
-      if (recentRecord.dueDate >= startOfDay) {
+      if (recentRecord && isSameDay(recentRecord.dueDate, today)) { // use isSameDay util -> ensures
 
          // if today is already set up, just return that record
          return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
@@ -196,13 +203,13 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    console.log('chores for new record are: ', rolloverChores, recurringChores);
 
-   choresList.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || ""));
+   choresList?.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || ""));
 
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({
       childId,
       familyId,
-      dueDate: startOfDay,
+      dueDate: today,
       choresList,
       isSubmitted: false,
       isApproved: false,
@@ -285,7 +292,7 @@ export async function submitDailyRecord(
    if (triggerCreate) {
       // this flag prevents calling below function-as it may call this function (below function gets triggered automatically by day changing - in which case it will call this function.  Note: submit API triggers this function directly, and needs to call below function)
       // create next day's record
-      await getOrCreateTodaysDailyRecord(record.childId, record.familyId, new Date());
+      await getOrCreateTodaysDailyRecord(record.childId, record.familyId);
    }
 
    return record.toObject() as IDailyRecord;
@@ -299,9 +306,9 @@ export async function getRecordsNeedingApproval(
 
    const query: any = {
       familyId,
-      // isSubmitted: true,
+      isSubmitted: true,
       isApproved: false,
-      dueDate: { $lte: getStartOfDay(new Date()) },
+      dueDate: { $lte: new Date(`${getLocalTodayString()}T00:00:00`) },
    };
 
    console.log("adding childId", { childId })
@@ -451,13 +458,22 @@ export async function getChildDailyRecords(
    endDate?: Date
 ): Promise<IDailyRecord[]> {
    // add in RBAC and userId validation later
+
+   // 1. Start with the mandatory start date
+   const dueDateFilter: any = { 
+      $gte: startDate    // 
+   };
+
+   // 2. Only add the end date filter if it actually exists   => no use case => always want most recent records
+   // if (endDate) {
+   //    dueDateFilter.$lte = endDate;
+   // }
+
+
    const records = await DailyRecord.find({
       childId,
       familyId,
-      dueDate: {
-         $gte: getStartOfDay(startDate),
-         $lte: getEndOfDay(endDate),
-      },
+      dueDate: dueDateFilter,
    }).sort({ dueDate: -1 });
 
    return records.map((r) => normalizeRecord(r) as IDailyRecord);
@@ -479,7 +495,7 @@ export async function getFamilyDailyRecords(
       },
    }).sort({ dueDate: -1 });
 
-   return records.map((r) => r.toObject() as IDailyRecord);
+   return records.map((r) => normalizeRecord(r) as IDailyRecord);
 }
 
 /**
@@ -487,6 +503,11 @@ export async function getFamilyDailyRecords(
  * If record exists: append to penalties array
  * If no record exists: create new record with status 'approved' and penalty
  */
+
+
+// TODO: penalties need to be sorted out -> remove date, add recordID -> penalties must go into a dailyRecord
+
+
 export async function upsertPenalty(
    childId: string,
    familyId: string,

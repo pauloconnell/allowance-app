@@ -11,7 +11,7 @@ import type { IChild } from '@/types/IChild';
 import type { IDailyRecord } from '@/types/IDailyRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
-import { isSameDay } from '@/lib/utils/dateHelper';
+import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 
 interface PageProps {
@@ -38,6 +38,8 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          //const endDate = new Date(targetDate);
          startDate.setDate(startDate.getMonth() - 1);
 
+         console.log("Start date should be 1 month ago ", startDate)
+
          records = await getChildDailyRecords(childId, familyId, startDate); // note 'todaysRecord' lives in client store only - in server its just records[0]
       } else {
          children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
@@ -48,15 +50,17 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    }
 
    // determine if viewing today's record
-   const today = new Date();
-   today.setHours(0, 0, 0, 0);
+   const today = getLocalTodayString();
+   console.log("today is ",today)
+   
    let isTodaysRecord = false;
    if (records.length > 0) {
       isTodaysRecord = isSameDay(records[0].dueDate, today);
+
    }
 
    if (!isTodaysRecord && childId) {
-      console.log("Not today's record - no live record present", records[0].dueDate);
+      console.log("Not today's record - no live record present", records[0]?.dueDate);
       //process last record
 
       // create today's record

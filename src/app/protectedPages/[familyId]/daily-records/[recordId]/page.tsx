@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
-import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import { connectDB } from '@/lib/mongodb';
-import { isSameDay } from '@/lib/utils/dateHelper';
+import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
 import {
    getChildDailyRecords,
    getStartOfDay,
@@ -77,22 +77,42 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    // recordDate.setHours(0,0,0,0);
    // const isToday = new Date().toDateString() === recordDate.toDateString();
 
-   // determine if viewing today's record
-   const today = new Date();
-   today.setHours(0, 0, 0, 0);
-   let isTodaysRecord = false;
+  // determine if viewing today's record
+   const today = getLocalTodayString();
+   console.log("today is ",today)
    
-   if (record && record.dueDate) {
+   let isTodaysRecord = false;
+   if (record) {
       isTodaysRecord = isSameDay(record.dueDate, today);
+
    }
 
    if (!isTodaysRecord && childId) {
-      console.log("Not today's record - no live record present", record);
+      console.log("Not today's record - no live record present", record?.dueDate);
       //process last record
 
       // create today's record
-      await handleCreateRecordForToday(childId, familyId);  // this get today's record, or will change page to new record
+      await handleCreateRecordForToday(childId, familyId);
    }
+   
+
+
+   // determine if viewing today's record
+   //const today = new Date();
+   //today.setHours(0, 0, 0, 0);
+   //let isTodaysRecord = false;
+   
+  // if (record && record.dueDate) {
+  //    isTodaysRecord = isSameDay(record.dueDate, today);
+  // }
+
+   // if (!isTodaysRecord && childId) {
+   //    console.log("Not today's record - no live record present", record);
+   //    //process last record
+
+   //    // create today's record
+   //    await handleCreateRecordForToday(childId, familyId);  // this get today's record, or will change page to new record
+   // }
 
    // motivate kids by showing earnings:
    // Calculate running totals for the motivation section

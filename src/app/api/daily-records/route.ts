@@ -8,7 +8,7 @@ import {
 } from '@/lib/data/dailyRecordService';
 import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
-import { normalizeRecord } from '@/lib/SharedFE-BE-Utils/normalizeRecord';
+import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 
 /**
  * GET /api/daily-records
@@ -95,8 +95,8 @@ export async function POST(request: Request) {
       }
 
       // Handle regular daily record creation/retrieval
-      const targetDate = date ? new Date(date) : new Date();
-      const dailyRecord = await getOrCreateTodaysDailyRecord(childId, familyId, targetDate);
+      //const targetDate = date ? new Date(date) : new Date();
+      const dailyRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
       const normalized = normalizeRecord(dailyRecord);
 
       return NextResponse.json(normalized, { status: 200 });
