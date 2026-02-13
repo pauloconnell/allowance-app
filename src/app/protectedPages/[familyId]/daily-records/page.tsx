@@ -226,9 +226,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                         <div className="space-y-4">
                            {records.map((record: any) => {
                               const recordDate = new Date(record.dueDate);
-                              const isLive =
-                                 getStartOfDay(recordDate).getTime() ===
-                                 getStartOfDay(today).getTime();
+                              const isLive = isSameDay(recordDate, today);
 
                               return (
                                  <div
