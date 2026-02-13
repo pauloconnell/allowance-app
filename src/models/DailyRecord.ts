@@ -19,7 +19,7 @@ const ChoreEntrySchema = new Schema({
   },
   suggestedTime: String,
   isOverridden: { type: Boolean, default: false },
-  dueDate: { type: Date, required: true },
+  dueDate: { type: String, required: true },
   notes: { type: String, default: null },
 }, { 
   _id: true, // IMPORTANT: Every entry gets its own unique ID for React keys and targeted updates
@@ -44,7 +44,7 @@ const DailyRecordSchema = new Schema(
          required: true, 
          index: true 
       },
-      dueDate: { type: Date, index: true },
+      dueDate: { type: String, index: true },
       date: { type: Date, index: true },
       // Use the ChoreSchema as a subdocument array
       choresList: [ChoreEntrySchema],

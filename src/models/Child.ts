@@ -16,7 +16,7 @@ const ChildChoreSchema = new Schema({ // this is just keeping data on the curren
     default: false
   },
   dueDate: {
-    type: Date,
+    type: String,
     default: null
   },
   suggestedTime: String,

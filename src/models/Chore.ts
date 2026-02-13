@@ -21,7 +21,7 @@ const ChoreSchema = new Schema(
       isRecurring: { type: Boolean, default: false },
       intervalDays: { type: Number, default: null },
       suggestedTime: { type: String, default: null }, 
-      dueDate: { type: Date, default: null },
+      dueDate: { type: String, default: null },
       isActive: { type: Boolean, default: true },
    },
    { timestamps: true }

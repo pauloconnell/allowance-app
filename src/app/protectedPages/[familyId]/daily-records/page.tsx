@@ -34,8 +34,10 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
       if (childId) {
          //   selectedChild = children.find((c: any) => c.id === childId);
+
+         // just get records for the past month
          const startDate = date ? new Date(date) : new Date();
-         //const endDate = new Date(targetDate);
+       
          startDate.setDate(startDate.getMonth() - 1);
 
          console.log("Start date should be 1 month ago ", startDate)
@@ -56,11 +58,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    let isTodaysRecord = false;
    if (records.length > 0) {
       isTodaysRecord = isSameDay(records[0].dueDate, today);
-
+      console.log("Page has: today is ",today, "record date is ",records[0]?.dueDate, "same:", isSameDay(records[0].dueDate, today))
    }
 
    if (!isTodaysRecord && childId) {
-      console.log("Not today's record - no live record present", records[0]?.dueDate);
+      console.log("DailyRecords/ childId:",childId," Not today's record - no live record present", records[0]?.dueDate);
       //process last record
 
       // create today's record
