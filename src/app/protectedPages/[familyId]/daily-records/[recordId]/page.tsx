@@ -79,7 +79,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
 
   // determine if viewing today's record
    const today = getLocalTodayString();
-   console.log("today is ",today)
+   
    
    let isTodaysRecord = false;
    if (record) {

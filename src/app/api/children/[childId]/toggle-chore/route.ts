@@ -35,8 +35,7 @@ export async function POST(
     const choreObjectId = new mongoose.Types.ObjectId(choreId);
 
     if (action === 'assign') {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Normalize to start of day
+      const today = new Date().toISOString().substring(0, 10); // Get YYYY-MM-DD string
       //  Fetch the Master Chore to get the source-of-truth settings
       const masterChore = await Chore.findById(choreObjectId);
 
@@ -54,8 +53,12 @@ export async function POST(
       console.log("Master Chore:", masterChore, choreObjectId);
       // normalize Master chore: -strip _id so child's choreList can have it's own unique id
       let {_id, __v, createdAt, updatedAt, ...safeMasterChore} = masterChore.toObject();
-      let dueDate = new Date(today);
-      dueDate.setDate(today.getDate() + (masterChore.intervalDays || 1));
+      
+      // Calculate next due date as string
+      const todayDate = new Date();
+      todayDate.setDate(todayDate.getDate() + (masterChore.intervalDays || 1));
+      const dueDateString = todayDate.toISOString().substring(0, 10);
+      
       await Child.findOneAndUpdate(
         { _id: childId, "choresList.choreId": { $ne: choreObjectId } },
         {
@@ -63,7 +66,7 @@ export async function POST(
             choresList: {
               ...safeMasterChore,           // Clones name, reward, interval, isRecurring, etc.
               choreId: choreId, // Explicitly link back to master
-              dueDate: today,
+              dueDate: dueDateString,
               isActive: true,         // Instance-specific tracking
               completionStatus: 0,    // Reset tracking
               rewardEarned: 0,        // Reset tracking

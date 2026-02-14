@@ -41,8 +41,8 @@ export async function GET(request: Request) {
          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const startDate = startDateStr ? new Date(startDateStr) : new Date(new Date().setDate(new Date().getDate() - 30));
-      const endDate = endDateStr ? new Date(endDateStr) : new Date();
+      const startDate = startDateStr ? startDateStr : new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().substring(0, 10);
+      const endDate = endDateStr ? endDateStr : new Date().toISOString().substring(0, 10);
 
       const records = await getChildDailyRecords(childId, familyId, startDate, endDate);
       const normalized = records.map((r) => normalizeRecord(r));
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
 
       // Handle penalty upsert
       if (penalty) {
-         const targetDate = date ? new Date(date) : new Date();                                                            // future
+         const targetDate = date ? date : new Date().toISOString().substring(0, 10);
          const dailyRecord = await upsertPenalty(childId, familyId, targetDate, penalty, session.userId);
          const normalized = normalizeRecord(dailyRecord);
          return NextResponse.json(normalized, { status: 200 });

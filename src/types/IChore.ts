@@ -11,7 +11,7 @@ export interface IChore {
    intervalDays?: number;
    completionStatus: 0 | 0.5 | 1; // 0 = not done, 0.5 = partial, 1 = complete
    suggestedTime?: string;
-   dueDate: Date | string;
+   dueDate: string;      // ISO date string YYYY-MM-DD
    isActive: boolean;
    createdAt?: string;
    updatedAt?: string;
@@ -35,7 +35,7 @@ export interface IDailyChore {
    isOverridden?: boolean;
    isRecurring: boolean;
    intervalDays?: number; // For recurring chores, how many days until next occurrence
-   dueDate: Date | string; // Snapshot of due date at time of assignment
+   dueDate: string;       // ISO date string YYYY-MM-DD - Snapshot of due date at time of assignment
    notes?: string;
    parentNotes?: string; // Notes added by parent during review
    completionDate?: Date | string;

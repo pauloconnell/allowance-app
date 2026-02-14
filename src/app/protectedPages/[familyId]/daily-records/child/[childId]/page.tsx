@@ -9,8 +9,6 @@ import { redirect } from 'next/navigation';
 import { getAllChildren } from '@/lib/data/childService';
 import {
    getChildDailyRecords,
-   getStartOfDay,
-   getEndOfDay,
    getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import type { IChild } from '@/types/IChild';
@@ -45,9 +43,9 @@ export default async function ChildDailyRecordsPage({ params, searchParams }: Pa
 
       if (childId) {
          //   selectedChild = children.find((c: any) => c.id === childId);
-         const startDate = date ? new Date(date) : new Date();
-         //const endDate = new Date(targetDate);
-         startDate.setMonth(startDate.getMonth() - 1);
+         const targetDate = date ? new Date(date) : new Date();
+         targetDate.setMonth(targetDate.getMonth() - 1);
+         const startDate = targetDate.toISOString().substring(0, 10);
 
          records = await getChildDailyRecords(childId, familyId, startDate); // note 'todaysRecord' lives in client store only - in server its just records[0]
       } 
@@ -245,9 +243,9 @@ export default async function ChildDailyRecordsPage({ params, searchParams }: Pa
                         <div className="space-y-4">
                            {records.map((record: any) => {
                               const recordDate = new Date(record.date);
-                              const isLive =
-                                 getStartOfDay(recordDate).getTime() ===
-                                 getStartOfDay(today).getTime();
+                              const todayStr = new Date().toISOString().substring(0, 10);
+                              const recordDateStr = recordDate.toISOString().substring(0, 10);
+                              const isLive = recordDateStr === todayStr;
 
                               return (
                                  <div

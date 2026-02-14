@@ -19,7 +19,7 @@ const ChoreSchema = new Schema(
       notes: { type: String, default: "" },
       rewardAmount: { type: Number, required: true, min: 0 },
       isRecurring: { type: Boolean, default: false },
-      intervalDays: { type: Number, default: null },
+      intervalDays: { type: Number, default: 1 },
       suggestedTime: { type: String, default: null }, 
       dueDate: { type: String, default: null },
       isActive: { type: Boolean, default: true },

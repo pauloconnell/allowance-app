@@ -80,3 +80,23 @@ export function isSameDay(a: Date | string, b: Date | string, timeZone: string =
 
   return dateA === dateB;
 }
+
+
+
+// Helper to add days to a "YYYY-MM-DD" string without UTC shifts
+export function addDaysToDateString(dateStr: string, days: number): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  
+  // Create date using the 'Local' constructor (Year, Month-Index, Day)
+  // Month is 0-indexed in JS (Jan = 0), so we subtract 1
+  const d = new Date(year, month - 1, day);
+  
+  d.setDate(d.getDate() + days);
+  
+  // Format back to YYYY-MM-DD
+const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+
+  return `${yyyy}-${mm}-${dd}`; // Returns "YYYY-MM-DD"
+}

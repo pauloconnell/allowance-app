@@ -3,8 +3,6 @@ import { redirect } from 'next/navigation';
 import { getAllChildren } from '@/lib/data/childService';
 import {
    getChildDailyRecords,
-   getStartOfDay,
-   getEndOfDay,
    getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import type { IChild } from '@/types/IChild';
@@ -36,9 +34,9 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          //   selectedChild = children.find((c: any) => c.id === childId);
 
          // just get records for the past month
-         const startDate = date ? new Date(date) : new Date();
-       
-         startDate.setDate(startDate.getMonth() - 1);
+         const targetDate = date ? new Date(date) : new Date();
+         targetDate.setMonth(targetDate.getMonth() - 1);
+         const startDate = targetDate.toISOString().substring(0, 10);
 
          console.log("Start date should be 1 month ago ", startDate)
 
@@ -53,7 +51,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    // determine if viewing today's record
    const today = getLocalTodayString();
-   console.log("today is ",today)
+   
    
    let isTodaysRecord = false;
    if (records.length > 0) {

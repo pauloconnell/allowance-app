@@ -36,7 +36,13 @@ const choreSanitization = {
       return num > 0 ? num : null;
    },
    suggestedTime: (val: any) => (val ? String(val).trim().substring(0, 50) : null),
-   dueDate: (val: any) => (val ? new Date(val) : null),
+   dueDate: (val: any) => {
+      if (!val) return null;
+      // If it's already a YYYY-MM-DD string, return it
+      if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+      // Otherwise convert Date to YYYY-MM-DD string
+      return new Date(val).toISOString().substring(0, 10);
+   },
    isActive: (val: any) => Boolean(val),
 };
 
@@ -114,7 +120,14 @@ export function sanitizeUpdateChore(data: Partial<IChore>): Partial<IChore> {
       sanitized.intervalDays = parseInt(String(data.intervalDays)) || undefined;
    }
    if (data.suggestedTime) sanitized.suggestedTime = String(data.suggestedTime).trim();
-   if (data.dueDate) sanitized.dueDate = new Date(data.dueDate);
+   if (data.dueDate) {
+      // Convert to YYYY-MM-DD string if not already
+      if (typeof data.dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data.dueDate)) {
+         sanitized.dueDate = data.dueDate;
+      } else {
+         sanitized.dueDate = new Date(data.dueDate).toISOString().substring(0, 10);
+      }
+   }
 
    return sanitized;
 }

@@ -9,7 +9,7 @@ export interface IDailyRecord {
    familyId: string;
    childId: string;
    date: Date | string;
-   dueDate: Date | string;
+   dueDate: string;       // ISO date string YYYY-MM-DD
    choresList: IDailyChore[];
    copyOfChildChoresSubmitted: IDailyChore[]; // Snapshot of chore details submitted for ref - saved at end of day and copied to choresList for parent to update and award actual earnings upon 'approval'
    isSubmitted: boolean;
