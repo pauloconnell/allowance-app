@@ -5,10 +5,7 @@ import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import { connectDB } from '@/lib/mongodb';
 import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
 import {
-   getChildDailyRecords,
-   getStartOfDay,
-   getEndOfDay,
-   getOrCreateTodaysDailyRecord,
+   getChildDailyRecords, getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import { redirect } from 'next/navigation';
 import { IChild } from '@/types/IChild';

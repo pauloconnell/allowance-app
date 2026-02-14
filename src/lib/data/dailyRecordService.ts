@@ -316,7 +316,7 @@ export async function getRecordsNeedingApproval(
       dueDate: { $lte: getLocalTodayString() },
    };
 
-   console.log("adding childId", { childId })
+   //console.log("adding childId", { childId })
    if (childId) {
       query.childId = childId;
    }

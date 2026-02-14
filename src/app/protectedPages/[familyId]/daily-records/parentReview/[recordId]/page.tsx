@@ -8,8 +8,6 @@ import { connectDB } from '@/lib/mongodb';
 import { isSameDay } from '@/lib/utils/dateHelper';
 import {
    getChildDailyRecords,
-   getStartOfDay,
-   getEndOfDay,
    getOrCreateTodaysDailyRecord,
 } from '@/lib/data/dailyRecordService';
 import { redirect } from 'next/navigation';
