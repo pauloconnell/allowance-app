@@ -121,6 +121,9 @@ export default async function DashboardPage({ params }: PageProps) {
                                  <p className="mt-4 font-semibold text-secondary-700">
                                    Current Balance: ${child.currentBalance.toFixed(2)}
                                  </p>
+                                 <Link href={`/protectedPages/${familyId}/penalties/${child._id}`} >
+                                 View/Record Penalties
+                                 </Link>
                               </div>
                            ))}
                         </div>

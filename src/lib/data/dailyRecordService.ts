@@ -79,7 +79,7 @@ export async function doRecurringChores(
 
    let child = await Child.findById(childId).lean(); // get child's assigned chores = use .lean() = plain array = faster ;)
 
-   child=normalizeRecord(child);
+   child = normalizeRecord(child);
 
    if (!child || !child.choresList) return [];
    const todayStr = getLocalTodayString();
@@ -89,11 +89,11 @@ export async function doRecurringChores(
 
    const choresToProcess: IDailyChore[] = [];
    const updatePromises: Promise<any>[] = [];
-   
+
    for (const chore of child.choresList || []) {
       const choreDueDateStr = chore.dueDate;
 
-      console.log("chore due?",choreDueDateStr, todayStr, chore )
+      console.log("chore due?", choreDueDateStr, todayStr)
       if (choreDueDateStr <= todayStr) {
          // only look at chores due
 
@@ -105,7 +105,7 @@ export async function doRecurringChores(
             if (chore.isRecurring && chore.intervalDays) {
 
                // if chore is recurring, update next due date in choreList immediately => details of chore completion{
-               
+
                const nextDueString = addDaysToDateString(chore.dueDate, chore.intervalDays || 1);// push out next occurance from today (assuming child does it today)
                // ie. update tomorrow's data
                updatePromises.push(
@@ -119,10 +119,10 @@ export async function doRecurringChores(
                   )
                );
             }
-         } 
+         }
       }
    }
-   
+
    // Wait for all updates to complete
    if (updatePromises.length > 0) {
       await Promise.all(updatePromises);
@@ -153,11 +153,12 @@ export async function doRecurringChores(
  */
 export async function getOrCreateTodaysDailyRecord( // too many things here -> simple createTOdaysDailyRecord -> call this from submitDailyRecord - or Directly if no records exist yet
    childId: string,
-   familyId: string
+   familyId: string,
+   date?: string
 ): Promise<IDailyRecord> {
-   const today = getLocalTodayString();
+   const today = date ? date : getLocalTodayString();
 
-   let recentRecord:IDailyRecord | null = null;
+   let recentRecord: IDailyRecord | null = null;
    try {
       // get most recent Record
       recentRecord = await DailyRecord.findOne(
@@ -166,18 +167,18 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
          { sort: { dueDate: -1 } } // newest → oldest => gets most recent record
       ).lean();
 
-      console.log("got most recent record:", recentRecord)
+      console.log("got most recent record:", recentRecord?._id, "check date", today)
 
-   // 2. CHECK: If it exists AND it's already today, stop and return it
+      // 2. CHECK: If it exists AND it's already today, stop and return it
       if (recentRecord && isSameDay(
-         typeof recentRecord.dueDate === 'string' 
-            ? recentRecord.dueDate.substring(0, 10) 
-            : recentRecord.dueDate, 
-         today
+         typeof recentRecord.dueDate === 'string'
+            ? recentRecord.dueDate.substring(0, 10)
+            : recentRecord.dueDate,
+         today                                              // compare to today
       )) {
          console.log("Record already exists for today:", today);
          return normalizeRecord(recentRecord) as IDailyRecord;
-           //return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
+         //return JSON.parse(JSON.stringify(recentRecord)) as IDailyRecord;
       }
    } catch (err) {
       console.error("Database error during lookup:", err);
@@ -189,7 +190,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    let rolloverChores: IDailyChore[] = [];  // IChildChore becomes IDailyChore
    if (recentRecord) {    // skip this if it's child's first day ie no daily record
 
-    
+
       // Get rollover chores from yesterday
       rolloverChores = await getRolloverChores(childId, familyId);
 
@@ -202,9 +203,16 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    // Combine chores
    const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
 
-   console.log('chores for new record are ready', rolloverChores, recurringChores);
+   console.log('chores for new record are ready');//, rolloverChores, recurringChores);
 
    choresList?.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || ""));
+
+
+   // sort out penalties
+
+   
+
+
 
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({
@@ -221,7 +229,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    await newRecord.save();
 
-   console.log("Saved new record, old one:", recentRecord, recentRecord?.dueDate)
+   console.log("Saved new record, old one:", recentRecord?.dueDate, recentRecord?.dueDate)
 
    // Need to submit old record if it exists and isn't submitted - will trigger copy of child's chores completion status for parent to approve for payment
    if (recentRecord && !recentRecord.isSubmitted) {
@@ -234,7 +242,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       // await recentRecord.save();
    }
 
-  return normalizeRecord(newRecord.toObject()) as IDailyRecord;
+   return normalizeRecord(newRecord.toObject()) as IDailyRecord;
 }
 
 /**
@@ -514,45 +522,44 @@ export async function getFamilyDailyRecords(
 export async function upsertPenalty(
    childId: string,
    familyId: string,
-   dueDate: string,
-   penalty: { amount: number; reason: string },
-   parentUserId: string
+   penalty: Record<string, any>,
+   date?: string
 ): Promise<IDailyRecord> {
-   // Check if record exists for this date
-   let dailyRecord = await DailyRecord.findOne({
+   //    // Check if record exists for this date
+   //    let dailyRecord = await DailyRecord.findOne({
+   //   childId, familyId, date });
+
+   // const penaltyWithMetadata = {
+   //    ...penalty,
+     
+   // };
+   console.log("penalty about to save: ", penalty)
+
+   // don't normalize this so we can save it back:
+   let record = await getOrCreateTodaysDailyRecord(
       childId,
       familyId,
-      dueDate: dueDate,
-   });
+      date
+   )
 
-   const penaltyWithMetadata = {
-      ...penalty,
-      appliedBy: parentUserId,
-      appliedAt: new Date(),
-   };
 
-   if (dailyRecord) {
-      // Record exists: append penalty
-      dailyRecord.penalties.push(penaltyWithMetadata);
-      await dailyRecord.save();
-   } else {
-      // No record exists: create new record with penalty
-      dailyRecord = new DailyRecord({
-         childId,
-         familyId,
-         dueDate: dueDate,
-         choresList: [],
-         isSubmitted: true,
-         isApproved: true,
-         submittedAt: new Date(),
-         approvedAt: new Date(),
-         approvedBy: parentUserId,
-         penalties: [penaltyWithMetadata],
-         status: 'approved',
-         totalReward: -penalty.amount,
-         notes: 'Standalone penalty record',
-      });
-      await dailyRecord.save();
+
+
+
+
+   //  append penalty
+   //record.penalties.push(...penalty);
+   await DailyRecord.findByIdAndUpdate(
+      record._id,
+      { $push: { penalties: penalty } },
+   );
+
+
+
+   // No record exists: create new record with penalty
+
+
+   if (penalty.amount) {
 
       // Update child balance immediately for standalone penalty
       await Child.findByIdAndUpdate(
@@ -562,5 +569,6 @@ export async function upsertPenalty(
       );
    }
 
-   return dailyRecord.toObject() as IDailyRecord;
+   return record;
+
 }

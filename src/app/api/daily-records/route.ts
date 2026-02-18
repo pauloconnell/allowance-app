@@ -88,8 +88,9 @@ export async function POST(request: Request) {
 
       // Handle penalty upsert
       if (penalty) {
-         const targetDate = date ? date : new Date().toISOString().substring(0, 10);
-         const dailyRecord = await upsertPenalty(childId, familyId, targetDate, penalty, session.userId);
+         console.log("Penalty should have date ", penalty)
+         penalty.appliedBy=session.userId;
+         const dailyRecord = await upsertPenalty(childId, familyId, penalty, date);
          const normalized = normalizeRecord(dailyRecord);
          return NextResponse.json(normalized, { status: 200 });
       }

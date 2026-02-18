@@ -1,5 +1,5 @@
 import { getAuthSession } from '@/lib/auth/auth';
-import { isParentInFamily }   from '@/lib/access-control/childAccess'
+import { isParentInFamily } from '@/lib/access-control/childAccess';
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
@@ -25,14 +25,12 @@ interface PageProps {
    searchParams: Promise<{ childId?: string }>;
 }
 
-
 // this is the parent review/override page to approve childs chores for this day
 
 export default async function ParentReviewDailyRecordDetailPage({
    params,
    searchParams,
 }: PageProps) {
-
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
@@ -41,15 +39,10 @@ export default async function ParentReviewDailyRecordDetailPage({
    let child: IChild | null = null;
    let error = null;
 
-
-     // 1. Get logged-in user
-   const session = await getAuthSession(); 
-   if (!session) redirect("/login"); 
+   // 1. Get logged-in user
+   const session = await getAuthSession();
+   if (!session) redirect('/login');
    const userId = session.userId;
-
-
- 
- 
 
    // RBAC: Get this user's role from userFamily:
 
@@ -60,10 +53,9 @@ export default async function ParentReviewDailyRecordDetailPage({
       redirect('/unauthorized');
    }
 
-  
    try {
       await connectDB();
-      console.log("Get record with params ID")
+      console.log('Get record with params ID');
 
       const dailyRecord = await DailyRecord.findById(recordId).lean();
       if (!dailyRecord) {
@@ -71,7 +63,10 @@ export default async function ParentReviewDailyRecordDetailPage({
       } else {
          record = normalizeRecord(dailyRecord);
 
-         console.log("daily record for parent review:", record?.copyOfChildChoresSubmitted[2]); // record);
+         console.log(
+            'daily record for parent review:',
+            record?.copyOfChildChoresSubmitted[2]
+         ); // record);
 
          // delete this if we want childID to be required -> faster =1 less api call
          child = await Child.findById(record?.childId).lean();
@@ -84,7 +79,6 @@ export default async function ParentReviewDailyRecordDetailPage({
       console.error('Failed to load daily record:', err);
       error = 'Failed to load daily record';
    }
-
 
    if (error || !record) {
       return (
@@ -133,17 +127,21 @@ export default async function ParentReviewDailyRecordDetailPage({
          return sum + chore.rewardAmount * chore.completionStatus;
       }, 0) || 0;
 
-   const potentialTotal:number =
+   const potentialTotal: number =
       record.choresList?.reduce((sum: number, chore: any) => {
          return sum + chore?.rewardAmount * 1; // 1 is 100% completion
       }, 0) || 0;
 
    const totalPenalties =
       record.penalties?.reduce((sum: number, p: IPenalty) => sum + p.amount, 0) || 0;
-   const finalTakeHome = currentEarnings - totalPenalties;
+   const finalTakeHome = currentEarnings - totalPenalties;                                      // note actual penalty is applied to Child current balance NOT here in record
 
-
-
+   const activePenalties = record.penalties.filter((penalty: any) => {
+      const start = new Date(penalty.date);
+      const end = new Date(penalty.endDate);
+      const current = new Date(record.dueDate);
+      return start <= current && current <= end;                                       // only show this penalty if it's currently in effect on date of record
+   });
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
@@ -188,7 +186,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                               record.status.slice(1)}
                         </p>
                      </div>
-                  
+
                      <div className="text-center">
                         <p className="text-sm text-gray-600">Submitted</p>
                         <p className="font-semibold">
@@ -212,12 +210,17 @@ export default async function ParentReviewDailyRecordDetailPage({
                         )}
                      </div>
                   </div>
-                     {record.status != 'approved' ? (
-                        <div className="flex justify-center mt-1">
-                         <FormSubmit recordId={recordId} userId={userId}  penalties={record?.penalties} />
-                         </div>
-                     ):''}
-                     
+                  {record.status != 'approved' ? (
+                     <div className="flex justify-center mt-1">
+                        <FormSubmit
+                           recordId={recordId}
+                           userId={userId}
+                           penalties={record?.penalties}
+                        />
+                     </div>
+                  ) : (
+                     ''
+                  )}
                </div>
 
                {/* Chores */}
@@ -258,17 +261,18 @@ export default async function ParentReviewDailyRecordDetailPage({
                                     </div>
                                  </div>
 
-                               
                                  <p className="text-sm text-center text-gray-600 mt-2">
                                     Child entry:
                                  </p>
                                  <ChoreCompletionBoxes
                                     key={index}
                                     chore={record.copyOfChildChoresSubmitted[index]}
-                                    recordId={record?.copyOfChildChoresSubmitted[index]?._id || ""}
-                                    isDisabled={ true }
-                                       />
-                                    
+                                    recordId={
+                                       record?.copyOfChildChoresSubmitted[index]?._id ||
+                                       ''
+                                    }
+                                    isDisabled={true}
+                                 />
 
                                  <p className="text-sm text-gray-600 mt-2">
                                     ChildNotes:{' '}
@@ -276,17 +280,16 @@ export default async function ParentReviewDailyRecordDetailPage({
                                  </p>
                               </div>
                               <div className="flex justify-center font-medium">
-                                 Parent override: 
-                                 </div>
+                                 Parent override:
+                              </div>
                               <ChoreCompletionBoxes
                                  key={chore._id}
                                  chore={chore}
                                  recordId={record._id}
-                               
                               />
-                                <p className="text-sm text-gray-600 mt-2">
-                                    Notes: {chore.notes}
-                                 </p>
+                              <p className="text-sm text-gray-600 mt-2">
+                                 Notes: {chore.notes}
+                              </p>
                            </div>
                         ))}
                      </div>
@@ -300,7 +303,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                <div className="bg-white rounded-lg shadow-md p-6">
                   <h2 className="text-xl font-semibold mb-4">Penalties</h2>
                   <div className="space-y-3">
-                     {record.penalties.map((penalty: any, index: number) => (
+                     {activePenalties.map((penalty: any, index: number) => (
                         <div
                            key={index}
                            className="border-l-4 border-red-500 bg-red-50 p-4"
@@ -310,11 +313,12 @@ export default async function ParentReviewDailyRecordDetailPage({
                                  <p className="font-medium text-red-700">
                                     -${penalty.amount}
                                  </p>
-                                 <p className="text-sm text-red-600">{penalty.reason}</p>
+                                 <p className="text-sm text-red-600">Reason:{penalty.reason}</p>
+                                  {penalty.consequence ? (<p className="text-sm text-red-600">Consequence:{penalty.consequence}</p>):''}
                               </div>
                               <div className="text-right text-xs text-red-500">
-                                 {penalty.appliedAt && (
-                                    <p>{new Date(penalty.appliedAt).toLocaleString()}</p>
+                                 {penalty.endDate && (
+                                    <p>{new Date(penalty.endDate).toLocaleString()}</p>
                                  )}
                               </div>
                            </div>
@@ -322,7 +326,11 @@ export default async function ParentReviewDailyRecordDetailPage({
                      ))}
                   </div>
                </div>
-                     <FormSubmit recordId={recordId} userId={userId}  penalties={record?.penalties} />
+               <FormSubmit
+                  recordId={recordId}
+                  userId={userId}
+                  penalties={record?.penalties}
+               />
                {/* <form
                   action={handleApprove()}
                >

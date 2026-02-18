@@ -47,8 +47,12 @@ export interface IDailyChore {
 export interface IPenalty {
    amount: number;
    reason: string;
+   consequence?: string;
+   date: string;
+   endDate?: string;
    appliedBy?: string; // User ID of parent who applied
    appliedAt?: Date | string;
+   status: string;
 }
 
 
