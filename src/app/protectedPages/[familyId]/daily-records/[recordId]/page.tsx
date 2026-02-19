@@ -145,7 +145,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                   Daily Record:
                   <div>
                      {' '}
-                     {record.dueDate.split('T')[0]}
+                     {record.dueDate}
                      {isTodaysRecord && (
                         <span className="ml-2 text-green-600">(Today)</span>
                      )}
@@ -154,7 +154,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                {child && (
                   <p className="text-secondary-600 text-xl font-semibold mt-2 text-center">
                      Child: {child.name} | Balance: $
-                     <span className="underline">{child.currentBalance}</span>
+                     <span className="underline">{Number(child.currentBalance).toFixed(2)}</span>
                   </p>
                )}
             </div>
@@ -364,7 +364,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                                  Total Bank Balance
                               </p>
                               <p className="text-lg font-bold text-secondary-900">
-                                 ${child.currentBalance.toFixed(2)}
+                                 ${Number(child.currentBalance).toFixed(2)}
                               </p>
                            </div>
                            <div className="text-right">

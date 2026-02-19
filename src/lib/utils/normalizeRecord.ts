@@ -25,6 +25,9 @@ export function normalizeRecord<T extends Record<string, any>>(doc: T) {
   if (obj.childId) normalized.childId = obj.childId.toString();
   if (obj.choreId) normalized.choreId = obj.choreId.toString();
   if (obj.userId) normalized.userId = obj.userId.toString();
+  // Format currency fields 
+  // if (typeof normalized.currentBalance === "number") { 
+  //   normalized.currentBalance = normalized.currentBalance.toFixed(2); }
 
 
   // need to get into the choreList and normalize those too:

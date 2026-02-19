@@ -66,7 +66,7 @@ const DailyRecordSchema = new Schema(
             // Auth0 ID: Stays String
             appliedBy: { type: String, default: null },
             endDate: { type: String, match: /^\d{4}-\d{2}-\d{2}$/ },       // how long consequence lasts until
-            status: { type: String, enum: ["active", "expired"], default: "active" }
+           // status: { type: String, enum: ["active", "expired"], default: "active" }
          },
       ],
       totalReward: { type: Number, default: null },

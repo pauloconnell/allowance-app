@@ -41,7 +41,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
         
       } else {
          records = await getRecordsNeedingApproval(familyId); // for all children, to show counts on parentReview page
-         console.log("got records for all kids:", records);
+         console.log("got records for all kids:" );
       }
    } catch (err) {
       console.error('Failed to load data:', err);
@@ -110,7 +110,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                         <h3 className="font-semibold">{child.name}</h3>
                         <p className="text-sm text-gray-600">Age {child.age}</p>
                         <p className="text-sm text-gray-600">
-                           Balance: ${child.currentBalance}
+                           Balance: ${Number(child.currentBalance).toFixed(2)}
                         </p>
                      </Link>
                   ))}

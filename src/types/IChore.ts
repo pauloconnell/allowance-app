@@ -52,7 +52,7 @@ export interface IPenalty {
    endDate?: string;
    appliedBy?: string; // User ID of parent who applied
    appliedAt?: Date | string;
-   status: string;
+   
 }
 
 

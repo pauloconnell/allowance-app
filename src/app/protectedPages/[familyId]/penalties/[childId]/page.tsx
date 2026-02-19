@@ -36,8 +36,8 @@ export default async function PenaltiesPage({ params }: PageProps) {
    const activePenalties: any[] = [];
    const expiredPenalties: any[] = [];
    for (const p of penalties) {
-      if (p.status === 'active') activePenalties.push(p);
-      else if (p.status === 'expired') expiredPenalties.push(p);
+      if (p.date <= p.endDate) activePenalties.push(p);
+      else expiredPenalties.push(p);
    }
 
    return (
@@ -90,9 +90,7 @@ export default async function PenaltiesPage({ params }: PageProps) {
                                        -${penalty.amount?.toFixed?.(2) ?? penalty.amount}
                                     </div>
                                     ): ""}
-                                    <div className="text-xs text-gray-500">
-                                       {penalty.status}
-                                    </div>
+                               
                                  </div>
                               </div>
                               {penalty.endDate? (
@@ -104,6 +102,11 @@ export default async function PenaltiesPage({ params }: PageProps) {
                         ))}
                      </ul>
                   )}
+               </section>
+
+                <section className="bg-white rounded-lg shadow p-6">
+                  <h2 className="text-lg font-semibold mb-4">Add New Penalty</h2>
+                  <NewPenaltyForm familyId={familyId} childId={childId} />
                </section>
 
                       <section className="bg-white rounded-lg shadow p-6">
@@ -134,9 +137,7 @@ export default async function PenaltiesPage({ params }: PageProps) {
                                        -${penalty.amount?.toFixed?.(2) ?? penalty.amount}
                                     </div>
                                     ): ""}
-                                    <div className="text-xs text-gray-500">
-                                       {penalty.status}
-                                    </div>
+                                    
                                  </div>
                               </div>
                                   {penalty.endDate? (
@@ -150,10 +151,7 @@ export default async function PenaltiesPage({ params }: PageProps) {
                   )}
                </section>
 
-               <section className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-lg font-semibold mb-4">Add New Penalty</h2>
-                  <NewPenaltyForm familyId={familyId} childId={childId} />
-               </section>
+              
             </div>
          </div>
       </div>

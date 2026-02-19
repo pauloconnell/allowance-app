@@ -44,8 +44,8 @@ export default function NewPenaltyForm({ familyId, childId }: Props) {
                reason,
                consequence,
                date: today,
-               endDate,
-               status: 'active',
+               endDate
+              // status: 'active',  // remove all traces of this ********************************************
             },
          };
 
