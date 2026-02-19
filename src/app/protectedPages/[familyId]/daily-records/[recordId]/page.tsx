@@ -120,7 +120,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       }, 0) || 0;
 
    const totalPenalties =
-      record.penalties?.reduce((sum: number, p: IPenalty) => sum + p.amount, 0) || 0;
+      record.penalties?.reduce((sum: number, p: IPenalty) => p.date == p.endDate ? sum + p.amount: 0, 0) || 0; // only add penalties that have penalty today
    const finalTakeHome = currentEarnings - totalPenalties;
 
    const activePenalties = record.penalties.filter((penalty: any) => {
@@ -272,7 +272,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                                  <div>
                                     <p className="font-medium text-red-700">
 
-                                       -${penalty.amount ? penalty.amount : '0'}
+                                       -${penalty.amount && penalty.date === today ? `${penalty.amount} Applied` : '0'} 
                                     </p>
                                     <p className="text-sm text-red-600">
                                        Reason: {penalty.reason}

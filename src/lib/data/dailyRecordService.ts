@@ -211,7 +211,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    // sort out penalties
 
    
-
+   const existingPenalties = recentRecord?.penalties?.filter(p=> p.endDate? p?.endDate >= today: false);
 
 
    // Create new DailyRecord for today
@@ -222,7 +222,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       choresList,
       isSubmitted: false,
       isApproved: false,
-      penalties: [],
+      penalties: existingPenalties,
       status: 'pending',
       notes: '',
    });

@@ -224,10 +224,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
                      {records.length > 0 ? (
                         <div className="space-y-4">
-                           {records.map((record: any) => {
-                              const recordDate = new Date(record.dueDate);
-                              const isLive = isSameDay(recordDate, today);
+                           {records.map((record: any, index:number) => {
+                             // const recordDate = record.dueDate;
+                             if (index === 0) return null; // skip first record
 
+                              const isLive = false; //isSameDay(record.date, today);
                               return (
                                  <div
                                     key={record._id}
@@ -240,7 +241,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                     <div className="flex justify-between items-start">
                                        <div>
                                           <h3 className="font-medium">
-                                             {recordDate.toLocaleDateString()}
+                                             {record.dueDate}
                                              {isLive && (
                                                 <span className="ml-2 text-green-600">
                                                    (Live)

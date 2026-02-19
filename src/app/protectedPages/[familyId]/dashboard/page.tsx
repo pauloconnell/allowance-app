@@ -85,7 +85,7 @@ export default async function DashboardPage({ params }: PageProps) {
 
                      <div className="min-h-[200px] sm:min-h-[300px] ">
                         <p className="flex justify-center text-secondary-600 mb-6">
-                           <div>Daily Records Metrics:</div>
+                           Daily Records Metrics:<br/>
                            (Future)
                         </p>
 

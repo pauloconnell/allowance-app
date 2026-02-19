@@ -4,6 +4,8 @@ import ChildDropdown from '@/components/Children/ChildDropdown';
 import NewPenaltyForm from '@/components/Forms/Penalty/NewPenaltyForm';
 import { getAllChildren, getChildById } from '@/lib/data/childService';
 import { getChildDailyRecords } from '@/lib/data/dailyRecordService';
+import { cancelPenalty } from '@/lib/actions/penalty';
+import { EndDateToast } from '@/components/UI/toastTriggerEndDate';
 
 interface PageProps {
    params: Promise<{ familyId: string; childId: string }>;
@@ -25,21 +27,25 @@ export default async function PenaltiesPage({ params }: PageProps) {
       })(),
    ]);
 
+   // If no records, avoid crashing
+   if (!records || records.length === 0) {
+      return { todayRecord: [], historicalPenalties: [] };
+   }
+
+   // Extract today's record
+   const todayRecord = records.shift(); // removes first element
+   //const todayPenalties = todayRecord || [];
+
    // Flatten penalties from records
-   const penalties = (records || []).flatMap((r: any) =>
+   const historicalPenalties = (records || []).flatMap((r: any) =>
       (r.penalties || []).map((p: any) => ({
          ...p,
          recordDate: r.dueDate,
          recordId: r._id,
       }))
    );
-   const activePenalties: any[] = [];
-   const expiredPenalties: any[] = [];
-   for (const p of penalties) {
-      if (p.date <= p.endDate) activePenalties.push(p);
-      else expiredPenalties.push(p);
-   }
 
+  
    return (
       <div className="min-h-screen bg-gray-50/50">
          <FamilyStoreInitializer familyId={familyId} children={children} />
@@ -68,58 +74,78 @@ export default async function PenaltiesPage({ params }: PageProps) {
                   <h2 className="text-lg font-semibold mb-4">
                      Current / Recent Penalties
                   </h2>
-                  {activePenalties.length === 0 ? (
+                  {todayRecord?.penalties.length === 0 ? (
                      <p className="text-sm text-gray-600">
                         No Active penalties found for this child.
                      </p>
                   ) : (
                      <ul className="space-y-3">
-                        {activePenalties.map((penalty: any, idx: number) => (
+                        {todayRecord?.penalties?.map((penalty: any, idx: number) => (
                            <li key={idx} className="border rounded-lg p-3">
                               <div className="flex justify-between items-start">
                                  <div>
                                     <div className="font-medium">{penalty.reason}</div>
-                                  
+
                                     <div className="text-sm text-gray-600">
                                        Consequeces start: {penalty.date}
+                                    </div>
+                                    <div>
+                                          {penalty.endDate ? (
+                                 <div className="font-medium text-gray-400 mt-2">
+                                    Active until: {penalty.endDate || '—'}
+                                 </div>
+                              ) : (
+                                 ''
+                              )}
                                     </div>
                                  </div>
                                  <div className="text-right">
                                     {penalty.amount ? (
-                                    <div className="text-lg font-semibold text-red-600">
-                                       -${penalty.amount?.toFixed?.(2) ?? penalty.amount}
-                                    </div>
-                                    ): ""}
-                               
+                                       <div className="text-lg font-semibold text-red-600">
+                                          -$
+                                          {penalty.amount?.toFixed?.(2) ?? penalty.amount}
+                                       </div>
+                                    ) : (
+                                       ''
+                                    )}
+                                    <form action={cancelPenalty}>
+                                       {' '}
+                                       <input
+                                          type="hidden"
+                                          name="recordId"
+                                          value={todayRecord?._id}
+                                       />{' '}
+                                       <input type="hidden" name="index" value={idx} />{' '}
+                                       <button type="submit"   className=" mt-3 px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium shadow-sm transition hover:bg-red-600 active:scale-95 ">End Penalty</button>{' '}
+                                    </form>
                                  </div>
                               </div>
-                              {penalty.endDate? (
-                              <div className="font-medium text-gray-400 mt-2">
-                                 Active until: {penalty.endDate || '—'}
-                              </div>
-                              ): ""}
+                            
+                               <EndDateToast endDate={penalty.endDate} />
+                          
+                              
                            </li>
                         ))}
                      </ul>
                   )}
                </section>
 
-                <section className="bg-white rounded-lg shadow p-6">
+               <section className="bg-white rounded-lg shadow p-6">
                   <h2 className="text-lg font-semibold mb-4">Add New Penalty</h2>
                   <NewPenaltyForm familyId={familyId} childId={childId} />
                </section>
 
-                      <section className="bg-white rounded-lg shadow p-6">
+               <section className="bg-white rounded-lg shadow p-6">
                   <h2 className="text-lg font-semibold mb-4">
                      Past Penalties (from previous 3 months)
                   </h2>
-                  {expiredPenalties.length === 0 ? (
+                  {historicalPenalties.length === 0 ? (
                      <p className="text-sm text-gray-600">
                         No Active penalties found for this child.
                      </p>
                   ) : (
                      <ul className="space-y-3">
-                        {expiredPenalties.map((penalty: any, idx: number) => (
+                        {historicalPenalties.map((penalty: any, idx: number) => (
                            <li key={idx} className="border rounded-lg p-3">
                               <div className="flex justify-between items-start">
                                  <div>
@@ -128,30 +154,32 @@ export default async function PenaltiesPage({ params }: PageProps) {
                                        {penalty.duration || ''}
                                     </div>
                                     <div className="text-sm text-gray-600">
-                                        Consequeces start: {penalty.date}
+                                       Consequeces start: {penalty.date}
                                     </div>
                                  </div>
                                  <div className="text-right">
-                                     {penalty.amount ? (
-                                    <div className="text-lg font-semibold text-red-600">
-                                       -${penalty.amount?.toFixed?.(2) ?? penalty.amount}
-                                    </div>
-                                    ): ""}
-                                    
+                                    {penalty.amount ? (
+                                       <div className="text-lg font-semibold text-red-600">
+                                          -$
+                                          {penalty.amount?.toFixed?.(2) ?? penalty.amount}
+                                       </div>
+                                    ) : (
+                                       ''
+                                    )}
                                  </div>
                               </div>
-                                  {penalty.endDate? (
-                              <div className="font-medium text-gray-400 mt-2">
-                                 Active until: {penalty.endDate || '—'}
-                              </div>
-                              ): ""}
+                              {penalty.endDate ? (
+                                 <div className="font-medium text-gray-400 mt-2">
+                                    Active until: {penalty.endDate || '—'}
+                                 </div>
+                              ) : (
+                                 ''
+                              )}
                            </li>
                         ))}
                      </ul>
                   )}
                </section>
-
-              
             </div>
          </div>
       </div>
