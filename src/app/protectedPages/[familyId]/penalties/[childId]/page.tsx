@@ -6,6 +6,8 @@ import { getAllChildren, getChildById } from '@/lib/data/childService';
 import { getChildDailyRecords } from '@/lib/data/dailyRecordService';
 import { cancelPenalty } from '@/lib/actions/penalty';
 import { EndDateToast } from '@/components/UI/toastTriggerEndDate';
+import { IPenalty } from '@/types/IChore';
+import { IDailyRecord } from '@/types/IDailyRecord';
 
 interface PageProps {
    params: Promise<{ familyId: string; childId: string }>;
@@ -14,34 +16,41 @@ interface PageProps {
 export default async function PenaltiesPage({ params }: PageProps) {
    const { familyId, childId } = await params;
 
+         // make a date 30 days ago to fetch records 'up to' 30 days ago
+        const start = new Date();
+         start.setDate(start.getDate() - 0);
+         const startDate = start.toISOString().substring(0, 10);
    // Load children + child
    const [children, child, records] = await Promise.all([
       getAllChildren(familyId),
       getChildById(childId, familyId),
-      // fetch records for last 90 days
-      (async () => {
-         const start = new Date();
-         start.setDate(start.getDate() - 90);
-         const startDate = start.toISOString().substring(0, 10);
-         return await getChildDailyRecords(childId, familyId, startDate);
-      })(),
+      getChildDailyRecords(childId, familyId, startDate)      
    ]);
+
+let todayRecord: IDailyRecord | null =null;
+
+   if(records && records.length > 0){
+      todayRecord= records.shift() as IDailyRecord;
+      
+   }
+    
+if (!child) return <div>Child not found</div>;
+
 
    // If no records, avoid crashing
    if (!records || records.length === 0) {
-      return { todayRecord: [], historicalPenalties: [] };
-   }
+      return <div> No records found</div>
+      
+   } 
 
    // Extract today's record
-   const todayRecord = records.shift(); // removes first element
+  
    //const todayPenalties = todayRecord || [];
 
    // Flatten penalties from records
-   const historicalPenalties = (records || []).flatMap((r: any) =>
-      (r.penalties || []).map((p: any) => ({
+   const historicalPenalties:IPenalty[] = (records || []).flatMap((r: any) =>
+      (r.penalties || []).map((p:IPenalty) => ({
          ...p,
-         recordDate: r.dueDate,
-         recordId: r._id,
       }))
    );
 
