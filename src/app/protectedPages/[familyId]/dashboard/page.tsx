@@ -5,7 +5,7 @@ import { getSession } from '@auth0/nextjs-auth0';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getUserRoles } from '@/lib/access-control/childAccess';
-import PayoutForm from '@/components/Buttons/FormSubmit/PayoutSubmit';
+import PayoutSubmit from '@/components/Buttons/FormSubmit/PayoutSubmit';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -39,15 +39,14 @@ export default async function DashboardPage({ params }: PageProps) {
 
    const userId = session.user.sub;
 
-
    // TODO: implement child roles RBAC
 
    // 3. Check the role immediately
- //  const userProfile = await getUserRoles(userId);
-// console.log('AUTH0 USER DATA:', JSON.stringify(session?.user, null, 2));
-//    if (userProfile?.some(p=>p.role === 'child')) {
-//       redirect(`/${familyId}/daily-records/`);
-//    }
+   //  const userProfile = await getUserRoles(userId);
+   // console.log('AUTH0 USER DATA:', JSON.stringify(session?.user, null, 2));
+   //    if (userProfile?.some(p=>p.role === 'child')) {
+   //       redirect(`/${familyId}/daily-records/`);
+   //    }
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
@@ -78,24 +77,26 @@ export default async function DashboardPage({ params }: PageProps) {
                {/* Chores/Daily Records Card - Spans 2 columns on large screens */}
                <div className="lg:col-span-2">
                   <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 sm:p-8">
-                     <div className="flex items-center justify-between mb-6">
+                     <div className="flex justify-center mb-6">
                         <h2 className="text-2xl font-bold text-secondary-900">
-                           Chores & Daily Records Metrics
+                           Child Accounts, Payments & Penalties
                         </h2>
-                        <div className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-lg">
-                           <span className="text-primary-600 font-semibold">📋</span>
-                        </div>
                      </div>
 
-                     <div className="min-h-[200px] sm:min-h-[300px]">
-                        <p className="text-secondary-600 mb-6">
-                           View chore completion stats for each child. (Future)
+                     <div className="min-h-[200px] sm:min-h-[300px] ">
+                        <p className="flex justify-center text-secondary-600 mb-6">
+                           <div>Daily Records Metrics:</div>
+                           (Future)
                         </p>
 
                         <div className="flex flex-wrap gap-8 justify-around">
                            {children.map((child) => (
                               <div key={child._id} className="flex flex-col items-center">
+                                 <p className="mt-4 font-semibold text-secondary-700">
+                                    {child.name}
+                                 </p>
                                  {/* Placeholder Pie Chart using CSS Conic Gradient */}
+
                                  <div
                                     className="w-32 h-32 rounded-full border-4 border-white shadow-inner flex items-center justify-center relative"
                                     style={{
@@ -110,19 +111,23 @@ export default async function DashboardPage({ params }: PageProps) {
                                     </div>
                                  </div>
 
-                                 <p className="mt-4 font-semibold text-secondary-700">
-                                    {child.name}
-                                 </p>
+                               
                                  <span className="text-xs text-secondary-500">
                                     63 of 89 chores done
                                  </span>
 
-                                 <PayoutForm childId={child._id.toString()} childName={child.name} />
+                                 <PayoutSubmit
+                                    childId={child._id.toString()}
+                                    childName={child.name}
+                                 />
                                  <p className="mt-4 font-semibold text-secondary-700">
-                                   Current Balance: ${child.currentBalance.toFixed(2)}
+                                    Current Balance: ${child.currentBalance.toFixed(2)}
                                  </p>
-                                 <Link href={`/protectedPages/${familyId}/penalties/${child._id}`} >
-                                 View/Record Penalties
+                                 <Link
+                                    href={`/protectedPages/${familyId}/penalties/${child._id}`}
+                                    className="text-xs font-bold text-white bg-red-600 px-4 py-1.5  mt-4 rounded-full hover:bg-red-700 transition shadow-sm"
+                                 >
+                                    View/Record Penalties
                                  </Link>
                               </div>
                            ))}
