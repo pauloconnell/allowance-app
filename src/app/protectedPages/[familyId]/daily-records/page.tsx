@@ -38,9 +38,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          targetDate.setMonth(targetDate.getMonth() - 1);
          const startDate = targetDate.toISOString().substring(0, 10);
 
-         console.log("Start date should be 1 month ago ", startDate)
+         console.log('Start date should be 1 month ago ', startDate);
 
          records = await getChildDailyRecords(childId, familyId, startDate); // note 'todaysRecord' lives in client store only - in server its just records[0]
+
+         console.log("got records: ", records)
       } else {
          children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
       }
@@ -51,16 +53,27 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    // determine if viewing today's record
    const today = getLocalTodayString();
-   
-   
+
    let isTodaysRecord = false;
    if (records.length > 0) {
       isTodaysRecord = isSameDay(records[0].dueDate, today);
-      console.log("Page has: today is ",today, "record date is ",records[0]?.dueDate, "same:", isSameDay(records[0].dueDate, today))
+      console.log(
+         'Page has: today is ',
+         today,
+         'record date is ',
+         records[0]?.dueDate,
+         'same:',
+         isSameDay(records[0].dueDate, today)
+      );
    }
 
    if (!isTodaysRecord && childId) {
-      console.log("DailyRecords/ childId:",childId," Not today's record - no live record present", records[0]?.dueDate);
+      console.log(
+         'DailyRecords/ childId:',
+         childId,
+         " Not today's record - no live record present",
+         records[0]?.dueDate
+      );
       //process last record
 
       // create today's record
@@ -125,7 +138,17 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   Track and review daily chore completion
                </p>
             </div>
-
+            { records.length>0 ? (
+            <div className={childId ? 'block' : 'hidden'}>
+               <Link
+                  href={`/protectedPages/${familyId}/daily-records/${records[0]._id}?childId=${childId}`}
+                  className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+               >
+                  <span className="text-lg">✅</span>
+                  <span className="hover:text-black ml-2">Today's CheckList</span>
+               </Link>
+            </div>
+            ): ""}
             {/* Child Selector */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
                <h2 className="text-xl font-semibold mb-4">
@@ -159,8 +182,9 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   <div className="bg-white rounded-lg shadow-md p-6">
                      <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-green-700">
-                           <div>📅</div><div> Today's Record </div>
-                          <div className="font-normal"> (Live Status View) </div>
+                           <div>📅</div>
+                           <div> Today's Record </div>
+                           <div className="font-normal"> (Live Status View) </div>
                         </h2>
                         {!isTodaysRecord && (
                            <form
@@ -224,9 +248,9 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
                      {records.length > 0 ? (
                         <div className="space-y-4">
-                           {records.map((record: any, index:number) => {
-                             // const recordDate = record.dueDate;
-                             if (index === 0) return null; // skip first record
+                           {records.map((record: any, index: number) => {
+                              // const recordDate = record.dueDate;
+                              if (index === 0) return null; // skip first record
 
                               const isLive = false; //isSameDay(record.date, today);
                               return (
@@ -256,12 +280,12 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                        </div>
                                        {isLive && 'Use Continue button above'}
                                        {!isLive && (
-                                       <Link
-                                          href={`/protectedPages/${familyId}/daily-records/parentReview/${record.id}`}
-                                          className="text-primary-600 hover:text-primary-700 text-sm"
-                                       >
-                                          View Details →
-                                       </Link>
+                                          <Link
+                                             href={`/protectedPages/${familyId}/daily-records/parentReview/${record.id}`}
+                                             className="text-primary-600 hover:text-primary-700 text-sm"
+                                          >
+                                             View Details →
+                                          </Link>
                                        )}
                                     </div>
                                  </div>
