@@ -18,7 +18,7 @@ export default async function PenaltiesPage({ params }: PageProps) {
 
    // make a date 30 days ago to fetch records 'up to' 30 days ago
    const start = new Date();
-   start.setDate(start.getDate() - 0);
+   start.setDate(start.getDate() - 30);
    const startDate = start.toISOString().substring(0, 10);
    // Load children + child
    const [children, child, records] = await Promise.all([
@@ -27,6 +27,7 @@ export default async function PenaltiesPage({ params }: PageProps) {
       getChildDailyRecords(childId, familyId, startDate),
    ]);
 
+   console.log('start date: ', start, 'records are ', records);
    let todayRecord: IDailyRecord | null = null;
 
    if (records && records.length > 0) {
@@ -92,8 +93,14 @@ export default async function PenaltiesPage({ params }: PageProps) {
                                     <div className="font-medium">{penalty.reason}</div>
 
                                     <div className="text-sm text-gray-600">
-                                       
-                                   {penalty.consequence ? `Consequeces start: ${penalty.date} <br/> Consequece: ${penalty.consequence}` : ""}
+                                       {penalty.consequence
+                                          ? `Consequeces started: ${penalty.date}`
+                                          : ''}
+                                       <div className="font-bold">
+                                          {penalty.consequence
+                                             ? `Consequece: ${penalty.consequence}`
+                                             : ''}
+                                       </div>
                                     </div>
                                     <div>
                                        {penalty.endDate ? (

@@ -64,11 +64,11 @@ export default async function DashboardPage({ params }: PageProps) {
                </div>
 
                <Link
-                  href={`/`}
+                 href={`/protectedPages/${familyId}/daily-records`}
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
                >
-                  <span className="text-lg"></span>
-                  <span className="hover:text-black ml-2">Change Family</span>
+                   <span className="text-lg">✅</span>
+                  <span className="hover:text-black ml-2">Today's CheckList</span>
                </Link>
             </div>
 
