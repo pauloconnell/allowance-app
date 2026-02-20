@@ -279,7 +279,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                                     </p>
                                     {penalty.consequence ? (
                                        <p className=" text-red-600">
-                                          Consequence: {penalty.consequence}
+                                          Consequence: <span className="font-bold"> {penalty.consequence}</span>
                                        </p>
                                     ) : (
                                        ''

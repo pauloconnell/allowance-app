@@ -16,45 +16,41 @@ interface PageProps {
 export default async function PenaltiesPage({ params }: PageProps) {
    const { familyId, childId } = await params;
 
-         // make a date 30 days ago to fetch records 'up to' 30 days ago
-        const start = new Date();
-         start.setDate(start.getDate() - 0);
-         const startDate = start.toISOString().substring(0, 10);
+   // make a date 30 days ago to fetch records 'up to' 30 days ago
+   const start = new Date();
+   start.setDate(start.getDate() - 0);
+   const startDate = start.toISOString().substring(0, 10);
    // Load children + child
    const [children, child, records] = await Promise.all([
       getAllChildren(familyId),
       getChildById(childId, familyId),
-      getChildDailyRecords(childId, familyId, startDate)      
+      getChildDailyRecords(childId, familyId, startDate),
    ]);
 
-let todayRecord: IDailyRecord | null =null;
+   let todayRecord: IDailyRecord | null = null;
 
-   if(records && records.length > 0){
-      todayRecord= records.shift() as IDailyRecord;
-      
+   if (records && records.length > 0) {
+      todayRecord = records.shift() as IDailyRecord;
    }
-    
-if (!child) return <div>Child not found</div>;
 
+   if (!child) return <div>Child not found</div>;
 
    // If no records, avoid crashing
    if (!records || records.length === 0) {
-      return <div> No records found</div>
-      
-   } 
+      return <div> No records found</div>;
+   }
 
    // Extract today's record
-  
+
    //const todayPenalties = todayRecord || [];
 
    // Flatten penalties from records
-   const historicalPenalties:IPenalty[] = (records || []).flatMap((r: any) =>
-      (r.penalties || []).map((p:IPenalty) => ({
+   const historicalPenalties: IPenalty[] = (records || []).flatMap((r: any) =>
+      (r.penalties || []).map((p: IPenalty) => ({
          ...p,
       }))
    );
 
-  
    return (
       <div className="min-h-screen bg-gray-50/50">
          <FamilyStoreInitializer familyId={familyId} children={children} />
@@ -96,16 +92,17 @@ if (!child) return <div>Child not found</div>;
                                     <div className="font-medium">{penalty.reason}</div>
 
                                     <div className="text-sm text-gray-600">
-                                       Consequeces start: {penalty.date}
+                                       
+                                   {penalty.consequence ? `Consequeces start: ${penalty.date} <br/> Consequece: ${penalty.consequence}` : ""}
                                     </div>
                                     <div>
-                                          {penalty.endDate ? (
-                                 <div className="font-medium text-gray-400 mt-2">
-                                    Active until: {penalty.endDate || '—'}
-                                 </div>
-                              ) : (
-                                 ''
-                              )}
+                                       {penalty.endDate ? (
+                                          <div className="font-medium text-gray-400 mt-2">
+                                             Active until: {penalty.endDate || '—'}
+                                          </div>
+                                       ) : (
+                                          ''
+                                       )}
                                     </div>
                                  </div>
                                  <div className="text-right">
@@ -125,14 +122,17 @@ if (!child) return <div>Child not found</div>;
                                           value={todayRecord?._id}
                                        />{' '}
                                        <input type="hidden" name="index" value={idx} />{' '}
-                                       <button type="submit"   className=" mt-3 px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium shadow-sm transition hover:bg-red-600 active:scale-95 ">End Penalty</button>{' '}
+                                       <button
+                                          type="submit"
+                                          className=" mt-3 px-3 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium shadow-sm transition hover:bg-red-600 active:scale-95 "
+                                       >
+                                          End Penalty
+                                       </button>{' '}
                                     </form>
                                  </div>
                               </div>
-                            
-                               <EndDateToast endDate={penalty.endDate} />
-                          
-                              
+
+                              <EndDateToast endDate={penalty.endDate} />
                            </li>
                         ))}
                      </ul>
