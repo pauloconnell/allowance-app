@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getAllChildren } from '@/lib/data/childService';
@@ -18,6 +19,9 @@ interface PageProps {
 }
 
 export default async function DailyRecordsPage({ params, searchParams }: PageProps) {
+
+
+
    const { familyId } = await params;
    const { childId, date } = await searchParams;
 
@@ -143,6 +147,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                <Link
                   href={`/protectedPages/${familyId}/daily-records/${records[0]._id}?childId=${childId}`}
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+                  prefetch={true}
                >
                   <span className="text-lg">✅</span>
                   <span className="hover:text-black ml-2">Today's CheckList</span>
@@ -164,6 +169,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200'
                         }`}
+                        prefetch={true}
                      >
                         <h3 className="font-semibold">{child.name}</h3>
                         <p className="text-sm text-gray-600">Age {child.age}</p>
@@ -204,6 +210,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                            <Link
                               href={`/protectedPages/${familyId}/daily-records/${records[0]._id}?childId=${childId}`}
                               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              prefetch={true}
                            >
                               Continue Today's Record
                            </Link>
@@ -283,6 +290,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                           <Link
                                              href={`/protectedPages/${familyId}/daily-records/parentReview/${record.id}`}
                                              className="text-primary-600 hover:text-primary-700 text-sm"
+                                             prefetch={true}
                                           >
                                              View Details →
                                           </Link>

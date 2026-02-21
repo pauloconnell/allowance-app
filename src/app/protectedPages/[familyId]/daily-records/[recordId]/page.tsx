@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
@@ -23,6 +24,9 @@ interface PageProps {
 // this is the page the child sees to complete thier chores
 
 export default async function DailyRecordDetailPage({ params, searchParams }: PageProps) {
+    
+
+
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 

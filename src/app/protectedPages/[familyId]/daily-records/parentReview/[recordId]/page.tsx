@@ -1,3 +1,4 @@
+
 import { getAuthSession } from '@/lib/auth/auth';
 import { isParentInFamily } from '@/lib/access-control/childAccess';
 import Link from 'next/link';
@@ -31,6 +32,9 @@ export default async function ParentReviewDailyRecordDetailPage({
    params,
    searchParams,
 }: PageProps) {
+
+
+
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
@@ -90,6 +94,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                   <Link
                      href={`/protectedPages/${familyId}/daily-records`}
                      className="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+
                   >
                      Back to Daily Records
                   </Link>

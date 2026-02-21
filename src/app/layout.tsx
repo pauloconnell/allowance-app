@@ -5,6 +5,7 @@ import HeaderServer from "@/components/Header/HeaderServer";
 import { Toaster } from "react-hot-toast";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import HeaderClient from "@/components/Header/HeaderClient";
+import { CacheUpdateListener } from "@/components/ServiceWorker/CacheUpdateListener"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
           <HeaderServer />
           {children}
           <Toaster position="top-right" />
+           <CacheUpdateListener />
         </UserProvider>
       </body>
     </html>

@@ -1,3 +1,4 @@
+
 import { getAllChildren } from '@/lib/data/childService';
 import ChildrenList from '@/components/Children/ChildrenList';
 import FamilyStoreInitializer from '@/components/StoreInitializers/FamilyStoreInitializer';
@@ -12,6 +13,9 @@ interface PageProps {
 }
 
 export default async function DashboardPage({ params }: PageProps) {
+    
+
+
    const { familyId: familyId } = await params;
    let children = [];
    let errorMessage = '';
@@ -66,6 +70,7 @@ export default async function DashboardPage({ params }: PageProps) {
                <Link
                  href={`/protectedPages/${familyId}/daily-records`}
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+                  prefetch={true}
                >
                    <span className="text-lg">✅</span>
                   <span className="hover:text-black ml-2">Today's CheckList</span>
@@ -126,6 +131,7 @@ export default async function DashboardPage({ params }: PageProps) {
                                  <Link
                                     href={`/protectedPages/${familyId}/penalties/${child._id}`}
                                     className="text-xs font-bold text-white bg-red-600 px-4 py-1.5  mt-4 rounded-full hover:bg-red-700 transition shadow-sm"
+                                    prefetch={true}
                                  >
                                     View/Record Penalties
                                  </Link>
@@ -145,6 +151,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      <Link
                         href={`/protectedPages/${familyId}/daily-records/parentReview`}
                         className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+                        prefetch={true}
                      >
                         <span className="text-lg">📝</span>
                         <span className="hover:text-black ml-2">
@@ -155,6 +162,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      <Link
                         href={`/protectedPages/${familyId}/daily-records`}
                         className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+                        prefetch={true}
                      >
                         <span className="text-lg">📝</span>
                         <span className="hover:text-black ml-2">View Daily Records</span>
@@ -163,6 +171,7 @@ export default async function DashboardPage({ params }: PageProps) {
                      <Link
                         href={`/protectedPages/${familyId}/chores`}
                         className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+                        prefetch={true}
                      >
                         <span className="text-lg">✅</span>
                         <span className="hover:text-black ml-2">Manage Chores</span>
