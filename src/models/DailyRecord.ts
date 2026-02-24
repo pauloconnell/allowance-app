@@ -81,7 +81,7 @@ const DailyRecordSchema = new Schema(
 );
 
 // High-performance compound indexes
-DailyRecordSchema.index({ familyId: 1, childId: 1, date: -1 });
+DailyRecordSchema.index({ familyId: 1, childId: 1, date: -1 }, { unique: true });
 
 
 export default mongoose.models.DailyRecord ||

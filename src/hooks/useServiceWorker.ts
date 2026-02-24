@@ -32,7 +32,7 @@ export function useServiceWorker() {
 
         // 2. Fuzzy Match: Check if the updated URL matches our current path
         // This handles the ?childId=... parameters gracefully
-        if (updatedUrl.pathname === window.location.pathname) {
+        if (updatedUrl.pathname === pathname) {
           console.log("ChorePay: Match found! Refreshing data...");
           // 3. App Router way to update data without a hard reload
           // Only try to refresh if we are actually online

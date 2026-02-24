@@ -1,3 +1,7 @@
+// this is removed - to be deleted if fix works  Feb 24th
+
+
+
 // components/ServiceWorker/CacheUpdateListener.tsx
 'use client';
 import { useEffect } from 'react';
