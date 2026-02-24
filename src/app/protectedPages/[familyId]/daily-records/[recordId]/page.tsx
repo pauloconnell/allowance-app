@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
@@ -14,6 +15,7 @@ import { IChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 import ChoreItem from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
+
 
 
 interface PageProps {

@@ -18,8 +18,25 @@ declare global {
   }
 }
 
+
+
 // The "North Star": Queue failed API requests serwist will handle
-const queue = new BackgroundSyncQueue("checklist-updates");
+const queue = new BackgroundSyncQueue("checklist-updates", {
+
+  onSync: async ({ queue }) => {
+    console.log("🚀 Sync starting: Replaying requests...");
+    try {
+      await queue.replayRequests();
+      console.log("✅ Sync complete!");
+
+      // Notify the UI
+      const channel = new BroadcastChannel("chorepay-updates");
+      channel.postMessage({ meta: "serwist-broadcast-update", forceRefresh: true });
+    } catch (err) {
+      console.error("❌ Sync replay failed:", err);
+    }
+  }
+});
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -27,40 +44,34 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
-
-    // AUTH Never cache Auth0 login/callback routes
-    // Handlecache the (login) Auth0 session check specifically
+    // 1. AUTH (Keep these at the top)
     {
       matcher: ({ url }) => url.pathname === "/api/auth/me",
-      handler: new StaleWhileRevalidate({
-        cacheName: "auth-session-cache",
-      }),
+      handler: new StaleWhileRevalidate({ cacheName: "auth-session-cache" }),
     },
-    // Ignore all other Auth routes (Login/Logout/Callback)
     {
       matcher: ({ url }) => url.pathname.startsWith("/api/auth"),
       handler: new NetworkOnly(),
     },
 
-
-
-
-    {   // ensure dailyRecords always get fresh data if possible
-      matcher: ({ url }) => url.pathname.includes("/protectedPages/daily-records"),
-
-      handler: new NetworkFirst({   // hits network before cache
+    // 2. DAILY RECORDS (Specific & High Priority)
+    // Switch to NetworkFirst so it's ALWAYS fresh when online
+    {
+      matcher: ({ url }) => url.pathname.includes("/daily-records"),
+      handler: new NetworkFirst({
         cacheName: "daily-records-cache",
         plugins: [
-          new ExpirationPlugin({ maxEntries: 10 }),
+          new ExpirationPlugin({ maxEntries: 20 }),
           new BroadcastUpdatePlugin({
-            headersToCheck: ["content-length", "etag", "last-modified"],
-            // Use the spread and cast to bypass the TypeScript "unknown property" error
+            // Only check ETag for more reliable "shouting"
+            headersToCheck: ["etag"],
             ...({ channelName: "chorepay-updates" } as any),
-          }), // Shouts to the UI if data changed
-        ]
+          }),
+        ],
       }),
     },
 
+    // 3. NAVIGATION FALLBACK (For other pages)
     {
       matcher: ({ request }) => request.mode === "navigate",
       handler: new NetworkFirst({
@@ -68,35 +79,29 @@ const serwist = new Serwist({
         plugins: [
           new ExpirationPlugin({ maxEntries: 20 }),
           new BroadcastUpdatePlugin({
-            headersToCheck: ["content-length", "etag", "last-modified"],
-            // Use the spread and cast to bypass the TypeScript "unknown property" error
+            headersToCheck: ["etag"],
             ...({ channelName: "chorepay-updates" } as any),
           }),
         ],
       }),
     },
-    // DATA & PAGES: Cache chore lists and pages
-    {
-      matcher: ({ url }) =>
-        url.pathname.startsWith("/protectedPages") ||
-        url.pathname.includes("/_next/data/"), // Next.js internal data
-      handler: new StaleWhileRevalidate({
-        cacheName: "app-data-cache",
-        plugins: [
-          // INVALIDATION LOGIC:
-          new ExpirationPlugin({
-            maxEntries: 50, // Only keep 50 pages
-            maxAgeSeconds: 72 * 60 * 60, // Force a fresh fetch if data is > 3 days old
-          }),
-          // This is the magic "Shout" button (Broadcast Update)
-          new BroadcastUpdatePlugin({
-            headersToCheck: ["content-length", "etag", "last-modified"], // Detect changes
-            // Use the spread and cast to bypass the TypeScript "unknown property" error
-            ...({ channelName: "chorepay-updates" } as any),
-          }),
-        ],
-      }),
-    },
+
+    // // 4. GENERAL APP DATA
+    // {
+    //   matcher: ({ url }) =>
+    //     url.pathname.startsWith("/protectedPages") ||
+    //     url.pathname.includes("/_next/data/"),
+    //   handler: new StaleWhileRevalidate({
+    //     cacheName: "app-data-cache",
+    //     plugins: [
+    //       new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 72 * 60 * 60 }),
+    //       new BroadcastUpdatePlugin({
+    //         headersToCheck: ["etag"],
+    //         ...({ channelName: "chorepay-updates" } as any),
+    //       }),
+    //     ],
+    //   }),
+    // },
     ...defaultCache,
   ],
 });
@@ -114,33 +119,88 @@ self.addEventListener("fetch", (event) => {
 
   if (isPost && (isApiRoute || isServerAction)) {
     event.respondWith(
-      (async () => {
-        try {
-          return await fetch(request.clone());
-        } catch (error) {
-          // THE NORTH STAR: Save the checkbox/form to the queue
-          await queue.pushRequest({ request: request.clone() });
 
 
-          // Return a 503 to signal "Offline - Action Queued"
-          return new Response("Offline", {
-            status: 503,
-            statusText: "Offline Action Queued"
-          });
+      fetch(request.clone()).catch(async (err) => {
+        // This only runs if the network is DOWN
+        console.log("📦 Offline: Queuing request for URL:", url.pathname);
 
-          // // This specific payload is the "Magic Handshake" for Next.js Server Actions
-          // // It says: "Action Success, but stay exactly where you are."
-          // return new Response('0:{"action":"done"}\n', {
-          //   status: 200,
-          //   headers: {
-          //     "Content-Type": "text/x-component", // This header is REQUIRED
-          //     "X-ChorePay-Offline": "true",
-          //   },
-          // });
+        await queue.pushRequest({ request: request.clone() });
+
+        // Manually trigger a sync registration for browsers that support it
+        if ("sync" in self.registration) {
+          try {
+            await (self.registration as any).sync.register("checklist-updates");
+          } catch (e) {
+            console.log("Sync registration failed (expected in some browsers)");
+          }
         }
-      })()
+
+        // Return the "Fake 200" to keep Next.js happy
+        return new Response('0:{"action":"done"}\n', {
+          status: 200,
+          headers: { "Content-Type": "text/x-component" },
+        });
+      })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // (async () => {
+      //   try {
+      //     return await fetch(request.clone());
+      //   } catch (error) {
+      //     // THE NORTH STAR: Save the checkbox/form to the queue
+      //     await queue.pushRequest({ request: request.clone() });
+
+
+      //     // Return a 503 to signal "Offline - Action Queued"
+      //     return new Response("Offline", {
+      //       status: 503,
+      //       statusText: "Offline Action Queued"
+      //     });
+
+      //     // // This specific payload is the "Magic Handshake" for Next.js Server Actions
+      //     // // It says: "Action Success, but stay exactly where you are."
+      //     // return new Response('0:{"action":"done"}\n', {
+      //     //   status: 200,
+      //     //   headers: {
+      //     //     "Content-Type": "text/x-component", // This header is REQUIRED
+      //     //     "X-ChorePay-Offline": "true",
+      //     //   },
+      //     // });
+      //   }
+      // })()
     );
   }
 });
+
+// 4. MANUAL TRIGGER: Kickstart replay if the browser's 'sync' event is lazy
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "FORCE_REPLAY") {
+    console.log("⚡ Manual Replay Triggered");
+    event.waitUntil(queue.replayRequests());
+  }
+});
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === "checklist-updates") {
+    event.waitUntil(queue.replayRequests());
+  }
+});
+
 
 serwist.addEventListeners();
