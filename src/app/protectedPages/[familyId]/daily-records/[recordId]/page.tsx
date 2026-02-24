@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import DailyRecord from '@/models/DailyRecord';
 import Child from '@/models/Child';
@@ -15,6 +14,7 @@ import { IChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 import ChoreItem from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
+import { ServiceWorkerListener } from '@/components/ServiceWorker/ServiceWorkerListener';
 
 interface PageProps {
    params: Promise<{ familyId: string; recordId: string }>;
@@ -24,9 +24,6 @@ interface PageProps {
 // this is the page the child sees to complete thier chores
 
 export default async function DailyRecordDetailPage({ params, searchParams }: PageProps) {
-    
-
-
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
@@ -78,6 +75,9 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    // recordDate.setHours(0,0,0,0);
    // const isToday = new Date().toDateString() === recordDate.toDateString();
 
+   // If we are offline, we bypass this check to prevent the "normalizeFlightData" crash.
+   const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
    // determine if viewing today's record
    const today = getLocalTodayString();
 
@@ -86,13 +86,43 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       isTodaysRecord = isSameDay(record.dueDate, today);
    }
 
-   if (!isTodaysRecord && childId) {
+   if (!isTodaysRecord && childId && isOffline) {
       console.log("Not today's record - no live record present", record?.dueDate);
       //process last record
 
       // create today's record
-      await handleCreateRecordForToday(childId, familyId);
+      //  await handleCreateRecordForToday(childId, familyId);
+
+      return (
+         <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+               <div className="bg-white rounded-lg shadow-md p-6 text-center">
+                  <h1 className="text-2xl font-bold text-red-600 mb-4">
+                     This isn't today's record
+                  </h1>
+                  <p className="text-gray-600">Go back to set up today's record</p>
+                  <Link
+                     href={`/protectedPages/${familyId}/daily-records`}
+                     className="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                     Back to Daily Records
+                  </Link>
+               </div>
+            </div>
+         </div>
+      );
    }
+
+
+   //  DATA GUARD: If record is missing (common during offline revalidation), 
+    // show a loading state instead of letting the code hit the .map() below.
+    if (!record) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <p className="text-gray-500">Syncing record data...</p>
+            </div>
+        );
+    }
 
    // determine if viewing today's record
    //const today = new Date();
@@ -124,19 +154,23 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       }, 0) || 0;
 
    const totalPenalties =
-      record.penalties?.reduce((sum: number, p: IPenalty) => p.date == p.endDate ? sum + p.amount: 0, 0) || 0; // only add penalties that have penalty today
+      record.penalties?.reduce(
+         (sum: number, p: IPenalty) => (p.date == p.endDate ? sum + p.amount : 0),
+         0
+      ) || 0; // only add penalties that have penalty today
    const finalTakeHome = currentEarnings - totalPenalties;
 
    const activePenalties = record.penalties.filter((penalty: any) => {
       const start = penalty.date;
       const end = penalty.endDate;
       const current = record.dueDate;
-      console.log( 'do we have one?', start, current , end)
+      console.log('do we have one?', start, current, end);
       return start <= current && current <= end; // only show this penalty if it's currently in effect on date of record
    });
 
    return (
       <div className="min-h-screen goldieKnows">
+         <ServiceWorkerListener />
          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="mb-8">
                <Link
@@ -158,7 +192,9 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                {child && (
                   <p className="text-secondary-600 text-xl font-semibold mt-2 text-center">
                      Child: {child.name} | Balance: $
-                     <span className="underline">{Number(child.currentBalance).toFixed(2)}</span>
+                     <span className="underline">
+                        {Number(child.currentBalance).toFixed(2)}
+                     </span>
                   </p>
                )}
             </div>
@@ -275,28 +311,30 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                               <div className="flex justify-between items-start">
                                  <div>
                                     <p className="font-medium text-red-700">
-
-                                       -${penalty.amount && penalty.date === today ? `${penalty.amount} Applied` : '0'} 
+                                       -$
+                                       {penalty.amount && penalty.date === today
+                                          ? `${penalty.amount} Applied`
+                                          : '0'}
                                     </p>
                                     <p className="text-sm text-red-600">
                                        Reason: {penalty.reason}
                                     </p>
                                     {penalty.consequence ? (
                                        <p className=" text-red-600">
-                                          Consequence: <span className="font-bold"> {penalty.consequence}</span>
+                                          Consequence:{' '}
+                                          <span className="font-bold">
+                                             {' '}
+                                             {penalty.consequence}
+                                          </span>
                                        </p>
                                     ) : (
                                        ''
                                     )}
                                  </div>
                                  <div className="text-right text-xs text-red-500">
-                                    {penalty.endDate && (
-                                       <p>Until: {penalty.endDate}</p>
-                                    )}
+                                    {penalty.endDate && <p>Until: {penalty.endDate}</p>}
                                  </div>
-                                 <div className="text-right text-xs text-red-500">
-                                
-                                 </div>
+                                 <div className="text-right text-xs text-red-500"></div>
                               </div>
                            </div>
                         ))}
@@ -345,7 +383,8 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                         {totalPenalties > 0 && (
                            <div className="flex justify-between text-sm">
                               <span className="text-red-600 font-medium">
-                                 Penalties Deducted: ( Note: already deducted from child Account )
+                                 Penalties Deducted: ( Note: already deducted from child
+                                 Account )
                               </span>
                               <span className="font-medium text-red-600">
                                  -${totalPenalties.toFixed(2)}
