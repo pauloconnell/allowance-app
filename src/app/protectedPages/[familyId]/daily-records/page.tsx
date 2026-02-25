@@ -78,9 +78,9 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          " Not today's record - no live record present",
          records[0]?.dueDate
       );
-      //process last record
+      
 
-      // create today's record
+      // create today's record and processes last record
       await handleCreateRecordForToday(childId, familyId);
    }
 

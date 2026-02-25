@@ -160,13 +160,12 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    let recentRecord: IDailyRecord | null = null;
    try {
-      // get most recent Record
-      recentRecord = await DailyRecord.findOne(
-         { childId, familyId },
-         null,
-         { sort: { dueDate: -1 } } // newest → oldest => gets most recent record
-      ).lean();
-
+      // 1. Fetch the 2 most recent records in ONE call
+      const recentRecords: IDailyRecord[] = await DailyRecord.find({ childId, familyId })
+         .sort({ dueDate: -1 })
+         .limit(2)
+         .lean();
+      recentRecord = recentRecords[0];
       console.log("got most recent record:", recentRecord?._id, "check date", today)
 
       // 2. CHECK: If it exists AND it's already today, stop and return it
@@ -210,10 +209,12 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    // sort out penalties
 
-   
-   const existingPenalties = recentRecord?.penalties?.filter(p=> p.endDate? p?.endDate >= today: false);
+
+   const existingPenalties = recentRecord?.penalties?.filter(p => p.endDate ? p?.endDate >= today : false)|| [];
 
 
+   // 4. Atomic Save with Race Condition Protection
+   try {
    // Create new DailyRecord for today
    const newRecord = new DailyRecord({
       childId,
@@ -243,6 +244,15 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    }
 
    return normalizeRecord(newRecord.toObject()) as IDailyRecord;
+
+   } catch (err: any) {
+      // 11000 = Duplicate Key (Unique Index triggered)
+      if (err.code === 11000) {
+         const collisionRecord = await DailyRecord.findOne({ childId, familyId, dueDate: today }).lean();
+         return normalizeRecord(collisionRecord!) as IDailyRecord;
+      }
+      throw err;
+   }
 }
 
 /**
@@ -531,7 +541,7 @@ export async function upsertPenalty(
 
    // const penaltyWithMetadata = {
    //    ...penalty,
-     
+
    // };
    console.log("penalty about to save: ", penalty)
 
