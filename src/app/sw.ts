@@ -47,7 +47,7 @@ const serwist = new Serwist({
     // 1. AUTH (Keep these at the top)
     {
       matcher: ({ url }) => url.pathname === "/api/auth/me",
-      handler: new StaleWhileRevalidate({ cacheName: "auth-session-cache" }),
+      handler: new NetworkFirst({ cacheName: "auth-session-cache" }),
     },
     {
       matcher: ({ url }) => url.pathname.startsWith("/api/auth"),
@@ -73,7 +73,7 @@ const serwist = new Serwist({
 
     // 3. NAVIGATION FALLBACK (For other pages)
     {
-      matcher: ({ request }) => request.mode === "navigate",
+      matcher: ({ request, url }) => request.mode === "navigate" && !url.pathname.startsWith("/api/auth"),
       handler: new NetworkFirst({
         cacheName: "pages-cache",
         plugins: [
