@@ -1,7 +1,7 @@
 // this page is landing point for when a child logs in, goes to dashboard and is directed here.
 // we must get the recordId for child to complete
 
-
+// FUTURE:   not currently hooked up for child access
 
 
 import Link from 'next/link';

@@ -210,7 +210,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    // sort out penalties
 
 
-   const existingPenalties = recentRecord?.penalties?.filter(p => p.endDate ? p?.endDate >= today : false)|| [];
+   const existingPenalties = recentRecord?.penalties?.filter(p => p.endDate ? p?.endDate >= today : false) || [];
 
 
    // 4. Atomic Save with Race Condition Protection
@@ -228,9 +228,9 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       notes: '',
    });
 
-   await newRecord.save();
+         await newRecord.save();
 
-   console.log("Saved new record, old one:", recentRecord?.dueDate, recentRecord?.dueDate)
+         console.log("Saved new record, old one:", recentRecord?.dueDate, recentRecord?.dueDate)
 
    // Need to submit old record if it exists and isn't submitted - will trigger copy of child's chores completion status for parent to approve for payment
    if (recentRecord && !recentRecord.isSubmitted) {
@@ -243,7 +243,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       // await recentRecord.save();
    }
 
-   return normalizeRecord(newRecord.toObject()) as IDailyRecord;
+      return normalizeRecord(newRecord.toObject()) as IDailyRecord;
 
    } catch (err: any) {
       // 11000 = Duplicate Key (Unique Index triggered)

@@ -95,12 +95,15 @@ export async function POST(request: Request) {
          return NextResponse.json(normalized, { status: 200 });
       }
 
-      // Handle regular daily record creation/retrieval
-      //const targetDate = date ? new Date(date) : new Date();
-      const dailyRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
-      const normalized = normalizeRecord(dailyRecord);
 
-      return NextResponse.json(normalized, { status: 200 });
+      // using server functions to create records, don't need this api
+
+      // // Handle regular daily record creation/retrieval
+      // //const targetDate = date ? new Date(date) : new Date();
+      // const dailyRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
+      // const normalized = normalizeRecord(dailyRecord);
+
+      // return NextResponse.json(normalized, { status: 200 });
    } catch (err) {
       console.error('POST /api/daily-records error:', err);
       return NextResponse.json(

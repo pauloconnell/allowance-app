@@ -78,6 +78,8 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          " Not today's record - no live record present",
          records[0]?.dueDate
       );
+
+      
       
 
       // create today's record and processes last record
@@ -169,7 +171,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200'
                         }`}
-                        prefetch={true}
+                        
                      >
                         <h3 className="font-semibold">{child.name}</h3>
                         <p className="text-sm text-gray-600">Age {child.age}</p>
