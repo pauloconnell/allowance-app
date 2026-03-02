@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { sanitizeInput } from '@/lib/utils/sanitizeInput';
-import type { IChore } from '@/types/IChore';
+import type { IChore, IDailyChore } from '@/types/IChore';
 
 interface ChoreFormProps {
-   chore?: IChore ;  // If present, we are in Edit mode
+   chore?: IChore | IDailyChore; // If present, we are in Edit mode
    familyId: string;
 }
 
@@ -15,7 +15,9 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
    const router = useRouter();
    const isEdit = !!chore;
 
-   //const derivedChoreId = chore && '_id' in chore ? chore._id : (chore?.choreId ?? '');
+   // if no 'chore' than it is in create mode / otherwise edit mode
+   const choreId = chore ? ('choreId' in chore ? chore.choreId : chore._id) : '';
+  
 
    const [form, setForm] = useState({
       taskName: chore?.taskName ?? '',
@@ -26,7 +28,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
          : new Date().toISOString().split('T')[0],
       intervalDays: chore?.intervalDays ?? '',
       suggestedTime: chore?.suggestedTime ?? '', // If it's there, we're editing. If not, we're creating.
-      choreId: chore?._id || '',
+      choreId: choreId,
       familyId: familyId ?? '',
    });
 
@@ -48,62 +50,55 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, type, checked, value } = e.target;
 
-     let cleaned: any;
+      let cleaned: any;
 
-  if (type === 'checkbox') {
-    cleaned = checked;           // check box is clean data
-  } else if (type === 'number') {
-    // Convert to number e.target.value is always a string, handle empty string as 0
-    cleaned = value === '' ? 0 : Number(value);
-  } else {
-    // Sanitize text inputs (taskName, notes, suggestedTime)
-    cleaned = sanitizeInput(value);
-  }
+      if (type === 'checkbox') {
+         cleaned = checked; // check box is clean data
+      } else if (type === 'number') {
+         // Convert to number e.target.value is always a string, handle empty string as 0
+         cleaned = value === '' ? 0 : Number(value);
+      } else {
+         // Sanitize text inputs (taskName, notes, suggestedTime)
+         cleaned = sanitizeInput(value);
+      }
       setForm({ ...form, [name]: cleaned });
    };
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-    
-
-
-
       // Extract choreId from form - form set it/'' either way we cant have it in the DB payload(mongodb hates having duplicate ids)
-  const { choreId, ...payload } = form;
-  const isUpdating = !!(isEdit && choreId);
-  
-  const url = isUpdating ? `/api/chores/${choreId}` : '/api/chores';
-  const method = isUpdating ? 'PUT' : 'POST';
+      const { choreId, ...payload } = form;
+      const isUpdating = !!(isEdit && choreId);
 
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...payload, familyId }), // Pure data + family link
-    });
+      const url = isUpdating ? `/api/chores/${choreId}` : '/api/chores';
+      const method = isUpdating ? 'PUT' : 'POST';
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || 'Failed to save chore');
-    }
+      try {
+         const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, familyId }), // Pure data + family link
+         });
 
-    toast.success(isUpdating ? 'Chore updated' : 'Chore created');
+         if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to save chore');
+         }
 
-    // Navigation logic
-    const redirectPath = isUpdating 
-      ? `/protectedPages/${familyId}/chores` // edit complete - just same path for now
-      : `/protectedPages/${familyId}/chores`;
-      
-    router.push(redirectPath);
-    router.refresh();
+         toast.success(isUpdating ? 'Chore updated' : 'Chore created');
 
-  } catch (error: any) {
-    console.error("Submit error:", error);
-    toast.error(error.message);
-  }
+         // Navigation logic
+         const redirectPath = isUpdating
+            ? `/protectedPages/${familyId}/chores` // edit complete - just same path for now
+            : `/protectedPages/${familyId}/chores`;
 
-
+         router.push(redirectPath);
+         router.refresh();
+      } catch (error: any) {
+         console.error('Submit error:', error);
+         toast.error(error.message);
+      }
    };
 
    return (
@@ -130,7 +125,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
             />
          </div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+            <div>
                <label htmlFor="isRecurring">
                   <input
                      type="checkbox"
@@ -144,9 +139,6 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
                   </span>
                </label>
             </div>
-       
-
-          
          </div>
          {form.isRecurring && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,7 +186,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
 
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Column 1: Reward Amount */}
-     <div>
+            <div>
                <label
                   htmlFor="rewardAmount"
                   className="block text-sm font-medium text-gray-700 mb-2"
