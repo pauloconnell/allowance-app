@@ -132,7 +132,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                <h2 className="text-xl font-semibold mb-4">
                   {childId
                      ? `Records to approve for ${childName}`
-                     : 'Records to approval for all children'}
+                     : 'Records to approve for all children'}
                </h2>
 
                {records.length === 0 && (
@@ -151,13 +151,13 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               >
                                  <div className="flex items-center justify-between">
                                     <div className="w-full">
-                                       <div className="flex justify-between">
-                                       <p className="font-semibold">
+                                       
+                                       <span className="font-semibold">
                                           {new Date(record.dueDate).toLocaleDateString()}
-                                       </p>
-                                       <p className="hidden sm:block"> Id:{record.childId.slice(-6)}</p>
-                                       <p className="hidden sm:block"></p>
-                                       </div>
+                                       </span>
+                                       <span className="hidden sm:block"> Id:{record.childId.slice(-6)}</span>
+                                    
+                                       
                                        <p className="text-sm text-gray-600">
                                           Status: {record.status}
                                        </p>
