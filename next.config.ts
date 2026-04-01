@@ -8,7 +8,8 @@ const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
   cacheOnNavigation: true, // Crucial for navigating records while offline
-    register: !isDev, // <--- THIS BREAKS THE LOOP in dev (standard issue)
+  register: !isDev, // <--- THIS BREAKS THE LOOP in dev (standard issue)
+  exclude: [/api\/auth/],
 });
 
 
