@@ -43,7 +43,7 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  navigateFallbackDenylist: [/^\/api\/auth/],
+  // removed: navigateFallbackDenylist: [/^\/api\/auth/],
   runtimeCaching: [
     // 1. AUTH (Keep these at the top)
     {
