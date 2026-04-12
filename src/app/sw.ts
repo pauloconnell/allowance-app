@@ -44,6 +44,14 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   // removed: navigateFallbackDenylist: [/^\/api\/auth/],
+  fallbacks: {
+    entries: [
+      {
+        url: "/offline", // The route to your custom offline page
+        matcher: ({ request }) => request.mode === "navigate",
+      },
+    ],
+  },
   runtimeCaching: [
     // 1. AUTH (Keep these at the top)
     {
@@ -53,6 +61,13 @@ const serwist = new Serwist({
     {
       matcher: ({ url }) => url.pathname.startsWith("/api/auth"),
       handler: new NetworkOnly(),
+    },
+    {
+      // This "Lazy" caches the offline page assets as soon as they are first seen
+      matcher: ({ url }) => url.pathname === "/offline",
+      handler: new StaleWhileRevalidate({
+        cacheName: "offline-fallback-cache",
+      }),
     },
 
     // 2. DAILY RECORDS (Specific & High Priority)
@@ -103,6 +118,8 @@ const serwist = new Serwist({
     //     ],
     //   }),
     // },
+
+
     ...defaultCache,
   ],
 });
