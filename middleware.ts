@@ -42,15 +42,7 @@ export default withMiddlewareAuthRequired(async function middleware(req: NextReq
 });
 
 export const config = {
-   matcher: [
-      /*
-       * Match all request paths except for the ones starting with:
-       * - api/auth (Auth0 login/callback/logout) <--- THIS IS THE KEY FIX
-       * - _next/static (static files)
-       * - _next/image (image optimization files)
-       * - favicon.ico (favicon file)
-       * - public (public folder)
-       */
-      '/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)',
-   ],
+  matcher: [
+    '/protectedPages/:path*',  // only run on pages that actually need auth
+  ],
 };

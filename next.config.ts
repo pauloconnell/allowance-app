@@ -9,7 +9,12 @@ const withSerwist = withSerwistInit({
   swDest: "public/sw.js",
   cacheOnNavigation: true, // Crucial for navigating records while offline
   register: !isDev, // <--- THIS BREAKS THE LOOP in dev (standard issue)
-  exclude: [/api\/auth/],
+  exclude: [/api\/auth/,
+      /chunks\/.*\.js$/,          // exclude large JS chunks from precache
+    /static\/media\//,          // exclude fonts/images from precache
+    /\.map$/,                   // exclude source maps
+  ],
+
 });
 
 

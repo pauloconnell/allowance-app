@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+//export const dynamic = "force-dynamic";
 
 import { getSession } from '@auth0/nextjs-auth0';
 import FamilySwitcher from '@/components/FamilySwitcher/FamilySwitcher';
