@@ -7,12 +7,10 @@ import '@/models/Family';
 import type { IFamily } from '@/types/IFamily';
 import { cookies } from 'next/headers';
 
-
-
 export default async function Home() {
    // Await cookies to satisfy Next.js 15 requirements
    await cookies();
-   
+
    let session = null;
    try {
       session = await getSession();
@@ -41,6 +39,9 @@ export default async function Home() {
          console.error('Failed to fetch families:', error);
       }
    }
+
+   const hasFamilies = families?.length > 0;
+   const noFamilies = families?.length === 0;
 
    return (
       <div className="min-h-screen bg-white">
@@ -98,7 +99,9 @@ export default async function Home() {
                   </h1>
 
                   <p className="text-lg sm:text-xl text-secondary-300 max-w-3xl mx-auto mb-8 leading-relaxed">
-                     allowanceApp helps you organize family chores, track daily records, and manage allowances. Smart reminders, complete activity history, and an intuitive dashboard built for families.
+                     allowanceApp helps you organize family chores, track daily records,
+                     and manage allowances. Smart reminders, complete activity history,
+                     and an intuitive dashboard built for families.
                   </p>
 
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -108,7 +111,7 @@ export default async function Home() {
                      >
                         {isLoggedIn ? 'Go to Dashboard' : 'Get Started Free'}
                      </a>
-                     {isLoggedIn && (families.length > 0) && (
+                     {isLoggedIn && hasFamilies && (
                         <div className="w-full sm:w-auto">
                            <FamilySwitcher
                               families={families}
@@ -116,7 +119,7 @@ export default async function Home() {
                            />
                         </div>
                      )}
-                     {isLoggedIn && (
+                     {isLoggedIn && noFamilies && (
                         <a
                            href="/setup-family"
                            className="flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg shadow-lg transition duration-150"
@@ -156,9 +159,12 @@ export default async function Home() {
                      <div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-6">
                         <span className="text-2xl">🔔</span>
                      </div>
-                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Smart Reminders</h3>
+                     <h3 className="text-xl font-bold text-secondary-900 mb-3">
+                        Smart Reminders
+                     </h3>
                      <p className="text-secondary-600">
-                        Automatic notifications for chores, tasks, and important family events.
+                        Automatic notifications for chores, tasks, and important family
+                        events.
                      </p>
                   </div>
 
@@ -167,9 +173,12 @@ export default async function Home() {
                      <div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-6">
                         <span className="text-2xl">📋</span>
                      </div>
-                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Complete Activity History</h3>
+                     <h3 className="text-xl font-bold text-secondary-900 mb-3">
+                        Complete Activity History
+                     </h3>
                      <p className="text-secondary-600">
-                        Keep a searchable log of every chore, task, and daily record for your entire family.
+                        Keep a searchable log of every chore, task, and daily record for
+                        your entire family.
                      </p>
                   </div>
 
@@ -178,9 +187,12 @@ export default async function Home() {
                      <div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-6">
                         <span className="text-2xl">�‍👩‍👧‍👦</span>
                      </div>
-                     <h3 className="text-xl font-bold text-secondary-900 mb-3">Multi-Child Support</h3>
+                     <h3 className="text-xl font-bold text-secondary-900 mb-3">
+                        Multi-Child Support
+                     </h3>
                      <p className="text-secondary-600">
-                        Manage all your children in one place — track their chores, allowances, and daily tasks.
+                        Manage all your children in one place — track their chores,
+                        allowances, and daily tasks.
                      </p>
                   </div>
                </div>
@@ -216,7 +228,8 @@ export default async function Home() {
                   Ready to organize your family?
                </h2>
                <p className="text-lg text-primary-100 mb-8">
-                  Join families who trust allowanceApp to manage chores, track daily records, and rewards.
+                  Join families who trust allowanceApp to manage chores, track daily
+                  records, and rewards.
                </p>
                <a
                   href={href}
@@ -233,7 +246,9 @@ export default async function Home() {
                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <div className="mb-6 sm:mb-0">
                      <span className="text-2xl font-bold text-white">allowanceApp</span>
-                     <p className="text-sm mt-2 text-secondary-400">Family chores made simple</p>
+                     <p className="text-sm mt-2 text-secondary-400">
+                        Family chores made simple
+                     </p>
                   </div>
                   <div className="text-sm text-secondary-400">
                      © 2025 allowanceApp. All rights reserved.
