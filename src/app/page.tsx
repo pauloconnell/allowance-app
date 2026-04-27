@@ -132,7 +132,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <div className="mb-6 sm:mb-0">
-                     <span className="text-2xl font-bold text-white">allowanceApp</span>
+                     <span className="text-2xl font-bold text-white">Chore Pay</span>
                      <p className="text-sm mt-2 text-secondary-400">Family chores made simple</p>
                   </div>
                   <div className="text-sm text-secondary-400">© 2026 allowanceApp. All rights reserved.</div>
