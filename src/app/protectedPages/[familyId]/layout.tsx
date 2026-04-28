@@ -5,11 +5,11 @@ import { TabBar } from '@/components/TabBar/TabBar';
 
 interface FamilyLayoutProps {
    children: ReactNode;
-   params: { familyId: string };
+   params: Promise<{ familyId: string }>;
 }
 
 export default async function FamilyLayout({ children, params }: FamilyLayoutProps) {
-   const { familyId } = params;
+   const { familyId } = await params;
 
    return (
       <FamilyProvider familyId={familyId}>
