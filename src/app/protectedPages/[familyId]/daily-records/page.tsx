@@ -11,7 +11,7 @@ import type { IDailyRecord } from '@/types/IDailyRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
 import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
-import { handleCreateRecordForToday } from '@/lib/actions/record';
+import { handleCreateRecordForToday, handleCreateRecordForYesterday } from '@/lib/actions/record';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -196,15 +196,15 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                         </h2>
                         {!isTodaysRecord && (
                            <form
-                              action={async () => {
-                                 await handleCreateRecordForToday(childId, familyId);
-                              }}
+                              action={handleCreateRecordForToday}
                            >
+                                <input type="hidden" name="childId" value={childId} />
+                                 <input type="hidden" name="familyId" value={familyId} />
                               <button
                                  type="submit"
                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                               >
-                                 Start Today's Record
+                                Start Today's Record
                               </button>
                            </form>
                         )}
@@ -217,6 +217,21 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               Continue Today's Record
                            </Link>
                         )}
+                       <form
+                              action={handleCreateRecordForYesterday}
+                           >
+                                <input type="hidden" name="childId" value={childId} />
+                                 <input type="hidden" name="familyId" value={familyId} />
+                              <button
+                                 type="submit"
+                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              >
+                                  Create Missed Record for yesterday
+                                 
+                              </button>
+                           </form>
+
+
                      </div>
 
                      {isTodaysRecord ? (

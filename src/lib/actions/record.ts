@@ -2,14 +2,18 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { getOrCreateTodaysDailyRecord } from '@/lib/data/dailyRecordService';
+import { getOrCreateTodaysDailyRecord, createDailyRecord } from '@/lib/data/dailyRecordService';
+import { addDaysToDateString, getLocalTodayString } from '@/lib/utils/dateHelper';
 import { connectDB } from '@/lib/mongodb'; // Updated to your actual DB utility
 import  DailyRecord  from '@/models/DailyRecord'; 
 
 /**
  * 1. Logic for creating/redirecting to today's record
  */
-export async function handleCreateRecordForToday(childId: string, familyId: string) {
+export async function handleCreateRecordForToday(formData: FormData){//childId: string, familyId: string) {
+     const childId = formData.get("childId") as string;
+  const familyId = formData.get("familyId") as string;
+  
    if (!childId || !familyId) {
       console.error('Child ID and Family ID are required.');
       return;
@@ -24,6 +28,32 @@ export async function handleCreateRecordForToday(childId: string, familyId: stri
    const newId = newRecord._id.toString();
    
    redirect(`/protectedPages/${familyId}/daily-records/${newId}?childId=${childId}`);
+}
+
+
+/**
+ * 1.5 Logic for creating/redirecting to yesterday's record
+ */
+export async function handleCreateRecordForYesterday(formData: FormData) {  //childId: string, familyId: string) {
+   const childId = formData.get("childId") as string;
+  const familyId = formData.get("familyId") as string;
+   if (!childId || !familyId) {
+      console.error('Child ID and Family ID are required.');
+      return;
+   } 
+   
+   await connectDB();
+   
+   console.log("Fetching/Creating record for yesterday...");
+   // need to get today's record for comparison in function:
+   const recentRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
+   const date = addDaysToDateString(getLocalTodayString(), -1);
+   const newRecord = await createDailyRecord(childId, familyId, recentRecord, date );
+   
+   // We only need the string ID for the redirect
+   const newId = newRecord._id.toString();
+   
+   redirect(`/protectedPages/${familyId}/daily-records/parentReview/${newId}?childId=${childId}`);
 }
 
 /**
