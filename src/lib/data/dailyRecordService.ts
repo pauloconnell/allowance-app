@@ -21,15 +21,16 @@ import { isSameDay, getLocalTodayString, stringToDate, addDaysToDateString } fro
  */
 export async function getRolloverChores(
    childId: string,
-   familyId: string
+   familyId: string, 
+   latestRecord: IDailyRecord
 ): Promise<IDailyChore[]> {
-   const [latestRecord] = await DailyRecord.find({ childId, familyId })
-      .sort({ dueDate: -1 })
-      .limit(1);
+   //const [latestRecord] = await DailyRecord.find({ childId, familyId })              // optimized to just get record from calling function which already has it
+   //   .sort({ dueDate: -1 })
+   //   .limit(1);
 
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
-   prevRecord.choresList = (normalizeRecord(prevRecord.choresList));
+   // should already be normalized now that we are not getting it from DB bueno?      prevRecord.choresList = (normalizeRecord(prevRecord.choresList));
 
    // Return chores with completionStatus === 0
    // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
@@ -40,7 +41,7 @@ export async function getRolloverChores(
       if (choreC.completionStatus == 0.5) {
          //if (!chore.isRecurring) {
          choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
-         choreC.completionStatus = 0;
+       
          choreC.completionStatus = 0; // reset to 0 so it defaults back to 0
       }
       if (choreC.isRecurring && choreC.intervalDays && choreC.completionStatus < 1) {
@@ -48,12 +49,16 @@ export async function getRolloverChores(
          // Define the Expiry for Recurring Chores
          const currentDue = stringToDate(choreC.dueDate);
          currentDue.setDate(currentDue.getDate() + (choreC.intervalDays || 0));
-         const choreDueAgainString = getLocalTodayString(currentDue);
+         const choreNextDueString = getLocalTodayString(currentDue);
          const todayString = getLocalTodayString();
 
-         if (choreDueAgainString > todayString) {
+          // update the chore's dueDate so it persists correctly
+         choreC.dueDate = choreNextDueString;
+
+         if (choreNextDueString > todayString) {
             //if chore is outstanding, and next occurance of chore isn't due yet, add it to todays chorelist
             choreC.completionStatus = 0;
+
             acc.push(choreC);
          }
       }
@@ -66,6 +71,8 @@ export async function getRolloverChores(
    }, []);   // initial value of acc must be set to [] here;)
 
 }
+
+
 
 /**
  * Recurrence Logic: Get active recurring chores that should be added to today  from DB
@@ -147,6 +154,10 @@ export async function doRecurringChores(
    return scheduled;
 }
 
+
+
+
+
 /**
  * Initialize or retrieve today's DailyRecord for a child
  * Implements rollover and recurrence logic
@@ -166,7 +177,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
          .limit(2)
          .lean();
       recentRecord = recentRecords[0];
-      console.log("got most recent record:", recentRecord?._id, "check date", today)
+      //console.log("got most recent record:", recentRecord?._id, "check date", today)
 
       // 2. CHECK: If it exists AND it's already today, stop and return it
       if (recentRecord && isSameDay(
@@ -184,16 +195,35 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       throw err;
    }
 
+   return createDailyRecord(childId, familyId, recentRecord, today);        // this function will create today's record as we have confirmed it doesn't exist yet
+
+}
+
+
+
+   export async function createDailyRecord(childId: string, familyId: string, recentRecord:IDailyRecord, date?: string ): Promise<IDailyRecord> {
+
+      // first, must make sure it doesn't exist already - today's would have been checked above, but must check yesterday's
+      let isYesterday = (date == addDaysToDateString(getLocalTodayString(), -1));
+      if(isYesterday){
+         //yesterday
+         if(recentRecord.dueDate == date){
+            return recentRecord;       // just return yesterday's record since it already exists
+         }
+      }
+    
+
+
 
 
    let rolloverChores: IDailyChore[] = [];  // IChildChore becomes IDailyChore
-   if (recentRecord) {    // skip this if it's child's first day ie no daily record
+   //if (recentRecord) {    // skip this if it's child's first day ie no daily record
 
 
       // Get rollover chores from yesterday
-      rolloverChores = await getRolloverChores(childId, familyId);
+      rolloverChores = await getRolloverChores(childId, familyId, recentRecord);
 
-   }
+   
 
    // Get recurring chores
    const existingChoreIds = rolloverChores?.map((c) => c?.choreId.toString());
@@ -219,7 +249,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    const newRecord = new DailyRecord({
       childId,
       familyId,
-      dueDate: today,
+      dueDate: date,
       choresList,
       isSubmitted: false,
       isApproved: false,
@@ -230,7 +260,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
          await newRecord.save();
 
-         console.log("Saved new record, old one:", recentRecord?.dueDate, recentRecord?.dueDate)
+         console.log("Saved new record, ",newRecord.dueDate, " old one:", recentRecord?.dueDate)
 
    // Need to submit old record if it exists and isn't submitted - will trigger copy of child's chores completion status for parent to approve for payment
    if (recentRecord && !recentRecord.isSubmitted) {
@@ -243,17 +273,27 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       // await recentRecord.save();
    }
 
+   // if yesterday's record just created, must submit it so it's ready for parantal approval which is how it works
+   if(isYesterday){
+        let triggerCreate = false;
+      await submitDailyRecord(newRecord._id, triggerCreate);
+   }
+
+
       return normalizeRecord(newRecord.toObject()) as IDailyRecord;
 
    } catch (err: any) {
       // 11000 = Duplicate Key (Unique Index triggered)
       if (err.code === 11000) {
-         const collisionRecord = await DailyRecord.findOne({ childId, familyId, dueDate: today }).lean();
+         const collisionRecord = await DailyRecord.findOne({ childId, familyId, dueDate: date }).lean();
          return normalizeRecord(collisionRecord!) as IDailyRecord;
       }
       throw err;
    }
 }
+
+
+
 
 /**
  * Update chore completion status

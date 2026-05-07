@@ -12,7 +12,7 @@
  */
 export function getLocalTodayString(
   date: Date | string = new Date(), 
-  timeZone: string = 'America/Los_Angeles'
+  timeZone: string = 'America/Los_Angeles'        // bro, we need to get the browser to tell us what time zone we are in    TODO 
 ): string {
  let d: Date;
 
