@@ -79,11 +79,15 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          records[0]?.dueDate
       );
 
-      
-      
-
+      // JS vars might not be available b4 hydration, so must use form data to send variables in call to this server function, just as i do in the HTML
+      const fd = new FormData();
+      fd.append("childId", childId);
+      fd.append("familyId", familyId);
       // create today's record and processes last record
-      await handleCreateRecordForToday(childId, familyId);
+      await handleCreateRecordForToday(fd);
+
+      
+    
    }
 
    // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.

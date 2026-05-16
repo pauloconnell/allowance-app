@@ -181,10 +181,10 @@ export default async function ChildDailyRecordsPage({ params, searchParams }: Pa
                         </h2>
                         {!isTodaysRecord && (
                            <form
-                              action={async () => {
-                                 await handleCreateRecordForToday(childId, familyId);
-                              }}
+                              action={handleCreateRecordForToday}
                            >
+                               <input type="hidden" name="childId" value={childId} />
+                              <input type="hidden" name="familyId" value={familyId} />
                               <button
                                  type="submit"
                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
