@@ -203,7 +203,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    export async function createDailyRecord(childId: string, familyId: string, recentRecord:IDailyRecord, date?: string ): Promise<IDailyRecord> {
 
-      // first, must make sure it doesn't exist already - today's would have been checked above, but must check yesterday's
+      // first, must make sure daily record for 'date' doesn't exist already -  ie must check yesterday's date (today's would have been checked above)
       let isYesterday = (date == addDaysToDateString(getLocalTodayString(), -1));
       if(isYesterday){
          //yesterday
@@ -211,7 +211,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
             return recentRecord;       // just return yesterday's record since it already exists
          }
       }
-    
+     
 
 
 
@@ -239,7 +239,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
    // sort out penalties
 
-
+   const today = getLocalTodayString();
    const existingPenalties = recentRecord?.penalties?.filter(p => p.endDate ? p?.endDate >= today : false) || [];
 
 

@@ -10,7 +10,7 @@ import  DailyRecord  from '@/models/DailyRecord';
 /**
  * 1. Logic for creating/redirecting to today's record
  */
-export async function handleCreateRecordForToday(formData: FormData){//childId: string, familyId: string) {
+export async function handleCreateRecordForToday(formData: FormData){//childId: string, familyId: string) {       // use form data because server function being sent in html, so must use form data to capture variables from client
      const childId = formData.get("childId") as string;
   const familyId = formData.get("familyId") as string;
   
