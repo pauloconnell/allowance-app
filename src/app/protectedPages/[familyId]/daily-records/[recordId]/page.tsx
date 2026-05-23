@@ -15,6 +15,7 @@ import { IChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 import ChoreItem from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
+import type { IDailyRecord } from '@/types/IDailyRecord';
 
 
 
@@ -29,7 +30,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
-   let record = null;
+   let record: IDailyRecord | null = null;
    let child: IChild | null = null;
    let error = null;
 
@@ -43,7 +44,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
          record = normalizeRecord(dailyRecord);
 
          // delete this if we want childID to be required -> faster =1 less api call
-         child = await Child.findById(record.childId).lean();
+         child = await Child.findById(record?.childId).lean();
          if (child) {
             child = normalizeRecord(child);
             childId = child._id;
@@ -184,8 +185,9 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                <h1 className="text-3xl font-bold text-secondary-900">
                   Daily Record:
                   <div>
-                     {' '}
-                     {record.dueDate}
+                     
+{new Date(record.dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+                   {record.dueDate}
                      {isTodaysRecord && (
                         <span className="ml-2 text-green-600">(Today)</span>
                      )}
