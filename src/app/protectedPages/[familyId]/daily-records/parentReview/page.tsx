@@ -2,10 +2,11 @@ import Link from 'next/link';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
 import { getAllChildren } from '@/lib/data/childService';
 import { getChildDailyRecords } from '@/lib/data/dailyRecordService';
-import { handleCreateRecordForToday } from '@/lib/actions/record';
+import { handleCreateRecordForToday, handleCreateRecordForYesterday } from '@/lib/actions/record';
 import { IChild } from '@/types/IChild';
 import { IDailyRecord } from '@/types/IDailyRecord';
 import { getRecordsNeedingApproval } from '@/lib/data/dailyRecordService';
+import { addDaysToDateString, getLocalTodayString } from '@/lib/utils/dateHelper';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -139,6 +140,36 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   <p className="text-gray-500">No records for approval found.</p>
                )}
 
+0:{
+new Date(records[0].dueDate).getDate()}<br/>
+1: {new Date(records[1].dueDate).getDate() }<br/>
+yesterday: {addDaysToDateString(getLocalTodayString(), -1)}
+New: {new Date(records[0].dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })
+}
+record: {records[0].dueDate}
+         
+  records[0].dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+  {
+records.every(r =>
+  r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+) && <div> 
+
+
+
+                             <form
+                                                action={handleCreateRecordForYesterday}
+                                             >
+                                                  <input type="hidden" name="childId" value={childId} />
+                                                   <input type="hidden" name="familyId" value={familyId} />
+                                                <button
+                                                   type="submit"
+                                                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                                >
+                                                    Create Missed Record for yesterday
+                                                   
+                                                </button>
+                                             </form>
+               </div>}
        
                   <ul className="divide-y divide-gray-200">
                      {records
@@ -153,7 +184,9 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                                   
                                        
                                        <span className="font-semibold">
-                                          {new Date(record.dueDate).toLocaleDateString()}
+                                          {new Date(record.dueDate + "T12:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+
+         {record.dueDate}
                                        </span>
                                        <span className="hidden sm:block"> Id:{record.childId.slice(-6)}</span>
                                     
