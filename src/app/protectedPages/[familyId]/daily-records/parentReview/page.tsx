@@ -141,10 +141,10 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                )}
 
 0:{
-new Date(records[0].dueDate).getDate()}<br/>
-1: {new Date(records[1].dueDate).getDate() }<br/>
-yesterday: {addDaysToDateString(getLocalTodayString(), -1)}
-New: {new Date(records[0].dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })
+records[0].dueDate}<br/>
+1: {records[1].dueDate }<br/>
+yesterday: {addDaysToDateString(getLocalTodayString(), -1)}<br/>
+Latest: {new Date(records[0].dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })
 }
 record: {records[0].dueDate}
          
@@ -161,6 +161,7 @@ records.every(r =>
                                              >
                                                   <input type="hidden" name="childId" value={childId} />
                                                    <input type="hidden" name="familyId" value={familyId} />
+                                                     <input type="hidden" name="timezone" value={Intl.DateTimeFormat().resolvedOptions().timeZone} />
                                                 <button
                                                    type="submit"
                                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
