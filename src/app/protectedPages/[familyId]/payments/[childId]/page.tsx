@@ -157,6 +157,11 @@ export default async function PaymentsPage({ params }: PageProps) {
                                        <div className="text-sm text-gray-500">
                                           {payment.paymentDate}
                                        </div>
+                                       {payment.previousBalance !== undefined && (
+                                          <div className="text-sm text-gray-500">
+                                             Previous Balance: ${Number(payment.previousBalance).toFixed(2)}
+                                          </div>
+                                       )}
                                     </div>
                                  </div>
                               </div>

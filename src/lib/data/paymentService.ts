@@ -24,6 +24,7 @@ export interface IPayment {
    childId: string;
    place: string;
    paymentAmount: number;
+   previousBalance: number;
    notes: string;
    paymentDate: string;
    createdAt?: string;
@@ -56,6 +57,7 @@ export async function getPaymentsByChildId(
       notes: payment.notes || '',
       place: payment.place || '',
       paymentAmount: payment.paymentAmount || 0,
+      previousBalance: payment.previousBalance ?? 0,
       createdAt: payment.createdAt?.toISOString?.() ?? null,
       updatedAt: payment.updatedAt?.toISOString?.() ?? null,
    }));
@@ -83,23 +85,26 @@ export async function recordPayment({
       throw new Error('Invalid child ID');
    }
 
-   const child = await Child.findOne({ _id: childId, familyId });
-   if (!child) {
+   const childBefore = await Child.findOneAndUpdate(
+      { _id: childId, familyId },
+      { $inc: { currentBalance: -paymentAmount } },
+      { new: false }
+   ).lean();
+
+   if (!childBefore) {
       throw new Error('Child not found');
    }
 
+   const previousBalance = childBefore.currentBalance ?? 0;
    const normalizedPaymentDate = paymentDate || new Date().toISOString().slice(0, 10);
    const payment = await Payment.create({
       childId,
       familyId,
       place,
+      previousBalance,
       paymentAmount,
       notes: notes || '',
       paymentDate: normalizedPaymentDate,
-   });
-
-   await Child.findByIdAndUpdate(childId, {
-      $inc: { currentBalance: paymentAmount },
    });
 
    return {
