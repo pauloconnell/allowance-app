@@ -120,14 +120,19 @@ export default async function DashboardPage({ params }: PageProps) {
                                  <span className="text-xs text-secondary-500">
                                     63 of 89 chores done
                                  </span>
-
-                                 <PayoutSubmit
-                                    childId={child._id.toString()}
-                                    childName={child.name}
-                                 />
+                           
                                  <p className="mt-4 font-semibold text-secondary-700">
                                     Current Balance: ${child.currentBalance.toFixed(2)}
                                  </p>
+
+                                           <Link
+                                    href={`/protectedPages/${familyId}/payments/${child._id}`}
+                                    className="text-xs font-bold text-white bg-red-600 px-4 py-1.5  mt-4 rounded-full hover:bg-red-700 transition shadow-sm"
+                                    prefetch={true}
+                                 >
+                                    Goto payments
+                                 </Link>
+                              
                                  <Link
                                     href={`/protectedPages/${familyId}/penalties/${child._id}`}
                                     className="text-xs font-bold text-white bg-red-600 px-4 py-1.5  mt-4 rounded-full hover:bg-red-700 transition shadow-sm"
