@@ -14,7 +14,7 @@ import crypto from 'crypto';
  */
 export async function createFamily(name: string) {
   let newFamilyId: string | null = null;
-    console.log("1Family name is ", name)
+  //  console.log("1Family name is ", name)
   try {
     if (!name || name.trim().length === 0) {
       return { error: 'Family name is required' };
@@ -24,9 +24,9 @@ export async function createFamily(name: string) {
     // // before calling the Auth0 SDK
     // await cookies(); 
     // await headers();
-  console.log("2Family name is ", name)
+ // console.log("2Family name is ", name)
     const session = await getSession();
-      console.log("3made it? ", name)
+  //    console.log("3made it? ", name)
     if (!session?.user) {
       return { error: 'Not authenticated' };
     }
@@ -35,10 +35,10 @@ export async function createFamily(name: string) {
     const email = session.user.email;
     const firstName = session.user.given_name || '';
     const lastName = session.user.family_name || '';
- console.log("got session?",session.user.sub);
- console.log("Using DB URI:", process.env.MONGODB_URI);
+// console.log("got session?",session.user.sub);
+// console.log("Using DB URI:", process.env.MONGODB_URI);
     await connectDB();
-console.log("Using DB URI:", process.env.MONGODB_URI);
+//console.log("Using DB URI:", process.env.MONGODB_URI);
     const family = await Family.create({
           userId: userId,
       name: name.trim(),
@@ -50,8 +50,8 @@ console.log("Using DB URI:", process.env.MONGODB_URI);
       isActive: true,
     });
     console.log("4Family created :) ")
-console.log("family created", family.name)
-console.log("Data check:", { userId, email, family });
+//console.log("family created", family.name)
+//console.log("Data check:", { userId, email, family });
 await UserFamily.create({
       userId: userId,
       familyId: family._id,

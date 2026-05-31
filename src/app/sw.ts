@@ -141,7 +141,7 @@ self.addEventListener("fetch", (event) => {
 
       fetch(request.clone()).catch(async (err) => {
         // This only runs if the network is DOWN
-        console.log("📦 Offline: Queuing request for URL:", url.pathname);
+       // console.log("📦 Offline: Queuing request for URL:", url.pathname);
 
         await queue.pushRequest({ request: request.clone() });
 

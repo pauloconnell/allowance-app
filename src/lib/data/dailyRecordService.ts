@@ -260,7 +260,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
          await newRecord.save();
 
-         console.log("Saved new record, ",newRecord.dueDate, " old one:", recentRecord?.dueDate)
+       //  console.log("Saved new record, ",newRecord.dueDate, " old one:", recentRecord?.dueDate)
 
    // Need to submit old record if it exists and isn't submitted - will trigger copy of child's chores completion status for parent to approve for payment
    if (recentRecord && !recentRecord.isSubmitted) {
@@ -344,7 +344,7 @@ export async function submitDailyRecord(
       throw new Error('Record already submitted');
    }
 
-   console.log("this errors on save? ", record._id, record.dueDate)
+   //console.log("this errors on save? ", record._id, record.dueDate)
 
    record.isSubmitted = true;
    record.submittedAt = new Date();

@@ -76,7 +76,7 @@ export function isSameDay(a: Date | string, b: Date | string, timeZone: string =
   const dateA = getComparisonString(a);
   const dateB = getComparisonString(b);
 
-  console.log(`Checking: [${dateA}] vs [${dateB}]`); // This will tell you the truth!
+ // console.log(`Checking: [${dateA}] vs [${dateB}]`); // This will tell you the truth!
 
   return dateA === dateB;
 }

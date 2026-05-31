@@ -77,15 +77,15 @@ export async function hasPermission(
    action: Action
 ): Promise<boolean> {
 
-   console.log("Checking permission for user:", userId, "family:", familyId, "resource:", resource, "action:", action);
+  // console.log("Checking permission for user:", userId, "family:", familyId, "resource:", resource, "action:", action);
 
 
    // First: check UserFamily (parents)
    const role = await getUserRoleInFamily(userId, familyId);
-   console.log("Got role = ", role, resource, action)
+  // console.log("Got role = ", role, resource, action)
    if (role) {
       const allowed = PERMISSIONS[role]?.[resource] ?? [];
-      console.log("Allowed actions:", allowed);
+     // console.log("Allowed actions:", allowed);
       return allowed.includes(action);
    }
 

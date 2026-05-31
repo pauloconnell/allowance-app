@@ -167,7 +167,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       const start = penalty.date;
       const end = penalty.endDate;
       const current = record.dueDate;
-      console.log('do we have one?', start, current, end);
+     // console.log('do we have one?', start, current, end);
       return start <= current && current <= end; // only show this penalty if it's currently in effect on date of record
    });
 
