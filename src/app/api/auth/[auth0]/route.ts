@@ -19,7 +19,7 @@ export const GET = handleAuth({
       // If the session is stale or the 'state' is mismatched, 
       // instead of crashing, we kick them back to the login to start fresh.
       console.error("Auth0 Callback Error:", error.message);
-      const baseUrl = process.env.AUTH0_BASE_URL ?? new URL(req.url).origin;
+      const baseUrl = process.env.AUTH0_BASE_URL!;
       return Response.redirect(new URL("/api/auth/login", baseUrl));
     }
   },

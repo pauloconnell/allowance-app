@@ -208,6 +208,7 @@ self.addEventListener("fetch", (event) => {
 
 // 4. MANUAL TRIGGER: Kickstart replay if the browser's 'sync' event is lazy
 self.addEventListener("message", (event) => {
+   if (event.origin !== self.location.origin) return; // Security check: Only accept messages from the same origin
   if (event.data && event.data.type === "FORCE_REPLAY") {
     console.log("⚡ Manual Replay Triggered");
     event.waitUntil(queue.replayRequests());
