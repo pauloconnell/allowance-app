@@ -88,7 +88,7 @@ export async function POST(request: Request) {
 
       // Handle penalty upsert
       if (penalty) {
-         console.log("Penalty should have date ", penalty)
+       //  console.log("Penalty should have date ", penalty)
          penalty.appliedBy=session.userId;
          const dailyRecord = await upsertPenalty(childId, familyId, penalty, date);
          const normalized = normalizeRecord(dailyRecord);

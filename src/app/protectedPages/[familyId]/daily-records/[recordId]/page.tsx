@@ -11,10 +11,11 @@ import {
 } from '@/lib/data/dailyRecordService';
 import { redirect } from 'next/navigation';
 import { IChild } from '@/types/IChild';
-import { IChore, IPenalty } from '@/types/IChore';
+import { IChore,IDailyChore, IPenalty } from '@/types/IChore';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 import ChoreItem from '@/components/Chores/ChoreCompletionBoxes';
 import { updateChoreStatus } from '@/lib/actions/record';
+import type { IDailyRecord } from '@/types/IDailyRecord';
 
 
 
@@ -29,7 +30,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    const { familyId, recordId } = await params;
    let { childId } = await searchParams;
 
-   let record = null;
+   let record: IDailyRecord | null = null;
    let child: IChild | null = null;
    let error = null;
 
@@ -43,7 +44,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
          record = normalizeRecord(dailyRecord);
 
          // delete this if we want childID to be required -> faster =1 less api call
-         child = await Child.findById(record.childId).lean();
+         child = await Child.findById(record?.childId).lean();
          if (child) {
             child = normalizeRecord(child);
             childId = child._id;
@@ -146,12 +147,12 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    // motivate kids by showing earnings:
    // Calculate running totals for the motivation section
    const currentEarnings =
-      record.choresList?.reduce((sum: number, chore: IChore) => {
+      record.choresList?.reduce((sum: number, chore: IDailyChore) => {
          return sum + chore.rewardAmount * chore.completionStatus;
       }, 0) || 0;
 
    const potentialTotal =
-      record.choresList?.reduce((sum: number, chore: IChore) => {
+      record.choresList?.reduce((sum: number, chore: IDailyChore) => {
          return sum + chore.rewardAmount * 1; // 1 is 100% completion
       }, 0) || 0;
 
@@ -166,7 +167,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
       const start = penalty.date;
       const end = penalty.endDate;
       const current = record.dueDate;
-      console.log('do we have one?', start, current, end);
+     // console.log('do we have one?', start, current, end);
       return start <= current && current <= end; // only show this penalty if it's currently in effect on date of record
    });
 
@@ -184,8 +185,9 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                <h1 className="text-3xl font-bold text-secondary-900">
                   Daily Record:
                   <div>
-                     {' '}
-                     {record.dueDate}
+                     
+{new Date(record.dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+                   {record.dueDate}
                      {isTodaysRecord && (
                         <span className="ml-2 text-green-600">(Today)</span>
                      )}

@@ -31,7 +31,7 @@ export function normalizeRecord<T extends Record<string, any>>(doc: T) {
 
 
   // need to get into the choreList and normalize those too:
-for (const key in normalized) {
+for (const key of Object.keys(normalized)) {
     const value = normalized[key];
 
     // Handle Dates (Next.js can't pass raw Date objects)

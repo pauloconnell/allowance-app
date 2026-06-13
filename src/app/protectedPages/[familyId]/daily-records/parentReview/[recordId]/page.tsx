@@ -105,8 +105,8 @@ export default async function ParentReviewDailyRecordDetailPage({
    }
 
    const recordDate = new Date(record?.dueDate);
-   recordDate.setHours(0, 0, 0, 0);
-   const isToday = new Date().toDateString() === recordDate.toDateString();
+  // recordDate.setHours(0, 0, 0, 0);
+   const isToday = new Date().toDateString() === record.dueDate; //.toDateString();
 
    // determine if viewing today's record
    const today = new Date();
@@ -159,7 +159,7 @@ export default async function ParentReviewDailyRecordDetailPage({
                   ← Back to Parent Records
                </Link>
                <h1 className="text-3xl font-bold text-secondary-900">
-                  Daily Record - {recordDate.toLocaleDateString()}
+                  Daily Record - {new Date(record.dueDate).toDateString()}
                   {isToday && <span className="ml-2 text-green-600">(Today)</span>}
                </h1>
                {child && (

@@ -17,7 +17,7 @@ export function CacheUpdateListener() {
          navigator.serviceWorker
             .register('/sw.js')
             .then((reg) => {
-               console.log('Service Worker active at scope:', reg.scope);
+             //  console.log('Service Worker active at scope:', reg.scope);
             })
             .catch((err) => {
                console.error('Service Worker registration failed:', err);

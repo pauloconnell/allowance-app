@@ -30,7 +30,7 @@ export async function POST(
         { status: 400 }
       );
     }
-    console.log("api toggle-chore got ", action, choreId)
+   // console.log("api toggle-chore got ", action, choreId)
     // 3. Prepare the ObjectId
     const choreObjectId = new mongoose.Types.ObjectId(choreId);
 
@@ -50,7 +50,7 @@ export async function POST(
        * it might add a second one. To be ultra-safe, we use findOneAndUpdate 
        * with a specific filter.
        */
-      console.log("Master Chore:", masterChore, choreObjectId);
+      //console.log("Master Chore:", masterChore, choreObjectId);
       // normalize Master chore: -strip _id so child's choreList can have it's own unique id
       let {_id, __v, createdAt, updatedAt, ...safeMasterChore} = masterChore.toObject();
       

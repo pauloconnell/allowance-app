@@ -12,7 +12,7 @@
  */
 export function getLocalTodayString(
   date: Date | string = new Date(), 
-  timeZone: string = 'America/Los_Angeles'
+  timeZone: string = 'America/Los_Angeles'        // bro, we need to get the browser to tell us what time zone we are in    TODO 
 ): string {
  let d: Date;
 
@@ -76,7 +76,7 @@ export function isSameDay(a: Date | string, b: Date | string, timeZone: string =
   const dateA = getComparisonString(a);
   const dateB = getComparisonString(b);
 
-  console.log(`Checking: [${dateA}] vs [${dateB}]`); // This will tell you the truth!
+ // console.log(`Checking: [${dateA}] vs [${dateB}]`); // This will tell you the truth!
 
   return dateA === dateB;
 }

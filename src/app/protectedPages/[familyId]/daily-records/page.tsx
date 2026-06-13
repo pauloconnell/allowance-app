@@ -11,7 +11,7 @@ import type { IDailyRecord } from '@/types/IDailyRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
 import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
-import { handleCreateRecordForToday } from '@/lib/actions/record';
+import { handleCreateRecordForToday, handleCreateRecordForYesterday } from '@/lib/actions/record';
 
 interface PageProps {
    params: Promise<{ familyId: string }>;
@@ -79,11 +79,15 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          records[0]?.dueDate
       );
 
-      
-      
-
+      // JS vars might not be available b4 hydration, so must use form data to send variables in call to this server function, just as i do in the HTML
+      const fd = new FormData();
+      fd.append("childId", childId);
+      fd.append("familyId", familyId);
       // create today's record and processes last record
-      await handleCreateRecordForToday(childId, familyId);
+      await handleCreateRecordForToday(fd);
+
+      
+    
    }
 
    // // Logic for creating new Record -> this should only happen once, as API will generate next record upon completion of current day's record.
@@ -196,15 +200,16 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                         </h2>
                         {!isTodaysRecord && (
                            <form
-                              action={async () => {
-                                 await handleCreateRecordForToday(childId, familyId);
-                              }}
+                              action={handleCreateRecordForToday}
                            >
+                                <input type="hidden" name="childId" value={childId} />
+                                 <input type="hidden" name="familyId" value={familyId} />
+                                     <input type="hidden" name="timezone" value={Intl.DateTimeFormat().resolvedOptions().timeZone} />
                               <button
                                  type="submit"
                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                               >
-                                 Start Today's Record
+                                Start Today's Record
                               </button>
                            </form>
                         )}
@@ -217,6 +222,21 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               Continue Today's Record
                            </Link>
                         )}
+                       <form
+                              action={handleCreateRecordForYesterday}
+                           >
+                                <input type="hidden" name="childId" value={childId} />
+                                 <input type="hidden" name="familyId" value={familyId} />
+                              <button
+                                 type="submit"
+                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              >
+                                  Create Missed Record for yesterday
+                                 
+                              </button>
+                           </form>
+
+
                      </div>
 
                      {isTodaysRecord ? (

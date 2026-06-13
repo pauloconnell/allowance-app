@@ -141,7 +141,7 @@ self.addEventListener("fetch", (event) => {
 
       fetch(request.clone()).catch(async (err) => {
         // This only runs if the network is DOWN
-        console.log("📦 Offline: Queuing request for URL:", url.pathname);
+       // console.log("📦 Offline: Queuing request for URL:", url.pathname);
 
         await queue.pushRequest({ request: request.clone() });
 
@@ -208,6 +208,7 @@ self.addEventListener("fetch", (event) => {
 
 // 4. MANUAL TRIGGER: Kickstart replay if the browser's 'sync' event is lazy
 self.addEventListener("message", (event) => {
+   if (event.origin !== self.location.origin) return; // Security check: Only accept messages from the same origin
   if (event.data && event.data.type === "FORCE_REPLAY") {
     console.log("⚡ Manual Replay Triggered");
     event.waitUntil(queue.replayRequests());

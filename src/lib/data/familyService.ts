@@ -21,7 +21,7 @@ export async function getUserFamilies(userId: string): Promise<(IFamily & { role
          .populate('familyId')
          .lean();
 
-      console.log("lib/...FamilyService got: userFamilies:", userFamilies);
+     // console.log("lib/...FamilyService got: userFamilies:", userFamilies);
 
       return userFamilies.map((userFamily: any) => {
 
