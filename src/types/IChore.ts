@@ -36,6 +36,7 @@ export interface IDailyChore {
    isRecurring: boolean;
    intervalDays?: number; // For recurring chores, how many days until next occurrence
    dueDate: string;       // ISO date string YYYY-MM-DD - Snapshot of due date at time of assignment
+   timezone?: string;
    notes?: string;
    parentNotes?: string; // Notes added by parent during review
    completionDate?: Date | string;

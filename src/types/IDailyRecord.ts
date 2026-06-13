@@ -20,6 +20,7 @@ export interface IDailyRecord {
    penalties: IPenalty[];
    totalReward?: number; // Calculated: sum of rewards after adjustments and penalties
    status: DailyRecordStatus;
+   timezone?: string;
    notes?: string;
    createdAt?: string;
    updatedAt?: string;

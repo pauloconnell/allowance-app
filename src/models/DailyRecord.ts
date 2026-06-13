@@ -20,6 +20,7 @@ const ChoreEntrySchema = new Schema({
    suggestedTime: String,
    isOverridden: { type: Boolean, default: false },
    dueDate: { type: String, required: true },
+   timezone: { type: String, default: 'America/Los_Angeles' },
    notes: { type: String, default: null },
 }, {
    _id: true, // IMPORTANT: Every entry gets its own unique ID for React keys and targeted updates
@@ -76,6 +77,7 @@ const DailyRecordSchema = new Schema(
          default: 'pending',
       },
       notes: { type: String, default: '' },
+      timezone: { type: String, default: 'America/Los_Angeles' },
    },
    { timestamps: true }
 );
