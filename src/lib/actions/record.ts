@@ -48,6 +48,23 @@ export async function handleCreateRecordForYesterday(formData: FormData) {  //ch
    // need to get today's record for comparison in function:
    const recentRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
    const date = addDaysToDateString(getLocalTodayString(), -1);
+
+     // 1. Check if yesterday's record already exists - if so, we can just redirect to it instead of creating a duplicate
+
+  const existingRecord = await DailyRecord.findOne({
+    childId,
+    familyId,
+    date,
+  });
+
+  if (existingRecord) {
+    return redirect(
+      `/protectedPages/${familyId}/daily-records/parentReview/${existingRecord._id}?childId=${childId}`
+    );
+  }
+
+  // 2. Create new record if none exists
+
    const newRecord = await createDailyRecord(childId, familyId, recentRecord, date );
    
    // We only need the string ID for the redirect
