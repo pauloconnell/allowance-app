@@ -93,9 +93,9 @@ export async function updateChoreStatus(recordId: string, choreId: string, newSt
       // Recalculate totalReward from the updated document - 
       const updated = await DailyRecord.findById(recordId, { choresList: 1 }).lean() as { choresList: { rewardAmount: number; completionStatus: number }[] } | null;
       if (updated?.choresList) {
-         const totalReward = updated.choresList.reduce(
+         const totalReward = parseFloat(updated.choresList.reduce(
             (sum, chore) => sum + chore.rewardAmount * chore.completionStatus, 0
-         );
+         ).toFixed(2));
          await DailyRecord.updateOne({ _id: recordId }, { $set: { totalReward } });
       }
 

@@ -222,6 +222,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               Continue Today's Record
                            </Link>
                         )}
+                        
                        <form
                               action={handleCreateRecordForYesterday}
                            >
