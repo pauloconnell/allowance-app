@@ -90,8 +90,15 @@ export async function updateChoreStatus(recordId: string, choreId: string, newSt
          return { success: false, error: 'No record found or no changes made' };
       }
 
-      // Revalidate the dynamic route to update the UI
-      // Note: Make sure the path matches your actual folder structure
+      // Recalculate totalReward from the updated document - 
+      const updated = await DailyRecord.findById(recordId, { choresList: 1 }).lean() as { choresList: { rewardAmount: number; completionStatus: number }[] } | null;
+      if (updated?.choresList) {
+         const totalReward = updated.choresList.reduce(
+            (sum, chore) => sum + chore.rewardAmount * chore.completionStatus, 0
+         );
+         await DailyRecord.updateOne({ _id: recordId }, { $set: { totalReward } });
+      }
+
       revalidatePath(`/protectedPages/[familyId]/daily-records/[id]`);
       
       return { success: true };
