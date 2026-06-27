@@ -18,7 +18,7 @@ const PaymentSchema = new Schema(
       },
       place: { type: String, required: true, default:"home" },
       paymentAmount: { type: Number, required: true, min: 0 },
-      previousBalance: { type: Number, required: true, min: 0 },
+      previousBalance: { type: Number, required: true },
       notes: { type: String, default: "" },
       paymentDate: { type: String, default:  () => new Date().toISOString().slice(0, 10)  }
       
