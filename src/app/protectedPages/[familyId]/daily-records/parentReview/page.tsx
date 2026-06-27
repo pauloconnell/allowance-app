@@ -140,19 +140,29 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                   <p className="text-gray-500">No records for approval found.</p>
                )}
 
-0:{
+Last 2 Records:{
 records[0].dueDate}<br/>
-1: {records[1].dueDate }<br/>
+ {records[1].dueDate }<br/>
+
 yesterday: {addDaysToDateString(getLocalTodayString(), -1)}<br/>
-Latest: {new Date(records[0].dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })
-}
-record: {records[0].dueDate}
-         
-  records[0].dueDate !== addDaysToDateString(getLocalTodayString(), -1)
-  {
-records.every(r =>
+
+{records.every(r =>
   r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
-) && <div> 
+).toString()
+}
+
+
+  {        (()=>{
+ 
+  // check every record to ensure it doesn't have yesterday's record - if not, show button
+   // old way: records[0].dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+let noYesterday = records.every(r =>
+  r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+); 
+
+return (noYesterday && childId) && (
+<div> 
+   testCase: {noYesterday}<br/>
 
 
 
@@ -170,7 +180,10 @@ records.every(r =>
                                                    
                                                 </button>
                                              </form>
-               </div>}
+               </div>
+);
+               })()
+}
        
                   <ul className="divide-y divide-gray-200">
                      {records

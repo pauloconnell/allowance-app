@@ -159,7 +159,10 @@ export default async function ParentReviewDailyRecordDetailPage({
                   ← Back to Parent Records
                </Link>
                <h1 className="text-3xl font-bold text-secondary-900">
-                  Daily Record - {new Date(record.dueDate).toDateString()}
+                  Daily Record -                          
+                                          {new Date(record.dueDate + "T12:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+
+         {record.dueDate}
                   {isToday && <span className="ml-2 text-green-600">(Today)</span>}
                </h1>
                {child && (
