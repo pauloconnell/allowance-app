@@ -202,7 +202,7 @@ return (noYesterday && childId) && (
 
          {record.dueDate}
                                        </span>
-                                       <span className="hidden sm:block"> Id:{record.childId.slice(-6)}</span>
+                                       <span className="hidden sm:block"> Earned: ${record.totalReward}</span>
                                     
                                        
                                    
