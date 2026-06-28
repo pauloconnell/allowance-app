@@ -39,6 +39,8 @@ export async function createFamily(name: string) {
 // console.log("Using DB URI:", process.env.MONGODB_URI);
     await connectDB();
 //console.log("Using DB URI:", process.env.MONGODB_URI);
+
+// this creates the family which 'belongs' to the user, and then creates a UserFamily record that links the user to the family with role 'parent'
     const family = await Family.create({
           userId: userId,
       name: name.trim(),
@@ -49,9 +51,11 @@ export async function createFamily(name: string) {
      //   .replace(/^-|-$/g, ''),
       isActive: true,
     });
-    console.log("4Family created :) ")
+    console.log("Family created :) ")
 //console.log("family created", family.name)
 //console.log("Data check:", { userId, email, family });
+
+//RBAC - the creator of the family is automatically a parent in the family, so we create a UserFamily record for them
 await UserFamily.create({
       userId: userId,
       familyId: family._id,
@@ -61,9 +65,9 @@ await UserFamily.create({
       lastName: lastName,
       isActive: true,
     });
-  console.log("userFamily created? should be...")
+ 
     newFamilyId = family._id.toString();
-    console.log("userFamily created? 1")
+ //   console.log("userFamily created? 1")
     
   } catch (error: any) {
     if (error.code === 11000) {

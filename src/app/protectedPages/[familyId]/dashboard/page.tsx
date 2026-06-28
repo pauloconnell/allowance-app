@@ -19,7 +19,7 @@ export default async function DashboardPage({ params }: PageProps) {
    const { familyId: familyId } = await params;
    let children = [];
    let errorMessage = '';
-   console.log('go get kids for familyId:', familyId);
+  // console.log('go get kids for familyId:', familyId);
    try {
       children = await getAllChildren(familyId);
    } catch (err) {

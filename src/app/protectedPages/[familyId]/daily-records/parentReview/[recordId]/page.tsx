@@ -59,7 +59,7 @@ export default async function ParentReviewDailyRecordDetailPage({
 
    try {
       await connectDB();
-      console.log('Get record with params ID');
+    //  console.log('Get record with params ID');
 
       const dailyRecord = await DailyRecord.findById(recordId).lean();
       if (!dailyRecord) {
@@ -67,10 +67,10 @@ export default async function ParentReviewDailyRecordDetailPage({
       } else {
          record = normalizeRecord(dailyRecord);
 
-         console.log(
-            'daily record for parent review:',
-            record?.copyOfChildChoresSubmitted[2]
-         ); // record);
+         // console.log(
+         //    'daily record for parent review:',
+         //    record?.copyOfChildChoresSubmitted[2]
+         // ); // record);
 
          // delete this if we want childID to be required -> faster =1 less api call
          child = await Child.findById(record?.childId).lean();

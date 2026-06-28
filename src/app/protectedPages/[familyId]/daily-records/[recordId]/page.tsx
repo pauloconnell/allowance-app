@@ -90,7 +90,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    }
 
    if (!isTodaysRecord && childId && isOffline) {
-      console.log("Not today's record - no live record present", record?.dueDate);
+    //  console.log("Not today's record - no live record present", record?.dueDate);
       //process last record
 
       // create today's record

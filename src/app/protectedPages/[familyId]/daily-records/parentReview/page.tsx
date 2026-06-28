@@ -42,7 +42,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
         
       } else {
          records = await getRecordsNeedingApproval(familyId); // for all children, to show counts on parentReview page
-         console.log("got records for all kids:" );
+       //  console.log("got records for all kids:" );
       }
    } catch (err) {
       console.error('Failed to load data:', err);
