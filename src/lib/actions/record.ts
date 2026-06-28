@@ -21,7 +21,7 @@ export async function handleCreateRecordForToday(formData: FormData){//childId: 
    
    await connectDB();
    
-   console.log("Fetching/Creating record for today...");
+   //console.log("Fetching/Creating record for today...");
    const newRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
    
    // We only need the string ID for the redirect
@@ -44,7 +44,7 @@ export async function handleCreateRecordForYesterday(formData: FormData) {  //ch
    
    await connectDB();
    
-   console.log("Fetching/Creating record for yesterday...");
+  // console.log("Fetching/Creating record for yesterday...");
    // need to get today's record for comparison in function:
    const recentRecord = await getOrCreateTodaysDailyRecord(childId, familyId);
    const date = addDaysToDateString(getLocalTodayString(), -1);

@@ -27,7 +27,7 @@ export default async function PenaltiesPage({ params }: PageProps) {
       getChildDailyRecords(childId, familyId, startDate),
    ]);
 
-   console.log('start date: ', start, 'records are ', records);
+ //  console.log('start date: ', start, 'records are ', records);
    let todayRecord: IDailyRecord | null = null;
 
    if (records && records.length > 0) {

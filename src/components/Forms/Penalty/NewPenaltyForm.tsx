@@ -32,7 +32,7 @@ export default function NewPenaltyForm({ familyId, childId }: Props) {
          setError('Please provide a reason'); //TODO use toast here
          return;
       }
-      console.log("date corrupt?", today);
+    //  console.log("date corrupt?", today);
       setLoading(true);
       try {
          const payload = {

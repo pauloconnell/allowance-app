@@ -10,7 +10,7 @@ import type { IChild } from '@/types/IChild';
 import type { IDailyRecord } from '@/types/IDailyRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
-import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
+import { addDaysToDateString, isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
 import { handleCreateRecordForToday, handleCreateRecordForYesterday } from '@/lib/actions/record';
 
 interface PageProps {
@@ -42,11 +42,11 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
          targetDate.setMonth(targetDate.getMonth() - 1);
          const startDate = targetDate.toISOString().substring(0, 10);
 
-         console.log('Start date should be 1 month ago ', startDate);
+        // console.log('Start date should be 1 month ago ', startDate);
 
          records = await getChildDailyRecords(childId, familyId, startDate); // note 'todaysRecord' lives in client store only - in server its just records[0]
 
-         console.log("got records: ", records)
+       //  console.log("got records: ", records)
       } else {
          children = await getAllChildren(familyId); // checks userId and RBAC throws error or returns data
       }
@@ -61,23 +61,23 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
    let isTodaysRecord = false;
    if (records.length > 0) {
       isTodaysRecord = isSameDay(records[0].dueDate, today);
-      console.log(
-         'Page has: today is ',
-         today,
-         'record date is ',
-         records[0]?.dueDate,
-         'same:',
-         isSameDay(records[0].dueDate, today)
-      );
+    //  console.log(
+      //    'Page has: today is ',
+      //    today,
+      //    'record date is ',
+      //    records[0]?.dueDate,
+      //    'same:',
+      //    isSameDay(records[0].dueDate, today)
+      // );
    }
 
    if (!isTodaysRecord && childId) {
-      console.log(
-         'DailyRecords/ childId:',
-         childId,
-         " Not today's record - no live record present",
-         records[0]?.dueDate
-      );
+      // console.log(
+      //    'DailyRecords/ childId:',
+      //    childId,
+      //    " Not today's record - no live record present",
+      //    records[0]?.dueDate
+      // );
 
       // JS vars might not be available b4 hydration, so must use form data to send variables in call to this server function, just as i do in the HTML
       const fd = new FormData();
@@ -222,20 +222,45 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                               Continue Today's Record
                            </Link>
                         )}
-                        
-                       <form
-                              action={handleCreateRecordForYesterday}
-                           >
-                                <input type="hidden" name="childId" value={childId} />
-                                 <input type="hidden" name="familyId" value={familyId} />
-                              <button
-                                 type="submit"
-                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                              >
-                                  Create Missed Record for yesterday
-                                 
-                              </button>
-                           </form>
+
+
+
+
+
+  {        (()=>{
+ 
+  // check every record to ensure it doesn't have yesterday's record - if not, show button
+   // old way: records[0].dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+let noYesterday = records.every(r =>
+  r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+); 
+
+return (noYesterday && childId) && (
+<div> 
+  
+
+
+
+                             <form
+                                                action={handleCreateRecordForYesterday}
+                                             >
+                                                  <input type="hidden" name="childId" value={childId} />
+                                                   <input type="hidden" name="familyId" value={familyId} />
+                                                     <input type="hidden" name="timezone" value={Intl.DateTimeFormat().resolvedOptions().timeZone} />
+                                                <button
+                                                   type="submit"
+                                                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                                >
+                                                    Create Missed Record for yesterday
+                                                   
+                                                </button>
+                                             </form>
+               </div>
+);
+               })()
+}
+
+
 
 
                      </div>

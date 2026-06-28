@@ -100,7 +100,7 @@ export async function doRecurringChores(
    for (const chore of child.choresList || []) {
       const choreDueDateStr = chore.dueDate;
 
-      console.log("chore due?", choreDueDateStr, todayStr)
+      //console.log("chore due?", choreDueDateStr, todayStr)
       if (choreDueDateStr <= todayStr) {
          // only look at chores due
 
@@ -232,7 +232,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    // Combine chores
    const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
 
-   console.log('chores for new record are ready');//, rolloverChores, recurringChores);
+  // console.log('chores for new record are ready');//, rolloverChores, recurringChores);
 
    choresList?.sort((a, b) => (a.suggestedTime || "").localeCompare(b.suggestedTime || ""));
 

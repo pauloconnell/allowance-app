@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+// This is a join table between Users and Families, with additional metadata about the relationship ie. a user owns a family, but userFamily can have several people in it
+
 const UserFamilySchema = new Schema(
    {
       // Auth0 ID - String is correct
