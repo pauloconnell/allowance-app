@@ -71,7 +71,7 @@ const { choreId } = await context.params;
       }
 
      
-
+      console.log("about to get chore ", choreId)
       const chore = await Chore.findById(choreId);
       if (!chore) {
          return NextResponse.json({ error: 'Chore not found' }, { status: 404 });

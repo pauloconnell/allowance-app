@@ -1,6 +1,7 @@
 // components/ChoreItem.tsx
 'use client';
 import { useTransition, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { updateChoreStatus } from '@/lib/actions/record';
 
 // Notice we use recordId (string) because it's serializable
