@@ -26,7 +26,7 @@ export default function ChoreManagementList({ allChores, child, familyId }: Chor
 
   const handleToggle = async (choreId: string, isCurrentlyAssigned: boolean) => {   // drilled down 2 levels to choreToggleCard @ bottom of this file
     const action = isCurrentlyAssigned ? 'remove' : 'assign';
-    
+    let id=toast.loading("working...");
     try {
       const res = await fetch(`/api/children/${child._id}/toggle-chore`, {
         method: 'POST',
@@ -42,6 +42,7 @@ export default function ChoreManagementList({ allChores, child, familyId }: Chor
       toast.error("Could not update assignment. Check console.");
       console.error("Toggle Error:", err);
     }
+    toast.dismiss(id);
   };
 
   return (

@@ -73,7 +73,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
 
       const url = isUpdating ? `/api/chores/${choreId}` : '/api/chores';
       const method = isUpdating ? 'PUT' : 'POST';
-
+      let id=toast.loading("saving...");
       try {
          const res = await fetch(url, {
             method,
@@ -85,7 +85,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
             const errorData = await res.json();
             throw new Error(errorData.message || 'Failed to save chore');
          }
-
+         toast.dismiss(id);
          toast.success(isUpdating ? 'Chore updated' : 'Chore created');
 
          // Navigation logic
@@ -97,6 +97,7 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
          router.refresh();
       } catch (error: any) {
          console.error('Submit error:', error);
+         toast.dismiss(id);
          toast.error(error.message);
       }
    };
