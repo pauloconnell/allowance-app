@@ -206,7 +206,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       // first, must make sure daily record for 'date' doesn't exist already -  ie must check yesterday's date (today's would have been checked above)
       let isYesterday = (date == addDaysToDateString(getLocalTodayString(), -1));
       if(isYesterday){
-         //yesterday
+         //incase button triggers create yesterday's record and it already exists
          if(recentRecord.dueDate == date){
             return recentRecord;       // just return yesterday's record since it already exists
          }
