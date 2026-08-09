@@ -36,39 +36,34 @@ export async function getRolloverChores(
    // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
    return prevRecord.choresList.reduce((acc: IDailyChore[], chore: IDailyChore) => {
       let rewardAmount = 0;
-      let choreC = { ...chore };
-      //ensure incomplete chores don't reward child: 1/2 done = 1/2 reward for tomorrow
-      if (choreC.completionStatus == 0.5) {
-         //if (!chore.isRecurring) {
-         choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
-       
-         choreC.completionStatus = 0; // reset to 0 so it defaults back to 0
-      }
-      if (choreC.isRecurring && choreC.intervalDays && choreC.completionStatus < 1) {
+        //only include recurring chores where it's not complete AND the next occurance isn't due yet  (doRecurringChores fetches fresh)
+     if (chore.isRecurring) {
+      const todayString = getLocalTodayString();
+      // If next occurrence is already due, discard stale snapshot — doRecurringChores fetches fresh
+      if (!chore.nextDue || chore.nextDue <= todayString) return acc;
 
-         // Define the Expiry for Recurring Chores
-         const currentDue = stringToDate(choreC.dueDate);
-         currentDue.setDate(currentDue.getDate() + (choreC.intervalDays || 0));
-         const choreNextDueString = getLocalTodayString(currentDue);
-         const todayString = getLocalTodayString();
-
-          // update the chore's dueDate so it persists correctly
-         choreC.dueDate = choreNextDueString;
-
-         if (choreNextDueString > todayString) {
-            //if chore is outstanding, and next occurance of chore isn't due yet, add it to todays chorelist
+      // Not due again yet AND incomplete — roll it over 
+      if (chore.completionStatus < 1) {
+         let choreC = { ...chore };
+         if (choreC.completionStatus === 0.5) {
+            choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
             choreC.completionStatus = 0;
-
-            acc.push(choreC);
          }
-      }
-
-      if (choreC.completionStatus < 1 && !choreC.isRecurring) {
-         // get all incomplete chores - except recurring (dealt with above and below)
          acc.push(choreC);
       }
       return acc;
-   }, []);   // initial value of acc must be set to [] here;)
+   }
+
+   
+   // Non-recurring: roll over if incomplete
+   let choreC = { ...chore };
+   if (choreC.completionStatus === 0.5) {
+      choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
+      choreC.completionStatus = 0;
+   }
+   if (choreC.completionStatus < 1) acc.push(choreC);
+   return acc;
+}, []);  // initial value of acc must be set to [] here;)
 
 }
 
@@ -206,7 +201,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       // first, must make sure daily record for 'date' doesn't exist already -  ie must check yesterday's date (today's would have been checked above)
       let isYesterday = (date == addDaysToDateString(getLocalTodayString(), -1));
       if(isYesterday){
-         //yesterday
+         //incase button triggers create yesterday's record and it already exists
          if(recentRecord.dueDate == date){
             return recentRecord;       // just return yesterday's record since it already exists
          }

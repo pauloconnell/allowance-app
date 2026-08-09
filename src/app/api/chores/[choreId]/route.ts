@@ -103,7 +103,7 @@ const { choreId } = await context.params;
       const body = (await request.json()) as Partial<IChoreFormData>;
 
       // Only allow updating these fields
-      if (body.taskName) chore.taskName = body.taskName;
+      if (body.taskName !== undefined) chore.taskName = body.taskName;
       if (body.rewardAmount !== undefined) chore.rewardAmount = body.rewardAmount;
       if (body.isRecurring !== undefined) chore.isRecurring = body.isRecurring;
       if (body.intervalDays !== undefined) chore.intervalDays = body.intervalDays;
