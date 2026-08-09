@@ -75,10 +75,16 @@ export default function NewChoreForm({ chore, familyId }: ChoreFormProps) {
       const method = isUpdating ? 'PUT' : 'POST';
       let id=toast.loading("saving...");
       try {
+         const cleanPayload = {
+         ...payload,
+         intervalDays: payload.intervalDays === '' ? null : Number(payload.intervalDays)
+         
+         };
+
          const res = await fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...payload, familyId }), // Pure data + family link
+            body: JSON.stringify({ ...cleanPayload, familyId }), // Pure data + family link
          });
 
          if (!res.ok) {
