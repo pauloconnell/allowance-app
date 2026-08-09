@@ -116,7 +116,7 @@ const { choreId } = await context.params;
 
       const normalized = normalizeRecord(chore.toObject());
       return NextResponse.json(normalized);
-   } catch (err) {
+   } catch (err:any) {
       console.error('PUT /api/chores/[choreId] error:', err);
       return NextResponse.json(
          { error: 'Failed to update chore', detail: err.message  },
