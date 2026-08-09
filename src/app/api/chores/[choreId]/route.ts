@@ -4,6 +4,7 @@ import { getAuthSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/auth/rbac';
 import { normalizeRecord } from '@/lib/utils/normalizeRecord';
 import type { IChoreFormData } from '@/types/IChore';
+import { connectDB } from '@/lib/mongodb';
 
 
 type RouteContext = {
@@ -65,6 +66,7 @@ export async function PUT(
 const { choreId } = await context.params;
 
    try {
+      await connectDB(); 
       const session = await getAuthSession();
       if (!session) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -117,7 +119,7 @@ const { choreId } = await context.params;
    } catch (err) {
       console.error('PUT /api/chores/[choreId] error:', err);
       return NextResponse.json(
-         { error: 'Failed to update chore' },
+         { error: 'Failed to update chore', detail: err.message  },
          { status: 500 }
       );
    }
