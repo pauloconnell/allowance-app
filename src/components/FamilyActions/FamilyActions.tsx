@@ -28,7 +28,7 @@ export default async function FamilyActions() {
          >
             {isLoggedIn ? 'Go to Dashboard' : 'Get Started Free'}
          </a>
-         {isLoggedIn && families.length > 0 && (
+         {isLoggedIn && families.length > 1 && (
             <div className="w-full sm:w-auto">
                <FamilySwitcher families={families} activeFamilyId={''} />
             </div>
