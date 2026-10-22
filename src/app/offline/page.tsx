@@ -52,7 +52,7 @@ export default function OfflinePage() {
         <p className="text-gray-600 mb-8">
           {isReconnecting 
             ? "Connection found! Reconnecting..." 
-            : "ChorePay needs the internet to log you in. Once you're back online, we'll get you right back to your chores."}
+            : "ChorePay needs the internet to log you in. Once you're back online, we'll get you right back to it!"}
         </p>
 
         <div className="space-y-3">
