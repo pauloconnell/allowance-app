@@ -440,14 +440,14 @@ async function calculateAndApplyPayout(
    parentUserId: string
 ): Promise<IPayoutResult> {
    // Calculate total chore reward
-   const totalChoreReward = record.choresList.reduce(
+   const totalChoreReward = +record.choresList.reduce(
       (sum: number, chore: IDailyChore) => {
          // USE record/parentChoresList here:
          const reward = chore.rewardAmount * (chore.completionStatus || 0);
          return sum + reward;
       },
       0
-   );
+   ).toFixed(2);
 
    // Calculate total penalties
    const totalPenalties = record.penalties.reduce(
@@ -497,7 +497,7 @@ export function computePayoutTotals(record: any) {
       0
    );
 
-   const netPayout = Math.max(0, totalChoreReward - totalPenalties);
+   const netPayout = +Math.max(0, totalChoreReward - totalPenalties).toFixed(2);
 
    return {
       totalChoreReward,
