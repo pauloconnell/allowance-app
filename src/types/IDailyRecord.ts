@@ -8,7 +8,6 @@ export interface IDailyRecord {
    _id: string;
    familyId: string;
    childId: string;
-   date: Date | string;
    recordDate: string;    // ISO date string YYYY-MM-DD — the date this record belongs to
    dueDate?: string;      // @deprecated — use recordDate
    choresList: IDailyChore[];

@@ -47,7 +47,6 @@ const DailyRecordSchema = new Schema(
       },
       recordDate: { type: String, index: true },
       dueDate: { type: String, index: true },   // kept for old documents
-      date: { type: String, index: true },            // used to send today's date of penalty to server to potentially create new record for today(without utc time shift)
       // Use the ChoreSchema as a subdocument array
       choresList: [ChoreEntrySchema],
       copyOfChildChoresSubmitted: [ChoreEntrySchema], // snapshot of chores at submission  by child for reference (immutable after submission)

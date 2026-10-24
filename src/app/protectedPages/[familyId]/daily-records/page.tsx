@@ -60,7 +60,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
 
    let isTodaysRecord = false;
    if (records.length > 0) {
-      isTodaysRecord = isSameDay(records[0].dueDate, today);
+      isTodaysRecord = isSameDay(records[0].recordDate, today);
     //  console.log(
       //    'Page has: today is ',
       //    today,
@@ -232,7 +232,7 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
   // check every record to ensure it doesn't have yesterday's record - if not, show button
    // old way: records[0].dueDate !== addDaysToDateString(getLocalTodayString(), -1)
 let noYesterday = records.every(r =>
-  r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+  r.recordDate !== addDaysToDateString(getLocalTodayString(), -1)
 ); 
 
 return (noYesterday && childId) && (
@@ -320,7 +320,7 @@ return (noYesterday && childId) && (
                                     <div className="flex justify-between items-start">
                                        <div>
                                           <h3 className="font-medium">
-                                             {record.dueDate}
+                                             {record.recordDate}
                                              {isLive && (
                                                 <span className="ml-2 text-green-600">
                                                    (Live)
