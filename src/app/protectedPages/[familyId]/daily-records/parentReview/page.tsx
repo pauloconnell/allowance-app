@@ -141,13 +141,13 @@ export default async function DailyRecordsPage({ params, searchParams }: PagePro
                )}
 
 Last 2 Records:{
-records[0].dueDate}<br/>
- {records[1].dueDate }<br/>
+records[0].recordDate}<br/>
+ {records[1].recordDate }<br/>
 
 yesterday: {addDaysToDateString(getLocalTodayString(), -1)}<br/>
 
 {records.every(r =>
-  r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+  r.recordDate !== addDaysToDateString(getLocalTodayString(), -1)
 ).toString()
 }
 
@@ -155,9 +155,8 @@ yesterday: {addDaysToDateString(getLocalTodayString(), -1)}<br/>
   {        (()=>{
  
   // check every record to ensure it doesn't have yesterday's record - if not, show button
-   // old way: records[0].dueDate !== addDaysToDateString(getLocalTodayString(), -1)
 let noYesterday = records.every(r =>
-  r.dueDate !== addDaysToDateString(getLocalTodayString(), -1)
+  r.recordDate !== addDaysToDateString(getLocalTodayString(), -1)
 ); 
 
 return (noYesterday && childId) && (
@@ -198,9 +197,9 @@ return (noYesterday && childId) && (
                                   
                                        
                                        <span className="font-semibold">
-                                          {new Date(record.dueDate + "T12:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+                                          {new Date(record.recordDate + "T12:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
 
-         {record.dueDate}
+         {record.recordDate}
                                        </span>
                                        <span className="hidden sm:block"> Earned: ${record.totalReward}</span>
                                     

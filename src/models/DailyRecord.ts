@@ -45,7 +45,8 @@ const DailyRecordSchema = new Schema(
          required: true,
          index: true
       },
-      dueDate: { type: String, index: true },         
+      recordDate: { type: String, index: true },
+      dueDate: { type: String, index: true },   // kept for old documents
       date: { type: String, index: true },            // used to send today's date of penalty to server to potentially create new record for today(without utc time shift)
       // Use the ChoreSchema as a subdocument array
       choresList: [ChoreEntrySchema],
@@ -83,7 +84,7 @@ const DailyRecordSchema = new Schema(
 );
 
 // High-performance compound indexes
-DailyRecordSchema.index({ familyId: 1, childId: 1, dueDate: -1 }, { unique: true });
+DailyRecordSchema.index({ familyId: 1, childId: 1, recordDate: -1 }, { unique: true });
 
 
 export default mongoose.models.DailyRecord ||
