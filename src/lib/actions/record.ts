@@ -54,7 +54,7 @@ export async function handleCreateRecordForYesterday(formData: FormData) {  //ch
   const existingRecord = await DailyRecord.findOne({
     childId,
     familyId,
-    date,
+    recordDate: date,
   });
 
   if (existingRecord) {

@@ -104,17 +104,17 @@ export default async function ParentReviewDailyRecordDetailPage({
       );
    }
 
-   const recordDate = new Date(record?.dueDate);
+   const recordDate = new Date(record?.recordDate);
   // recordDate.setHours(0, 0, 0, 0);
-   const isToday = new Date().toDateString() === record.dueDate; //.toDateString();
+   const isToday = new Date().toDateString() === record.recordDate; //.toDateString();
 
    // determine if viewing today's record
    const today = new Date();
    today.setHours(0, 0, 0, 0);
    let isTodaysRecord = false;
 
-   if (record && record.dueDate) {
-      isTodaysRecord = isSameDay(record.dueDate, today);
+   if (record && record.recordDate) {
+      isTodaysRecord = isSameDay(record.recordDate, today);
    }
 
    // if (!isTodaysRecord && childId) {
@@ -144,7 +144,7 @@ export default async function ParentReviewDailyRecordDetailPage({
    const activePenalties = record.penalties.filter((penalty: any) => {
       const start = new Date(penalty.date);
       const end = new Date(penalty.endDate);
-      const current = new Date(record.dueDate);
+      const current = new Date(record.recordDate);
       return start <= current && current <= end;                                       // only show this penalty if it's currently in effect on date of record
    });
 
@@ -160,9 +160,9 @@ export default async function ParentReviewDailyRecordDetailPage({
                </Link>
                <h1 className="text-3xl font-bold text-secondary-900">
                   Daily Record -                          
-                                          {new Date(record.dueDate + "T12:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+                                          {new Date(record.recordDate + "T12:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
 
-         {record.dueDate}
+         {record.recordDate}
                   {isToday && <span className="ml-2 text-green-600">(Today)</span>}
                </h1>
                {child && (

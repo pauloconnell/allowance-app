@@ -168,7 +168,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    try {
       // 1. Fetch the 2 most recent records in ONE call
       const recentRecords: IDailyRecord[] = await DailyRecord.find({ childId, familyId })
-         .sort({ dueDate: -1 })
+         .sort({ recordDate: -1 })
          .limit(2)
          .lean();
       recentRecord = recentRecords[0];
@@ -176,9 +176,9 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
 
       // 2. CHECK: If it exists AND it's already today, stop and return it
       if (recentRecord && isSameDay(
-         typeof recentRecord.dueDate === 'string'
-            ? recentRecord.dueDate.substring(0, 10)
-            : recentRecord.dueDate,
+         typeof recentRecord.recordDate === 'string'
+            ? recentRecord.recordDate.substring(0, 10)
+            : recentRecord.recordDate,
          today                                              // compare to today
       )) {
          console.log("Record already exists for today:", today);
@@ -202,7 +202,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
       let isYesterday = (date == addDaysToDateString(getLocalTodayString(), -1));
       if(isYesterday){
          //incase button triggers create yesterday's record and it already exists
-         if(recentRecord.dueDate == date){
+         if(recentRecord.recordDate == date){
             return recentRecord;       // just return yesterday's record since it already exists
          }
       }
@@ -244,7 +244,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    const newRecord = new DailyRecord({
       childId,
       familyId,
-      dueDate: date,
+      recordDate: date,
       choresList,
       isSubmitted: false,
       isApproved: false,
@@ -280,7 +280,7 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    } catch (err: any) {
       // 11000 = Duplicate Key (Unique Index triggered)
       if (err.code === 11000) {
-         const collisionRecord = await DailyRecord.findOne({ childId, familyId, dueDate: date }).lean();
+         const collisionRecord = await DailyRecord.findOne({ childId, familyId, recordDate: date }).lean();
          return normalizeRecord(collisionRecord!) as IDailyRecord;
       }
       throw err;
@@ -366,7 +366,7 @@ export async function getRecordsNeedingApproval(
       familyId,
       isSubmitted: true,
       isApproved: false,
-      dueDate: { $lte: getLocalTodayString() },
+      recordDate: { $lte: getLocalTodayString() },
    };
 
    //console.log("adding childId", { childId })
@@ -374,7 +374,7 @@ export async function getRecordsNeedingApproval(
       query.childId = childId;
    }
 
-   const records = await DailyRecord.find(query).sort({ dueDate: -1 });
+   const records = await DailyRecord.find(query).sort({ recordDate: -1 });
 
    return records.map((r) => normalizeRecord(r) as IDailyRecord);
 }
@@ -518,15 +518,11 @@ export async function getChildDailyRecords(
    // add in RBAC and userId validation later
 
    // 1. Start with the mandatory start date
-   const dueDateFilter: any = {
-      $gte: startDate
-   };
-
    const records = await DailyRecord.find({
       childId,
       familyId,
-      dueDate: dueDateFilter,
-   }).sort({ dueDate: -1 });
+      recordDate: { $gte: startDate },
+   }).sort({ recordDate: -1 });
 
    return records.map((r) => normalizeRecord(r) as IDailyRecord);
 }
@@ -545,11 +541,11 @@ export async function getFamilyDailyRecords(
 
    const records = await DailyRecord.find({
       familyId,
-      dueDate: {
+      recordDate: {
          $gte: startDate,
          $lte: endDate,
       },
-   }).sort({ dueDate: -1 });
+   }).sort({ recordDate: -1 });
 
    return records.map((r) => normalizeRecord(r) as IDailyRecord);
 }

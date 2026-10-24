@@ -86,7 +86,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
 
    let isTodaysRecord = false;
    if (record) {
-      isTodaysRecord = isSameDay(record.dueDate, today);
+      isTodaysRecord = isSameDay(record.recordDate, today);
    }
 
    if (!isTodaysRecord && childId && isOffline) {
@@ -166,7 +166,7 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
    const activePenalties = record.penalties.filter((penalty: any) => {
       const start = penalty.date;
       const end = penalty.endDate;
-      const current = record.dueDate;
+      const current = record.recordDate;
      // console.log('do we have one?', start, current, end);
       return start <= current && current <= end; // only show this penalty if it's currently in effect on date of record
    });
@@ -186,8 +186,8 @@ export default async function DailyRecordDetailPage({ params, searchParams }: Pa
                   Daily Record:
                   <div>
                      
-{new Date(record.dueDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
-                   {record.dueDate}
+{new Date(record.recordDate + "T00:00").toLocaleDateString("en-US", { weekday: "long" })} { ' '}
+                   {record.recordDate}
                      {isTodaysRecord && (
                         <span className="ml-2 text-green-600">(Today)</span>
                      )}

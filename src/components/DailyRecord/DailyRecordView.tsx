@@ -75,7 +75,7 @@ export function DailyRecordView({
          <div className="mb-6">
             <h2 className="text-2xl font-bold mb-2">{child.name}'s Daily Record</h2>
             <p className="text-gray-600 mb-4">
-               {new Date(dailyRecord.date).toLocaleDateString('en-US', {
+               {new Date(dailyRecord.recordDate + 'T12:00').toLocaleDateString('en-US', {
                   weekday: 'long',
                   month: 'long',
                   day: 'numeric',

@@ -15,7 +15,7 @@ import type { IChild } from '@/types/IChild';
 import type { IDailyRecord } from '@/types/IDailyRecord';
 import { useEffect } from 'react';
 import ChildRecordStoreInitializer from '@/components/StoreInitializers/ChildRecordStoreInitializer';
-import { isSameDay } from '@/lib/utils/dateHelper';
+import { isSameDay, getLocalTodayString } from '@/lib/utils/dateHelper';
 import { handleCreateRecordForToday } from '@/lib/actions/record';
 
 interface PageProps {
@@ -57,11 +57,9 @@ export default async function ChildDailyRecordsPage({ params, searchParams }: Pa
    }
 
    // determine if viewing today's record
-   const today = new Date();
-   today.setHours(0, 0, 0, 0);
    let isTodaysRecord = false;
    if (records.length > 0) {
-      isTodaysRecord = isSameDay(records[0].date, today);
+      isTodaysRecord = isSameDay(records[0].recordDate, getLocalTodayString());
    }
 
 
@@ -242,10 +240,7 @@ export default async function ChildDailyRecordsPage({ params, searchParams }: Pa
                      {records.length > 0 ? (
                         <div className="space-y-4">
                            {records.map((record: any) => {
-                              const recordDate = new Date(record.date);
-                              const todayStr = new Date().toISOString().substring(0, 10);
-                              const recordDateStr = recordDate.toISOString().substring(0, 10);
-                              const isLive = recordDateStr === todayStr;
+                              const isLive = record.recordDate === getLocalTodayString();
 
                               return (
                                  <div
@@ -259,7 +254,7 @@ export default async function ChildDailyRecordsPage({ params, searchParams }: Pa
                                     <div className="flex justify-between items-start">
                                        <div>
                                           <h3 className="font-medium">
-                                             {recordDate.toLocaleDateString()}
+                                             {record.recordDate}
                                              {isLive && (
                                                 <span className="ml-2 text-green-600">
                                                    (Live)

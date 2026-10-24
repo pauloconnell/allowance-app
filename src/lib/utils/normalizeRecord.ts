@@ -16,9 +16,14 @@ export function normalizeRecord<T extends Record<string, any>>(doc: T) {
 
   const normalized: Record<string, any> = {
     ...obj,
-    id: obj._id?.toString() ?? "", // Add a standard String 'id' field for frontend use
+    id: obj._id?.toString() ?? "",
     _id: obj._id?.toString() ?? "",
   };
+
+  // safety net for old records that only have dueDate
+  if (!normalized.recordDate && normalized.dueDate) {
+    normalized.recordDate = normalized.dueDate;
+  }
 
   // Normalize known foreign keys only if they exist (schemas keep these as objectIds for efficient querries)
   if (obj.familyId) normalized.familyId = obj.familyId.toString();

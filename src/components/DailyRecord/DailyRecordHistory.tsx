@@ -83,7 +83,7 @@ export function DailyRecordHistory({ familyId, childId }: DailyRecordHistoryProp
                         return (
                            <tr key={record._id} className="border-b hover:bg-gray-50">
                               <td className="px-4 py-3">
-                                 {new Date(record.date).toLocaleDateString()}
+                                 {new Date(record.recordDate + 'T12:00').toLocaleDateString()}
                               </td>
                               <td className="px-4 py-3">
                                  <span
