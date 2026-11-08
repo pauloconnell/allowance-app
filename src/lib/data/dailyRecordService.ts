@@ -605,7 +605,7 @@ export async function upsertPenalty(
       // Update child balance immediately for standalone penalty
       await Child.findByIdAndUpdate(
          childId,
-         { $inc: { currentBalance: -penalty.amount } },
+         { $inc: { currentBalance: -Math.round(penalty.amount * 100) / 100 } },  // can't use .toFixed(2) as that returns a string ;)
          { new: true }
       );
    }

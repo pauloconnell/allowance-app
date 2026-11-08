@@ -44,7 +44,7 @@ export default async function ChildDetailPage({ params }: PageProps) {
                      <div className="space-y-3 ml-auto">
                         <p>
                            <span className="font-medium">Balance:</span>{' '}
-                           {child ? child.currentBalance : 'Loading...'}
+                           {child ? child.currentBalance.toFixed(2) : 'Loading...'}
                         </p>
                      </div>
                   </div>
