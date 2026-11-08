@@ -10,7 +10,7 @@ export async function recordPayout(childId: string, amount: number) {
   
   // Use $inc with a negative number to subtract the amount safely
   await Child.findByIdAndUpdate(childId, { 
-    $inc: { currentBalance: -amount } 
+    $inc: { currentBalance: -Math.round(amount * 100) / 100 }   // can't use .toFixed(2) as that returns a string ;)
   });
 
   revalidatePath('/protectedPages/parent-dashboard'); 
