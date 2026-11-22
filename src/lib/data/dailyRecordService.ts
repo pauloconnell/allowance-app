@@ -39,14 +39,14 @@ export async function getRolloverChores(
         //only include recurring chores where it's not complete AND the next occurance isn't due yet  (doRecurringChores fetches fresh)
      if (chore.isRecurring) {
       const todayString = getLocalTodayString();
-      // If next occurrence is already due, discard stale snapshot — doRecurringChores fetches fresh
+      // If next occurrence is already due, discard stale snapshot — doRecurringChores fetches fresh chore list
       if (!chore.nextDue || chore.nextDue <= todayString) return acc;
 
       // Not due again yet AND incomplete — roll it over 
       if (chore.completionStatus < 1) {
          let choreC = { ...chore };
          if (choreC.completionStatus === 0.5) {
-            choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
+            choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);   // note the + converts the string(toFixed()) back to a number
             choreC.completionStatus = 0;
          }
          acc.push(choreC);
