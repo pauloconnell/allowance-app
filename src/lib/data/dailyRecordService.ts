@@ -22,29 +22,27 @@ import { isSameDay, getLocalTodayString, stringToDate, addDaysToDateString } fro
 export async function getRolloverChores(
    childId: string,
    familyId: string, 
-   latestRecord: IDailyRecord
+   latestRecord: IDailyRecord,
+   freshChoresList: IDailyChore[]
 ): Promise<IDailyChore[]> {
-   //const [latestRecord] = await DailyRecord.find({ childId, familyId })              // optimized to just get record from calling function which already has it
-   //   .sort({ dueDate: -1 })
-   //   .limit(1);
-
    const prevRecord = latestRecord ? latestRecord : null;
    if (!prevRecord) return [];
-   // should already be normalized now that we are not getting it from DB bueno?      prevRecord.choresList = (normalizeRecord(prevRecord.choresList));
 
-   // Return chores with completionStatus === 0
-   // return prevRecord.choresList.filter((chore: IDailyChore) => chore.completionStatus < 1);
+   const freshChoresMap = new Map(
+      freshChoresList.map((c: IDailyChore) => [c.choreId.toString(), c])
+   );
+
    return prevRecord.choresList.reduce((acc: IDailyChore[], chore: IDailyChore) => {
-      let rewardAmount = 0;
-        //only include recurring chores where it's not complete AND the next occurance isn't due yet  (doRecurringChores fetches fresh)
      if (chore.isRecurring) {
       const todayString = getLocalTodayString();
-      // If next occurrence is already due, discard stale snapshot — doRecurringChores fetches fresh
+      // If next occurrence is already due, discard stale snapshot — doRecurringChores fetches fresh chore list
       if (!chore.nextDue || chore.nextDue <= todayString) return acc;
 
-      // Not due again yet AND incomplete — roll it over 
+      // Not due again yet AND incomplete — roll it over with fresh definition
       if (chore.completionStatus < 1) {
-         let choreC = { ...chore };
+         const fresh = freshChoresMap.get(chore.choreId.toString()) as IDailyChore | undefined;
+         if (!fresh) return acc; // chore was removed from child's list, don't roll over
+         let choreC: IDailyChore = { ...fresh, completionStatus: chore.completionStatus, nextDue: chore.nextDue };
          if (choreC.completionStatus === 0.5) {
             choreC.rewardAmount = +(choreC.rewardAmount / 2).toFixed(2);
             choreC.completionStatus = 0;
@@ -76,23 +74,18 @@ export async function getRolloverChores(
 export async function doRecurringChores(
    familyId: string,
    childId: string,
-   existingChoreIds: string[]
+   existingChoreIds: string[],
+   freshChoresList: IDailyChore[]
 ): Promise<IDailyChore[]> {
 
-   let child = await Child.findById(childId).lean(); // get child's assigned chores = use .lean() = plain array = faster ;)
-
-   child = normalizeRecord(child);
-
-   if (!child || !child.choresList) return [];
+   if (!freshChoresList.length) return [];
    const todayStr = getLocalTodayString();
    const scheduled: IDailyChore[] = [];
-
-   // 2. Filter the master list for active chores due today that aren't already rolled over - update any chores rolled over to reschedule based on today ( if recurring)
 
    const choresToProcess: IDailyChore[] = [];
    const updatePromises: Promise<any>[] = [];
 
-   for (const chore of child.choresList || []) {
+   for (const chore of freshChoresList) {
       const choreDueDateStr = chore.dueDate;
 
       //console.log("chore due?", choreDueDateStr, todayStr)
@@ -215,14 +208,16 @@ export async function getOrCreateTodaysDailyRecord( // too many things here -> s
    //if (recentRecord) {    // skip this if it's child's first day ie no daily record
 
 
-      // Get rollover chores from yesterday
-      rolloverChores = await getRolloverChores(childId, familyId, recentRecord);
+   // Fetch child's choresList once for both rollover and recurrence
+   const freshChild = normalizeRecord(await Child.findById(childId).lean());
+   const freshChoresList: IDailyChore[] = freshChild?.choresList || [];
 
-   
+      // Get rollover chores from yesterday
+      rolloverChores = await getRolloverChores(childId, familyId, recentRecord, freshChoresList);
 
    // Get recurring chores
    const existingChoreIds = rolloverChores?.map((c) => c?.choreId.toString());
-   const recurringChores = await doRecurringChores(familyId, childId, existingChoreIds); // this auto re-schedules next re-curring chore
+   const recurringChores = await doRecurringChores(familyId, childId, existingChoreIds, freshChoresList); // this auto re-schedules next re-curring chore
 
    // Combine chores
    const choresList: IDailyChore[] = [...rolloverChores, ...recurringChores];
